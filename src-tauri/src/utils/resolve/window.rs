@@ -59,10 +59,10 @@ pub async fn build_new_window() -> Result<WebviewWindow, String> {
         "main", /* the unique window label */
         tauri::WebviewUrl::App(start_page.into()),
     )
-    .title("Clash Verge")
+    .title("SubLinks Client")
     .center()
     // Using WindowManager::prefer_system_titlebar to control if show system built-in titlebar
-    // .decorations(true)
+    .decorations(false)
     .fullscreen(false)
     .inner_size(DEFAULT_WIDTH, DEFAULT_HEIGHT)
     .min_inner_size(MINIMAL_WIDTH, MINIMAL_HEIGHT)

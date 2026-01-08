@@ -130,6 +130,25 @@
         "global": "모든 네트워크 요청을 선택한 프록시를 통해 전달합니다.",
         "direct": "프록시를 우회하여 직접 인터넷에 연결합니다."
       }
+    },
+    "welcomeBanner": {
+      "greetings": {
+        "earlyMorning": "좋은 새벽",
+        "morning": "좋은 아침",
+        "forenoon": "좋은 오전",
+        "noon": "점심 시간",
+        "afternoon": "좋은 오후",
+        "evening": "좋은 저녁",
+        "night": "좋은 밤",
+        "lateNight": "늦은 밤"
+      },
+      "hitokoto": {
+        "loading": "로딩 중...",
+        "fallback": "로드 실패"
+      },
+      "tooltips": {
+        "refreshBackground": "배경 새로고침"
+      }
     }
   }
 }

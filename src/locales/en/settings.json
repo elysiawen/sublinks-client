@@ -1,10 +1,5 @@
 {
   "page": {
-    "actions": {
-      "manual": "Manual",
-      "telegram": "Telegram Channel",
-      "github": "Github Repo"
-    },
     "title": "Settings"
   },
   "sections": {
@@ -124,6 +119,10 @@
     }
   },
   "components": {
+    "sidebar": {
+      "title": "Sidebar Settings",
+      "essential": "Essential (Cannot be disabled)"
+    },
     "verge": {
       "basic": {
         "title": "Verge Basic Setting",
@@ -145,7 +144,8 @@
           "themeSetting": "Theme Setting",
           "layoutSetting": "Layout Setting",
           "misc": "Miscellaneous",
-          "hotkeySetting": "Hotkey Setting"
+          "hotkeySetting": "Hotkey Setting",
+          "miniWindow": "Mini Window"
         }
       },
       "advanced": {

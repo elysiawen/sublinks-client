@@ -1,10 +1,5 @@
 {
   "page": {
-    "actions": {
-      "manual": "Manual",
-      "telegram": "Saluran Telegram",
-      "github": "Repositori Github"
-    },
     "title": "Pengaturan"
   },
   "sections": {
@@ -33,10 +28,6 @@
         "systemProxy": "Aktifkan untuk mengubah pengaturan proksi sistem operasi. Jika pengaktifan gagal, ubah pengaturan proksi sistem operasi secara manual",
         "tunMode": "Mode Tun (NIC Virtual): Menangkap semua lalu lintas sistem, saat diaktifkan, tidak perlu mengaktifkan proksi sistem.",
         "tunUnavailable": "TUN requires Service Mode or Admin Mode"
-      },
-      "actions": {
-        "installService": "Instal Layanan",
-        "uninstallService": "Uninstall Service"
       },
       "fields": {
         "systemProxy": "Proksi Sistem",
@@ -73,9 +64,6 @@
       },
       "placeholders": {
         "origin": "Please enter a valid url"
-      },
-      "actions": {
-        "add": "Add"
       },
       "messages": {
         "alwaysIncluded": "Always included origins: {{urls}}"
@@ -127,9 +115,6 @@
     "verge": {
       "basic": {
         "title": "Pengaturan Dasar Verge",
-        "actions": {
-          "browse": "Jelajahi"
-        },
         "trayOptions": {
           "showMainWindow": "Tampilkan Jendela Utama",
           "showTrayMenu": "Show Tray Menu",
@@ -154,9 +139,6 @@
           "backupInfo": "Mendukung file konfigurasi cadangan WebDAV",
           "openConfDir": "Jika perangkat lunak berjalan tidak normal, CADANGKAN dan hapus semua file di folder ini lalu mulai ulang perangkat lunak",
           "liteMode": "Tutup GUI dan biarkan hanya kernel yang berjalan"
-        },
-        "actions": {
-          "copyVersion": "Copy Version"
         },
         "notifications": {
           "latestVersion": "Saat ini pada Versi Terbaru",
@@ -189,9 +171,6 @@
           "successColor": "Warna Keberhasilan",
           "fontFamily": "Keluarga Font",
           "cssInjection": "Injeksi CSS"
-        },
-        "actions": {
-          "editCss": "Edit CSS"
         },
         "dialogs": {
           "editCssTitle": "Edit CSS"
@@ -253,9 +232,6 @@
         "redir": "Port Redir",
         "tproxy": "Port Tproxy"
       },
-      "actions": {
-        "random": "Port Acak"
-      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "Port settings saved",
@@ -270,9 +246,6 @@
     },
     "liteMode": {
       "title": "LightWeight Mode Settings",
-      "actions": {
-        "enterNow": "Enter LightWeight Mode Now"
-      },
       "toggles": {
         "autoEnter": "Auto Enter LightWeight Mode"
       },
@@ -291,17 +264,6 @@
       "tabs": {
         "local": "Local backup",
         "webdav": "WebDAV backup"
-      },
-      "actions": {
-        "selectTarget": "Select backup target",
-        "backup": "Cadangan",
-        "export": "Export",
-        "exportBackup": "Export Backup",
-        "importBackup": "Import Backup",
-        "deleteBackup": "Hapus Cadangan",
-        "restore": "Pulihkan",
-        "restoreBackup": "Pulihkan Cadangan",
-        "viewHistory": "View history"
       },
       "fields": {
         "webdavUrl": "URL Server WebDAV",
@@ -398,10 +360,6 @@
     },
     "update": {
       "title": "New Version v{{version}}",
-      "actions": {
-        "goToRelease": "Pergi ke Halaman Rilis",
-        "update": "Perbarui"
-      },
       "messages": {
         "portableError": "Versi portabel tidak mendukung pembaruan dalam aplikasi. Harap unduh dan ganti secara manual",
         "breakChangeError": "Versi ini adalah pembaruan besar dan tidak mendukung pembaruan dalam aplikasi. Harap hapus instalasi dan unduh serta instal versi baru secara manual"
@@ -554,9 +512,6 @@
       }
     },
     "webUI": {
-      "actions": {
-        "openUrl": "Buka URL"
-      },
       "title": "Antarmuka Web",
       "messages": {
         "supportedPlaceholders": "Dukung %host, %port, %secret",

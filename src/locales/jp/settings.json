@@ -1,10 +1,5 @@
 {
   "page": {
-    "actions": {
-      "manual": "マニュアル",
-      "telegram": "Telegramチャンネル",
-      "github": "GitHubリポジトリ"
-    },
     "title": "設定"
   },
   "sections": {
@@ -33,10 +28,6 @@
         "systemProxy": "オペレーティングシステムのプロキシ設定を変更します。有効にできない場合は、手動でオペレーティングシステムのプロキシ設定を変更してください。",
         "tunMode": "TUN（仮想ネットワークカード）モードはシステムのすべてのトラフィックを制御します。有効にすると、システムプロキシを開く必要はありません。",
         "tunUnavailable": "TUNモードはサービスモードまたは管理者モードが必要です"
-      },
-      "actions": {
-        "installService": "サービスをインストール",
-        "uninstallService": "サービスのアンインストール"
       },
       "fields": {
         "systemProxy": "システムプロキシ",
@@ -73,9 +64,6 @@
       },
       "placeholders": {
         "origin": "有効なURLを入力してください"
-      },
-      "actions": {
-        "add": "追加"
       },
       "messages": {
         "alwaysIncluded": "常に含まれるオリジン: {{urls}}"
@@ -127,9 +115,6 @@
     "verge": {
       "basic": {
         "title": "Verge基本設定",
-        "actions": {
-          "browse": "参照"
-        },
         "trayOptions": {
           "showMainWindow": "メインウィンドウを表示",
           "showTrayMenu": "トレイメニューを表示",
@@ -154,9 +139,6 @@
           "backupInfo": "WebDAVを使用した設定ファイルのバックアップをサポートします。",
           "openConfDir": "アプリケーションが正常に動作しない場合は、このフォルダ内のすべてのファイルを!バックアップ!して削除し、アプリケーションを再起動してください。",
           "liteMode": "GUIを閉じて、コアのみを実行します。"
-        },
-        "actions": {
-          "copyVersion": "Copy Version"
         },
         "notifications": {
           "latestVersion": "現在は最新バージョンです。",
@@ -189,9 +171,6 @@
           "successColor": "成功色",
           "fontFamily": "フォントファミリー",
           "cssInjection": "CSSインジェクション"
-        },
-        "actions": {
-          "editCss": "Edit CSS"
         },
         "dialogs": {
           "editCssTitle": "Edit CSS"
@@ -253,9 +232,6 @@
         "redir": "Redir透明プロキシポート",
         "tproxy": "TPROXY透明プロキシポート"
       },
-      "actions": {
-        "random": "ランダムポート"
-      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "Port settings saved",
@@ -270,9 +246,6 @@
     },
     "liteMode": {
       "title": "軽量モード設定",
-      "actions": {
-        "enterNow": "今すぐ軽量モードに入る"
-      },
       "toggles": {
         "autoEnter": "自動的に軽量モードに入る"
       },
@@ -291,17 +264,6 @@
       "tabs": {
         "local": "Local backup",
         "webdav": "WebDAV backup"
-      },
-      "actions": {
-        "selectTarget": "Select backup target",
-        "backup": "バックアップ",
-        "export": "Export",
-        "exportBackup": "Export Backup",
-        "importBackup": "バックアップをインポート",
-        "deleteBackup": "バックアップを削除",
-        "restore": "復元",
-        "restoreBackup": "バックアップを復元",
-        "viewHistory": "View history"
       },
       "fields": {
         "webdavUrl": "WebDAVサーバーのURL http(s)://",
@@ -398,10 +360,6 @@
     },
     "update": {
       "title": "New Version v{{version}}",
-      "actions": {
-        "goToRelease": "リリースページに移動",
-        "update": "更新"
-      },
       "messages": {
         "portableError": "ポータブル版ではアプリケーション内での更新はサポートされていません。手動でダウンロードして置き換えてください。",
         "breakChangeError": "このバージョンは重大な更新であり、アプリケーション内での更新はサポートされていません。アンインストールしてから手動でダウンロードしてインストールしてください。"
@@ -554,9 +512,6 @@
       }
     },
     "webUI": {
-      "actions": {
-        "openUrl": "URLを開く"
-      },
       "title": "Webインターフェース",
       "messages": {
         "supportedPlaceholders": "%host, %port, %secretをサポートします。",

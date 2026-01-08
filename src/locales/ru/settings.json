@@ -1,10 +1,5 @@
 {
   "page": {
-    "actions": {
-      "manual": "Документация",
-      "telegram": "Telegram-канал",
-      "github": "GitHub репозиторий"
-    },
     "title": "Настройки"
   },
   "sections": {
@@ -33,10 +28,6 @@
         "systemProxy": "Разрешить изменение настроек прокси-сервера операционной системы. Если разрешение не удастся, измените настройки прокси-сервера операционной системы вручную",
         "tunMode": "Режим Tun: захватывает весь системный трафик, при включении нет необходимости включать системный прокси-сервер.",
         "tunUnavailable": "TUN requires Service Mode or Admin Mode"
-      },
-      "actions": {
-        "installService": "Установить службу",
-        "uninstallService": "Uninstall Service"
       },
       "fields": {
         "systemProxy": "Системный прокси",
@@ -73,9 +64,6 @@
       },
       "placeholders": {
         "origin": "Введите корректный URL"
-      },
-      "actions": {
-        "add": "Добавить"
       },
       "messages": {
         "alwaysIncluded": "Всегда включаемые источники: {{urls}}"
@@ -127,9 +115,6 @@
     "verge": {
       "basic": {
         "title": "Основные настройки Verge",
-        "actions": {
-          "browse": "Просмотреть"
-        },
         "trayOptions": {
           "showMainWindow": "Показать главное окно",
           "showTrayMenu": "Показать меню в трее",
@@ -154,9 +139,6 @@
           "backupInfo": "Поддерживает файлы конфигурации резервного копирования WebDAV",
           "openConfDir": "Если программное обеспечение работает неправильно, сделайте резервную копию и удалите все файлы в этой папке, а затем перезапустите ПО",
           "liteMode": "Режим, в котором работает только ядро Clash, а графический интрефейс закрыт"
-        },
-        "actions": {
-          "copyVersion": "Copy Version"
         },
         "notifications": {
           "latestVersion": "Обновление не требуется",
@@ -189,9 +171,6 @@
           "successColor": "Цвет успеха",
           "fontFamily": "Семейство шрифтов",
           "cssInjection": "Внедрение CSS"
-        },
-        "actions": {
-          "editCss": "Edit CSS"
         },
         "dialogs": {
           "editCssTitle": "Edit CSS"
@@ -253,9 +232,6 @@
         "redir": "Порт прозрачного прокси Redir",
         "tproxy": "Порт прозрачного прокси Tproxy"
       },
-      "actions": {
-        "random": "Случайный порт"
-      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "Port settings saved",
@@ -270,9 +246,6 @@
     },
     "liteMode": {
       "title": "Настройки LightWeight Mode",
-      "actions": {
-        "enterNow": "Войти в LightWeight Mode"
-      },
       "toggles": {
         "autoEnter": "Автоматический вход в LightWeight Mode"
       },
@@ -291,17 +264,6 @@
       "tabs": {
         "local": "Local backup",
         "webdav": "WebDAV backup"
-      },
-      "actions": {
-        "selectTarget": "Select backup target",
-        "backup": "Резервное копирование",
-        "export": "Export",
-        "exportBackup": "Export Backup",
-        "importBackup": "Import Backup",
-        "deleteBackup": "Удалить резервную копию",
-        "restore": "Восстановить",
-        "restoreBackup": "Восстановить резервную копию",
-        "viewHistory": "View history"
       },
       "fields": {
         "webdavUrl": "URL-адрес сервера WebDAV http(s)://",
@@ -398,10 +360,6 @@
     },
     "update": {
       "title": "New Version v{{version}}",
-      "actions": {
-        "goToRelease": "Перейти на страницу релизов",
-        "update": "Обновить"
-      },
       "messages": {
         "portableError": "Портативная версия не поддерживает обновление внутри приложения, пожалуйста, скачайте и замените файлы вручную",
         "breakChangeError": "Это крупное обновление, которое не поддерживает обновление внутри приложения. Пожалуйста, удалите его и загрузите установочный файл вручную."
@@ -554,9 +512,6 @@
       }
     },
     "webUI": {
-      "actions": {
-        "openUrl": "Перейти по адресу"
-      },
       "title": "Веб-интерфейс",
       "messages": {
         "supportedPlaceholders": "Поддерживаются %host, %port, %secret",

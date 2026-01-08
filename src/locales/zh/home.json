@@ -16,11 +16,7 @@
         "currentProxy": "当前代理卡",
         "network": "网络设置卡",
         "proxyMode": "代理模式卡",
-        "traffic": "流量统计卡",
-        "tests": "网站测试卡",
-        "ip": "IP 信息卡",
-        "clashInfo": "Clash 信息卡",
-        "systemInfo": "系统信息卡"
+        "traffic": "流量统计卡"
       },
       "title": "首页设置"
     },
@@ -57,7 +53,7 @@
         "autoLaunch": "开机自启",
         "runningMode": "运行模式",
         "lastCheckUpdate": "最后检查更新",
-        "vergeVersion": "Verge 版本"
+        "vergeVersion": "客户端版本"
       },
       "actions": {
         "settings": "设置"
@@ -129,6 +125,25 @@
         "rule": "基于预设规则智能判断流量走向，提供灵活的代理策略",
         "global": "所有流量均通过代理服务器，适用于需要全局科学上网的场景",
         "direct": "所有流量不经过代理节点，但经过Clash内核转发连接目标服务器，适用于需要通过内核进行分流的特定场景"
+      }
+    },
+    "welcomeBanner": {
+      "greetings": {
+        "earlyMorning": "凌晨好",
+        "morning": "早上好",
+        "forenoon": "上午好",
+        "noon": "中午好",
+        "afternoon": "下午好",
+        "evening": "傍晚好",
+        "night": "晚上好",
+        "lateNight": "夜深了"
+      },
+      "hitokoto": {
+        "loading": "一言加载中...",
+        "fallback": "一言加载失败"
+      },
+      "tooltips": {
+        "refreshBackground": "刷新背景图"
       }
     }
   }

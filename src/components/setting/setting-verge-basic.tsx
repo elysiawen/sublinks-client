@@ -4,10 +4,10 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DialogRef, TooltipIcon } from "@/components/base";
+import { DialogRef, Switch, TooltipIcon } from "@/components/base";
 import { useVerge } from "@/hooks/use-verge";
 import { navItems } from "@/pages/_routers";
-import { copyClashEnv } from "@/services/cmds";
+import { copyClashEnv, openMiniWindow, closeMiniWindow } from "@/services/cmds";
 import { supportedLanguages } from "@/services/i18n";
 import { showNotice } from "@/services/notice-service";
 import getSystem from "@/utils/get-system";
@@ -21,7 +21,6 @@ import { MiscViewer } from "./mods/misc-viewer";
 import { SettingItem, SettingList } from "./mods/setting-comp";
 import { ThemeModeSwitch } from "./mods/theme-mode-switch";
 import { ThemeViewer } from "./mods/theme-viewer";
-import { UpdateViewer } from "./mods/update-viewer";
 
 interface Props {
   onError?: (err: Error) => void;
@@ -59,6 +58,7 @@ const SettingVergeBasic = ({ onError }: Props) => {
     tray_event,
     env_type,
     startup_script,
+    enable_mini_window,
     start_page,
   } = verge ?? {};
   const configRef = useRef<DialogRef>(null);
@@ -66,7 +66,6 @@ const SettingVergeBasic = ({ onError }: Props) => {
   const miscRef = useRef<DialogRef>(null);
   const themeRef = useRef<DialogRef>(null);
   const layoutRef = useRef<DialogRef>(null);
-  const updateRef = useRef<DialogRef>(null);
   const backupRef = useRef<DialogRef>(null);
 
   const onChangeData = (patch: any) => {
@@ -88,7 +87,6 @@ const SettingVergeBasic = ({ onError }: Props) => {
       <HotkeyViewer ref={hotkeyRef} />
       <MiscViewer ref={miscRef} />
       <LayoutViewer ref={layoutRef} />
-      <UpdateViewer ref={updateRef} />
       <BackupViewer ref={backupRef} />
 
       <SettingItem label={t("settings.components.verge.basic.fields.language")}>
@@ -273,6 +271,27 @@ const SettingVergeBasic = ({ onError }: Props) => {
         onClick={() => hotkeyRef.current?.open()}
         label={t("settings.components.verge.basic.fields.hotkeySetting")}
       />
+      <SettingItem
+        label={t("settings.components.verge.basic.fields.miniWindow")}
+      >
+        <GuardState
+          value={enable_mini_window ?? false}
+          valueProps="checked"
+          onFormat={(_e, checked) => checked}
+          onCatch={onError}
+          onChange={(e) => onChangeData({ enable_mini_window: e })}
+          onGuard={async (e: boolean) => {
+            patchVerge({ enable_mini_window: e });
+            if (e) {
+              await openMiniWindow();
+            } else {
+              await closeMiniWindow();
+            }
+          }}
+        >
+          <Switch edge="end" />
+        </GuardState>
+      </SettingItem>
     </SettingList>
   );
 };

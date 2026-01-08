@@ -4,7 +4,8 @@
       "updateAll": "更新所有订阅",
       "viewRuntimeConfig": "查看运行时订阅",
       "reactivate": "重新激活订阅",
-      "import": "导入"
+      "import": "导入",
+      "syncSubscriptions": "同步订阅列表"
     },
     "batch": {
       "actions": {

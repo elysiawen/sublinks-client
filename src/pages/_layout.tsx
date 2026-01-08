@@ -12,14 +12,17 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { LogoutRounded, PersonRounded } from "@mui/icons-material";
 import {
   Box,
   List,
   Menu,
   MenuItem,
   Paper,
-  SvgIcon,
   ThemeProvider,
+  Typography,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -29,19 +32,23 @@ import { useTranslation } from "react-i18next";
 import { Outlet, useNavigate } from "react-router";
 import { SWRConfig } from "swr";
 
-import iconDark from "@/assets/image/icon_dark.svg?react";
-import iconLight from "@/assets/image/icon_light.svg?react";
-import LogoSvg from "@/assets/image/logo.svg?react";
+import logoIcon from "@/assets/image/logo.ico";
 import { BaseErrorBoundary } from "@/components/base";
 import { LayoutItem } from "@/components/layout/layout-item";
 import { LayoutTraffic } from "@/components/layout/layout-traffic";
 import { NoticeManager } from "@/components/layout/notice-manager";
-import { UpdateButton } from "@/components/layout/update-button";
 import { WindowControls } from "@/components/layout/window-controller";
+import { SUBLINKS_CONFIG } from "@/configs/sublinks-config"; // [NEW] Import config
 import { useI18n } from "@/hooks/use-i18n";
 import { useVerge } from "@/hooks/use-verge";
 import { useWindowDecorations } from "@/hooks/use-window";
+
+// [NEW] Updated imports for cleanup
 import { useThemeMode } from "@/services/states";
+import {
+  syncSubLinksSubscriptions,
+  logoutSubLinks,
+} from "@/services/sublinks-service"; // [NEW] Updated imports
 import getSystem from "@/utils/get-system";
 
 import {
@@ -53,6 +60,7 @@ import {
 } from "./_layout/hooks";
 import { handleNoticeMessage } from "./_layout/utils";
 import { navItems } from "./_routers";
+import LoginPage from "./login"; // [NEW] Import Login Page
 
 import "dayjs/locale/ru";
 import "dayjs/locale/zh-cn";
@@ -143,7 +151,8 @@ const Layout = () => {
   const handleMenuOrderOptimisticUpdate = useCallback(
     (order: string[]) => {
       mutateVerge(
-        (prev) => (prev ? { ...prev, menu_order: order } : prev),
+        (prev: IVergeConfig | undefined) =>
+          prev ? { ...prev, menu_order: order } : prev,
         false,
       );
     },
@@ -206,10 +215,21 @@ const Layout = () => {
     () =>
       !decorated ? (
         <div className="the_titlebar" data-tauri-drag-region="true">
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: "bold",
+              opacity: 0.8,
+              pointerEvents: "none",
+              ml: 2,
+            }}
+          >
+            {SUBLINKS_CONFIG.PRODUCT_NAME}
+          </Typography>
           <WindowControls ref={windowControlsRef} />
         </div>
       ) : null,
-    [decorated],
+    [decorated, SUBLINKS_CONFIG.PRODUCT_NAME],
   );
 
   useLoadingOverlay(themeReady);
@@ -236,6 +256,54 @@ const Layout = () => {
     }
   }, [language, switchLanguage]);
 
+  const [sidebarVisibility, setSidebarVisibility] = useState<
+    Record<string, boolean>
+  >(() => {
+    const saved = localStorage.getItem(
+      SUBLINKS_CONFIG.STORAGE_KEYS.SIDEBAR_VISIBILITY,
+    );
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return {};
+      }
+    }
+    return {};
+  });
+
+  useEffect(() => {
+    const handleVisibilityUpdate = () => {
+      const saved = localStorage.getItem(
+        SUBLINKS_CONFIG.STORAGE_KEYS.SIDEBAR_VISIBILITY,
+      );
+      if (saved) {
+        try {
+          setSidebarVisibility(JSON.parse(saved));
+        } catch (e) {
+          console.error("Failed to parse sidebar visibility", e);
+        }
+      }
+    };
+    window.addEventListener(
+      "sidebar-visibility-change",
+      handleVisibilityUpdate,
+    );
+    return () =>
+      window.removeEventListener(
+        "sidebar-visibility-change",
+        handleVisibilityUpdate,
+      );
+  }, []);
+
+  const visibleMenuOrder = useMemo(() => {
+    const essentialPaths = ["/", "/settings"];
+    return menuOrder.filter(
+      (path: string) =>
+        essentialPaths.includes(path) || sidebarVisibility[path] !== false,
+    );
+  }, [menuOrder, sidebarVisibility]);
+
   if (!themeReady) {
     return (
       <div
@@ -252,6 +320,46 @@ const Layout = () => {
       ></div>
     );
   }
+
+  // [NEW] Auth Guard
+  let token = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
+  const userStr = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER);
+
+  // Handle "undefined" string from previous bugs
+  if (token === "undefined") {
+    localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
+    token = null;
+  }
+
+  let user = null;
+  try {
+    if (userStr) user = JSON.parse(userStr);
+  } catch (e) {}
+
+  // [NEW] Auto-sync subscriptions on startup
+  const syncAttempted = useRef(false);
+
+  useEffect(() => {
+    if (token && !syncAttempted.current) {
+      syncAttempted.current = true;
+      // Delay sync to allow core and app to stabilize
+      setTimeout(() => {
+        syncSubLinksSubscriptions({ silent: true });
+      }, 1000);
+    }
+  }, [token]);
+
+  if (!token) {
+    return (
+      <ThemeProvider theme={theme}>
+        <LoginPage />
+      </ThemeProvider>
+    );
+  }
+
+  const handleLogout = async () => {
+    await logoutSubLinks();
+  };
 
   return (
     <SWRConfig
@@ -323,25 +431,36 @@ const Layout = () => {
                 <div
                   data-tauri-drag-region="true"
                   style={{
-                    height: "27px",
                     display: "flex",
-                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: "8px",
                   }}
                 >
-                  <SvgIcon
-                    component={isDark ? iconDark : iconLight}
-                    style={{
-                      height: "36px",
-                      width: "36px",
-                      marginTop: "-3px",
-                      marginRight: "5px",
-                      marginLeft: "-3px",
+                  <Box
+                    component="img"
+                    src={logoIcon}
+                    sx={{
+                      height: 39,
+                      width: 39,
+                      objectFit: "contain",
                     }}
-                    inheritViewBox
                   />
-                  <LogoSvg fill={isDark ? "white" : "black"} />
+                  {!navCollapsed && (
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: "bold",
+                        color: isDark ? "white" : "black",
+                        userSelect: "none",
+                        fontSize: "1.5rem",
+                        lineHeight: 1,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {SUBLINKS_CONFIG.PRODUCT_NAME.split(" ")[0]}
+                    </Typography>
+                  )}
                 </div>
-                <UpdateButton className="the-newbtn" />
               </div>
 
               {menuUnlocked && (
@@ -373,12 +492,12 @@ const Layout = () => {
                   collisionDetection={closestCenter}
                   onDragEnd={handleMenuDragEnd}
                 >
-                  <SortableContext items={menuOrder}>
+                  <SortableContext items={visibleMenuOrder}>
                     <List
                       className="the-menu"
                       onContextMenu={handleMenuContextMenu}
                     >
-                      {menuOrder.map((path) => {
+                      {visibleMenuOrder.map((path) => {
                         const item = navItemMap.get(path);
                         if (!item) {
                           return null;
@@ -399,7 +518,7 @@ const Layout = () => {
                   className="the-menu"
                   onContextMenu={handleMenuContextMenu}
                 >
-                  {menuOrder.map((path) => {
+                  {visibleMenuOrder.map((path) => {
                     const item = navItemMap.get(path);
                     if (!item) {
                       return null;
@@ -457,6 +576,58 @@ const Layout = () => {
                   {t("layout.components.navigation.menu.restoreDefaultOrder")}
                 </MenuItem>
               </Menu>
+
+              {/* User Info & Logout */}
+              <Box
+                sx={{
+                  mx: 2,
+                  mt: "auto",
+                  mb: 1,
+                  p: 1.5,
+                  borderRadius: 2,
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "light"
+                      ? "rgba(0, 0, 0, 0.05)"
+                      : "rgba(255, 255, 255, 0.05)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    overflow: "hidden",
+                  }}
+                >
+                  <PersonRounded sx={{ fontSize: 20, mr: 1, opacity: 0.7 }} />
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography variant="body2" fontWeight="bold" noWrap>
+                      {user?.username || "User"}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      noWrap
+                      display="block"
+                    >
+                      {t("layout.components.navigation.userInfo.loggedIn")}
+                    </Typography>
+                  </Box>
+                </Box>
+                <Tooltip
+                  title={t("layout.components.navigation.userInfo.logout")}
+                >
+                  <IconButton
+                    onClick={handleLogout}
+                    size="small"
+                    sx={{ ml: 0.5 }}
+                  >
+                    <LogoutRounded fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
 
               <div className="the-traffic">
                 <LayoutTraffic />

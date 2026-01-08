@@ -1,10 +1,5 @@
 {
   "page": {
-    "actions": {
-      "manual": "문서",
-      "telegram": "Telegram 채널",
-      "github": "GitHub 저장소"
-    },
     "title": "설정"
   },
   "sections": {
@@ -33,10 +28,6 @@
         "systemProxy": "운영 체제의 프록시 설정을 수정합니다. 활성화에 실패하면 운영 체제의 프록시를 수동으로 설정하세요",
         "tunMode": "TUN(가상 NIC) 모드: 시스템 전체 트래픽을 캡처합니다. 활성화 시 시스템 프록시를 사용할 필요가 없습니다.",
         "tunUnavailable": "TUN은 서비스 모드 또는 관리자 모드가 필요합니다"
-      },
-      "actions": {
-        "installService": "서비스 설치",
-        "uninstallService": "서비스 제거"
       },
       "fields": {
         "systemProxy": "시스템 프록시",
@@ -73,9 +64,6 @@
       },
       "placeholders": {
         "origin": "유효한 URL을 입력하세요"
-      },
-      "actions": {
-        "add": "추가"
       },
       "messages": {
         "alwaysIncluded": "항상 포함되는 오리진: {{urls}}"
@@ -127,9 +115,6 @@
     "verge": {
       "basic": {
         "title": "Verge 기본 설정",
-        "actions": {
-          "browse": "찾아보기"
-        },
         "trayOptions": {
           "showMainWindow": "메인 창 표시",
           "showTrayMenu": "트레이 메뉴 표시",
@@ -154,9 +139,6 @@
           "backupInfo": "설정 파일의 로컬 또는 WebDAV 백업을 지원합니다",
           "openConfDir": "소프트웨어가 비정상 동작할 경우, 이 폴더의 파일을 백업 후 모두 삭제하고 재시작하세요",
           "liteMode": "GUI를 닫고 커널만 실행 상태로 유지합니다"
-        },
-        "actions": {
-          "copyVersion": "버전 복사"
         },
         "notifications": {
           "latestVersion": "현재 최신 버전입니다",
@@ -189,9 +171,6 @@
           "successColor": "성공 색상",
           "fontFamily": "글꼴",
           "cssInjection": "CSS 삽입"
-        },
-        "actions": {
-          "editCss": "CSS 편집"
         },
         "dialogs": {
           "editCssTitle": "CSS 편집"
@@ -253,9 +232,6 @@
         "redir": "Redir 포트",
         "tproxy": "TProxy 포트"
       },
-      "actions": {
-        "random": "임의 포트"
-      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "포트 설정이 저장되었습니다",
@@ -270,9 +246,6 @@
     },
     "liteMode": {
       "title": "경량 모드 설정",
-      "actions": {
-        "enterNow": "지금 경량 모드로 전환"
-      },
       "toggles": {
         "autoEnter": "경량 모드 자동 진입"
       },
@@ -291,17 +264,6 @@
       "tabs": {
         "local": "로컬 백업",
         "webdav": "WebDAV 백업"
-      },
-      "actions": {
-        "selectTarget": "백업 대상 선택",
-        "backup": "백업",
-        "export": "내보내기",
-        "exportBackup": "백업 내보내기",
-        "importBackup": "백업 가져오기",
-        "deleteBackup": "백업 삭제",
-        "restore": "복원",
-        "restoreBackup": "백업 복원",
-        "viewHistory": "View history"
       },
       "fields": {
         "webdavUrl": "WebDAV 서버 URL",
@@ -398,10 +360,6 @@
     },
     "update": {
       "title": "새 버전 v{{version}}",
-      "actions": {
-        "goToRelease": "릴리스 페이지로 이동",
-        "update": "업데이트"
-      },
       "messages": {
         "portableError": "포터블 버전은 앱 내 업데이트를 지원하지 않습니다. 수동으로 다운로드하여 교체하세요",
         "breakChangeError": "이 버전은 메이저 업데이트로 앱 내 업데이트를 지원하지 않습니다. 프로그램을 제거한 뒤 새 버전을 수동으로 설치하세요"
@@ -554,9 +512,6 @@
       }
     },
     "webUI": {
-      "actions": {
-        "openUrl": "URL 열기"
-      },
       "title": "Web UI",
       "messages": {
         "supportedPlaceholders": "지원되는 자리표시자: %host, %port, %secret",

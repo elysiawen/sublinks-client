@@ -5,11 +5,14 @@
         "home": "Ana Sayfa",
         "proxies": "Vekil'ler",
         "profiles": "Profiller",
+        "test": "Test",
+        "test_web": "Web Sitesi Testi",
+        "test_media": "Medya Testi",
         "connections": "Bağlantılar",
         "rules": "Kurallar",
         "logs": "Günlükler",
-        "unlock": "Test",
-        "settings": "Ayarlar"
+        "settings": "Ayarlar",
+        "about": "Hakkında"
       },
       "menu": {
         "reorderMode": "Menu reorder mode",
@@ -18,6 +21,10 @@
         "lock": "Lock menu order",
         "collapseNavBar": "Collapse navigation bar",
         "expandNavBar": "Expand navigation bar"
+      },
+      "userInfo": {
+        "loggedIn": "Giriş yapıldı",
+        "logout": "Çıkış yap"
       }
     }
   }

@@ -130,6 +130,25 @@
         "global": "Forward all network requests through the selected proxy.",
         "direct": "Bypass the proxy and connect to the internet directly."
       }
+    },
+    "welcomeBanner": {
+      "greetings": {
+        "earlyMorning": "Guten frühen Morgen",
+        "morning": "Guten Morgen",
+        "forenoon": "Guten Vormittag",
+        "noon": "Guten Mittag",
+        "afternoon": "Guten Nachmittag",
+        "evening": "Guten Abend",
+        "night": "Gute Nacht",
+        "lateNight": "Es ist spät"
+      },
+      "hitokoto": {
+        "loading": "Wird geladen...",
+        "fallback": "Laden fehlgeschlagen"
+      },
+      "tooltips": {
+        "refreshBackground": "Hintergrund aktualisieren"
+      }
     }
   }
 }

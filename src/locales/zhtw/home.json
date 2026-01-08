@@ -130,6 +130,25 @@
         "global": "將所有網路請求轉送至所選代理。",
         "direct": "略過代理，直接連線至網際網路。"
       }
+    },
+    "welcomeBanner": {
+      "greetings": {
+        "earlyMorning": "凌晨好",
+        "morning": "早上好",
+        "forenoon": "上午好",
+        "noon": "中午好",
+        "afternoon": "下午好",
+        "evening": "傍晚好",
+        "night": "晚上好",
+        "lateNight": "夜深了"
+      },
+      "hitokoto": {
+        "loading": "載入中...",
+        "fallback": "載入失敗"
+      },
+      "tooltips": {
+        "refreshBackground": "刷新背景圖"
+      }
     }
   }
 }

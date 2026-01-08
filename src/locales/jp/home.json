@@ -130,6 +130,25 @@
         "global": "Forward all network requests through the selected proxy.",
         "direct": "Bypass the proxy and connect to the internet directly."
       }
+    },
+    "welcomeBanner": {
+      "greetings": {
+        "earlyMorning": "おはようございます",
+        "morning": "おはようございます",
+        "forenoon": "こんにちは",
+        "noon": "こんにちは",
+        "afternoon": "こんにちは",
+        "evening": "こんばんは",
+        "night": "こんばんは",
+        "lateNight": "夜遅いですね"
+      },
+      "hitokoto": {
+        "loading": "読み込み中...",
+        "fallback": "読み込み失敗"
+      },
+      "tooltips": {
+        "refreshBackground": "背景を更新"
+      }
     }
   }
 }

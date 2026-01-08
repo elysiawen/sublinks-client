@@ -63,11 +63,17 @@ pub async fn enhance_profiles() -> CmdResult {
 
 /// 导入配置文件
 #[tauri::command]
-pub async fn import_profile(url: std::string::String, option: Option<PrfOption>) -> CmdResult {
+pub async fn import_profile(
+    url: std::string::String,
+    name: Option<std::string::String>,
+    option: Option<PrfOption>,
+) -> CmdResult {
     logging!(info, Type::Cmd, "[导入订阅] 开始导入: {}", url);
 
+    let name_smart: Option<String> = name.map(|s| s.into());
+
     // 直接依赖 PrfItem::from_url 自身的超时/重试逻辑，不再使用 tokio::time::timeout 包裹
-    let item = &mut match PrfItem::from_url(&url, None, None, option.as_ref()).await {
+    let item = &mut match PrfItem::from_url(&url, name_smart.as_ref(), None, option.as_ref()).await {
         Ok(it) => {
             logging!(info, Type::Cmd, "[导入订阅] 下载完成，开始保存配置");
             it

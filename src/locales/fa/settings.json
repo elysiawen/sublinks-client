@@ -1,10 +1,5 @@
 {
   "page": {
-    "actions": {
-      "manual": "راهنما",
-      "telegram": "کانال تلگرام",
-      "github": "مخزن GitHub"
-    },
     "title": "تنظیمات"
   },
   "sections": {
@@ -33,10 +28,6 @@
         "systemProxy": "به امکانات تنظیم پروکسی سیستم عامل دسترسی پیدا کنید. اگر فعال‌سازی ناموفق بود، پروکسی سیستم عامل را به‌صورت دستی تغییر دهید",
         "tunMode": "حالت Tun (NIC مجازی): تمام ترافیک سیستم را ضبط می کند، وقتی فعال باشد، نیازی به فعال کردن پروکسی سیستم نیست.",
         "tunUnavailable": "TUN به حالت سرویس یا حالت ادمین نیاز دارد"
-      },
-      "actions": {
-        "installService": "نصب سرویس",
-        "uninstallService": "حذف سرویس"
       },
       "fields": {
         "systemProxy": "پراکسی سیستم",
@@ -73,9 +64,6 @@
       },
       "placeholders": {
         "origin": "لطفا یک url معتبر وارد کنید"
-      },
-      "actions": {
-        "add": "افزودن"
       },
       "messages": {
         "alwaysIncluded": "Always included origins: {{urls}}"
@@ -127,9 +115,6 @@
     "verge": {
       "basic": {
         "title": "تنظیمات پایه Verge",
-        "actions": {
-          "browse": "مرور کردن"
-        },
         "trayOptions": {
           "showMainWindow": "نمایش پنجره اصلی",
           "showTrayMenu": "Show Tray Menu",
@@ -154,9 +139,6 @@
           "backupInfo": "از فایل های پیکربندی پشتیبان WebDAV پشتیبانی می کند",
           "openConfDir": "اگر نرم‌افزار به‌طور غیرعادی اجرا می‌شود، از تمام فایل‌های موجود در این پوشه نسخه پشتیبان تهیه و پاک کنید تا نرم‌افزار را مجدداً راه‌اندازی کنید",
           "liteMode": "رابط کاربری گرافیکی را ببندید و فقط هسته را در حال اجرا نگه دارید"
-        },
-        "actions": {
-          "copyVersion": "کپی نسخه"
         },
         "notifications": {
           "latestVersion": "در حال حاضر در آخرین نسخه",
@@ -189,9 +171,6 @@
           "successColor": "رنگ موفقیت",
           "fontFamily": "خانواده فونت",
           "cssInjection": "تزریق CSS"
-        },
-        "actions": {
-          "editCss": "Edit CSS"
         },
         "dialogs": {
           "editCssTitle": "Edit CSS"
@@ -253,9 +232,6 @@
         "redir": "پورت پروکسی شفاف Redir",
         "tproxy": "پورت پروکسی شفاف Tproxy"
       },
-      "actions": {
-        "random": "پورت تصادفی"
-      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "Port settings saved",
@@ -270,9 +246,6 @@
     },
     "liteMode": {
       "title": "LightWeight Mode Settings",
-      "actions": {
-        "enterNow": "Enter LightWeight Mode Now"
-      },
       "toggles": {
         "autoEnter": "Auto Enter LightWeight Mode"
       },
@@ -291,17 +264,6 @@
       "tabs": {
         "local": "Local backup",
         "webdav": "WebDAV backup"
-      },
-      "actions": {
-        "selectTarget": "Select backup target",
-        "backup": "پشتیبان‌گیری",
-        "export": "Export",
-        "exportBackup": "Export Backup",
-        "importBackup": "Import Backup",
-        "deleteBackup": "حذف پشتیبان",
-        "restore": "بازیابی",
-        "restoreBackup": "بازیابی پشتیبان",
-        "viewHistory": "View history"
       },
       "fields": {
         "webdavUrl": "http(s):// URL سرور WebDAV",
@@ -398,10 +360,6 @@
     },
     "update": {
       "title": "New Version v{{version}}",
-      "actions": {
-        "goToRelease": "رفتن به صفحه انتشار",
-        "update": "به‌روزرسانی"
-      },
       "messages": {
         "portableError": "نسخه پرتابل از به‌روزرسانی درون برنامه‌ای پشتیبانی نمی‌کند. لطفاً به صورت دستی دانلود و جایگزین کنید",
         "breakChangeError": "این نسخه یک به‌روزرسانی اساسی است و پشتیبانی از به‌روزرسانی درون برنامه را پشتیبانی نمی‌کند. لطفاً پس از حذف، دستی دانلود و نصب کنید."
@@ -554,9 +512,6 @@
       }
     },
     "webUI": {
-      "actions": {
-        "openUrl": "باز کردن آدرس اینترنتی"
-      },
       "title": "رابط وب",
       "messages": {
         "supportedPlaceholders": "پشتیبانی از %host، %port و %secret",

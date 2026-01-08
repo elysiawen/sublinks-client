@@ -1,10 +1,5 @@
 {
   "page": {
-    "actions": {
-      "manual": "Manual de uso",
-      "telegram": "Canal de Telegram",
-      "github": "Dirección del proyecto en GitHub"
-    },
     "title": "Ajustes"
   },
   "sections": {
@@ -33,10 +28,6 @@
         "systemProxy": "Modifica la configuración del proxy del sistema operativo. Si no se puede habilitar, puede modificar manualmente la configuración del proxy del sistema operativo.",
         "tunMode": "El modo TUN (interfaz virtual) gestiona todo el tráfico del sistema. No es necesario habilitar el proxy del sistema cuando está activado.",
         "tunUnavailable": "El modo TUN requiere el modo de servicio o el modo de administrador"
-      },
-      "actions": {
-        "installService": "Instalar servicio",
-        "uninstallService": "Desinstalar servicio"
       },
       "fields": {
         "systemProxy": "Proxy del sistema",
@@ -73,9 +64,6 @@
       },
       "placeholders": {
         "origin": "Introduce una URL válida"
-      },
-      "actions": {
-        "add": "Agregar"
       },
       "messages": {
         "alwaysIncluded": "Orígenes siempre incluidos: {{urls}}"
@@ -127,9 +115,6 @@
     "verge": {
       "basic": {
         "title": "Ajustes básicos de Verge",
-        "actions": {
-          "browse": "Examinar"
-        },
         "trayOptions": {
           "showMainWindow": "Mostrar ventana principal",
           "showTrayMenu": "Mostrar menú de la bandeja",
@@ -154,9 +139,6 @@
           "backupInfo": "Soporte para la copia de seguridad de archivos de configuración a través de WebDAV",
           "openConfDir": "Si el software no funciona correctamente, !realice una copia de seguridad! y elimine todos los archivos de esta carpeta, luego reinicie el software.",
           "liteMode": "Cierra la interfaz gráfica y solo mantiene el núcleo en ejecución"
-        },
-        "actions": {
-          "copyVersion": "Copy Version"
         },
         "notifications": {
           "latestVersion": "Actualmente está en la última versión",
@@ -189,9 +171,6 @@
           "successColor": "Color de éxito",
           "fontFamily": "Familia tipográfica",
           "cssInjection": "Inyección de CSS"
-        },
-        "actions": {
-          "editCss": "Edit CSS"
         },
         "dialogs": {
           "editCssTitle": "Edit CSS"
@@ -253,9 +232,6 @@
         "redir": "Puerto de proxy transparente Redir",
         "tproxy": "Puerto de proxy transparente TPROXY"
       },
-      "actions": {
-        "random": "Puerto aleatorio"
-      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "Port settings saved",
@@ -270,9 +246,6 @@
     },
     "liteMode": {
       "title": "Configuración del modo ligero",
-      "actions": {
-        "enterNow": "Entrar en modo ligero ahora"
-      },
       "toggles": {
         "autoEnter": "Entrar automáticamente en modo ligero"
       },
@@ -291,17 +264,6 @@
       "tabs": {
         "local": "Local backup",
         "webdav": "WebDAV backup"
-      },
-      "actions": {
-        "selectTarget": "Select backup target",
-        "backup": "Copia de seguridad",
-        "export": "Export",
-        "exportBackup": "Export Backup",
-        "importBackup": "Import Backup",
-        "deleteBackup": "Eliminar copia de seguridad",
-        "restore": "Restaurar",
-        "restoreBackup": "Restaurar copia de seguridad",
-        "viewHistory": "View history"
       },
       "fields": {
         "webdavUrl": "Dirección del servidor WebDAV http(s)://",
@@ -398,10 +360,6 @@
     },
     "update": {
       "title": "New Version v{{version}}",
-      "actions": {
-        "goToRelease": "Ir a la página de lanzamiento",
-        "update": "Actualizar"
-      },
       "messages": {
         "portableError": "La versión portátil no admite la actualización desde dentro de la aplicación. Descargue e instale manualmente la actualización.",
         "breakChangeError": "Esta es una actualización importante y no se admite la actualización desde dentro de la aplicación. Desinstale e instale manualmente la nueva versión."
@@ -554,9 +512,6 @@
       }
     },
     "webUI": {
-      "actions": {
-        "openUrl": "Abrir enlace"
-      },
       "title": "Interfaz web",
       "messages": {
         "supportedPlaceholders": "Soporta %host, %port, %secret",

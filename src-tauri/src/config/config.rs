@@ -98,6 +98,17 @@ impl Config {
             let _ = profiles.cleanup_orphaned_files().await;
         }
 
+        {
+           let verge = Self::verge().await.latest_arc();
+           if verge.enable_mini_window == Some(true) {
+               let handle = Handle::app_handle();
+               // We need to spawn this because we are in an async function and we want to fire and forget
+                tauri::async_runtime::spawn(async move {
+                    let _ = crate::cmd::open_mini_window(handle.clone()).await;
+                });
+           }
+        }
+
         Ok(())
     }
 

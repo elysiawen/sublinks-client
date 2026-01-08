@@ -40,9 +40,14 @@ export async function saveProfileFile(index: string, fileData: string) {
   return invoke<void>("save_profile_file", { index, fileData });
 }
 
-export async function importProfile(url: string, option?: IProfileOption) {
+export async function importProfile(
+  url: string,
+  name?: string,
+  option?: IProfileOption,
+) {
   return invoke<void>("import_profile", {
     url,
+    name,
     option: option || { with_proxy: true },
   });
 }
@@ -382,6 +387,14 @@ export async function getPortableFlag() {
 
 export async function openDevTools() {
   return invoke("open_devtools");
+}
+
+export async function openMiniWindow() {
+  return invoke("open_mini_window");
+}
+
+export async function closeMiniWindow() {
+  return invoke("close_mini_window");
 }
 
 export async function exitApp() {

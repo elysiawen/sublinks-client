@@ -130,6 +130,25 @@
         "global": "Forward all network requests through the selected proxy.",
         "direct": "Bypass the proxy and connect to the internet directly."
       }
+    },
+    "welcomeBanner": {
+      "greetings": {
+        "earlyMorning": "Хәерле иртә",
+        "morning": "Хәерле иртә",
+        "forenoon": "Хәерле көн",
+        "noon": "Хәерле көн",
+        "afternoon": "Хәерле көн",
+        "evening": "Хәерле кич",
+        "night": "Хәерле төн",
+        "lateNight": "Соңгы вакыт"
+      },
+      "hitokoto": {
+        "loading": "Йөкләнә...",
+        "fallback": "Йөкләү уңышсыз"
+      },
+      "tooltips": {
+        "refreshBackground": "Фонны яңарту"
+      }
     }
   }
 }

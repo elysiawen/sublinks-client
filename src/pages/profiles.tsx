@@ -16,7 +16,6 @@ import {
   CheckBoxOutlineBlankRounded,
   CheckBoxRounded,
   ClearRounded,
-  ContentPasteRounded,
   DeleteRounded,
   IndeterminateCheckBoxRounded,
   LocalFireDepartmentRounded,
@@ -25,9 +24,7 @@ import {
 } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import { Box, Button, Divider, Grid, IconButton, Stack } from "@mui/material";
-import { listen, TauriEvent } from "@tauri-apps/api/event";
-import { readText } from "@tauri-apps/plugin-clipboard-manager";
-import { readTextFile } from "@tauri-apps/plugin-fs";
+import { listen } from "@tauri-apps/api/event";
 import { useLockFn } from "ahooks";
 import { throttle } from "lodash-es";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -36,7 +33,7 @@ import { useLocation } from "react-router";
 import useSWR, { mutate } from "swr";
 import { closeAllConnections } from "tauri-plugin-mihomo-api";
 
-import { BasePage, BaseStyledTextField, DialogRef } from "@/components/base";
+import { BasePage, DialogRef } from "@/components/base";
 import { ProfileItem } from "@/components/profile/profile-item";
 import { ProfileMore } from "@/components/profile/profile-more";
 import {
@@ -47,18 +44,17 @@ import { ConfigViewer } from "@/components/setting/mods/config-viewer";
 import { useListen } from "@/hooks/use-listen";
 import { useProfiles } from "@/hooks/use-profiles";
 import {
-  createProfile,
   deleteProfile,
   enhanceProfiles,
   getProfiles,
   //restartCore,
   getRuntimeLogs,
-  importProfile,
   reorderProfile,
   updateProfile,
 } from "@/services/cmds";
 import { showNotice } from "@/services/notice-service";
 import { useSetLoadingCache, useThemeMode } from "@/services/states";
+import { syncSubLinksSubscriptions } from "@/services/sublinks-service"; // [NEW] Import service
 import { debugLog } from "@/utils/debug";
 
 // 记录profile切换状态
@@ -100,8 +96,7 @@ const ProfilePage = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { addListener } = useListen();
-  const [url, setUrl] = useState("");
-  const [disabled, setDisabled] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [activatings, setActivatings] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -179,44 +174,7 @@ const ProfilePage = () => {
     isStale,
   } = useProfiles();
 
-  useEffect(() => {
-    const handleFileDrop = async () => {
-      const unlisten = await addListener(
-        TauriEvent.DRAG_DROP,
-        async (event: any) => {
-          const paths = event.payload.paths;
-
-          for (const file of paths) {
-            if (!file.endsWith(".yaml") && !file.endsWith(".yml")) {
-              showNotice.error("profiles.page.feedback.errors.onlyYaml");
-              continue;
-            }
-            const item = {
-              type: "local",
-              name: file.split(/\/|\\/).pop() ?? "New Profile",
-              desc: "",
-              url: "",
-              option: {
-                with_proxy: false,
-                self_proxy: false,
-              },
-            } as IProfileItem;
-            const data = await readTextFile(file);
-            await createProfile(item, data);
-            await mutateProfiles();
-          }
-        },
-      );
-
-      return unlisten;
-    };
-
-    const unsubscribe = handleFileDrop();
-
-    return () => {
-      unsubscribe.then((cleanup) => cleanup());
-    };
-  }, [addListener, mutateProfiles, t]);
+  // Removed manual file drop logic for SubLinks Client
 
   // 添加紧急恢复功能
   const onEmergencyRefresh = useLockFn(async () => {
@@ -271,49 +229,11 @@ const ProfilePage = () => {
     return [...new Set([profiles.current ?? ""])].filter(Boolean);
   };
 
-  const onImport = async () => {
-    if (!url) return;
-    // 校验url是否为http/https
-    if (!/^https?:\/\//i.test(url)) {
-      showNotice.error("profiles.page.feedback.errors.invalidUrl");
-      return;
-    }
-    setLoading(true);
-
-    const handleImportSuccess = async (noticeKey: string) => {
-      showNotice.success(noticeKey);
-      setUrl("");
-      await performRobustRefresh();
-    };
-
-    try {
-      // 尝试正常导入
-      await importProfile(url);
-      await handleImportSuccess("shared.feedback.notifications.importSuccess");
-    } catch (initialErr) {
-      console.warn("[订阅导入] 首次导入失败:", initialErr);
-
-      showNotice.info("profiles.page.feedback.notifications.importRetry");
-      try {
-        // 使用自身代理尝试导入
-        await importProfile(url, {
-          with_proxy: false,
-          self_proxy: true,
-        });
-        await handleImportSuccess(
-          "shared.feedback.notifications.importWithClashProxy",
-        );
-      } catch (retryErr) {
-        // 回退导入也失败
-        showNotice.error(
-          "profiles.page.feedback.notifications.importFail",
-          String(retryErr),
-        );
-      }
-    } finally {
-      setDisabled(false);
-      setLoading(false);
-    }
+  const onSync = async () => {
+    setSyncing(true);
+    await syncSubLinksSubscriptions();
+    setSyncing(false);
+    await mutateProfiles();
   };
 
   // 强化的刷新策略
@@ -640,11 +560,6 @@ const ProfilePage = () => {
     });
   });
 
-  const onCopyLink = async () => {
-    const text = await readText();
-    if (text) setUrl(text);
-  };
-
   // Batch selection functions
   const toggleBatchMode = () => {
     setBatchMode(!batchMode);
@@ -818,15 +733,6 @@ const ProfilePage = () => {
               <IconButton
                 size="small"
                 color="inherit"
-                title={t("profiles.page.actions.updateAll")}
-                onClick={onUpdateAll}
-              >
-                <RefreshRounded />
-              </IconButton>
-
-              <IconButton
-                size="small"
-                color="inherit"
                 title={t("profiles.page.actions.viewRuntimeConfig")}
                 onClick={() => configRef.current?.open()}
               >
@@ -920,64 +826,25 @@ const ProfilePage = () => {
           alignItems: "center",
         }}
       >
-        <BaseStyledTextField
-          value={url}
-          variant="outlined"
-          onChange={(e) => setUrl(e.target.value)}
-          onKeyDown={(event) => {
-            if (event.key !== "Enter" || event.nativeEvent.isComposing) {
-              return;
-            }
-            if (!url || disabled || loading) {
-              return;
-            }
-            event.preventDefault();
-            void onImport();
-          }}
-          placeholder={t("profiles.page.importForm.placeholder")}
-          slotProps={{
-            input: {
-              sx: { pr: 1 },
-              endAdornment: !url ? (
-                <IconButton
-                  size="small"
-                  sx={{ p: 0.5 }}
-                  title={t("profiles.page.importForm.actions.paste")}
-                  onClick={onCopyLink}
-                >
-                  <ContentPasteRounded fontSize="inherit" />
-                </IconButton>
-              ) : (
-                <IconButton
-                  size="small"
-                  sx={{ p: 0.5 }}
-                  title={t("shared.actions.clear")}
-                  onClick={() => setUrl("")}
-                >
-                  <ClearRounded fontSize="inherit" />
-                </IconButton>
-              ),
-            },
-          }}
-        />
         <LoadingButton
-          disabled={!url || disabled}
-          loading={loading}
-          variant="contained"
+          loading={syncing}
+          variant="outlined"
           size="small"
           sx={{ borderRadius: "6px" }}
-          onClick={onImport}
+          onClick={onSync}
+          startIcon={<RefreshRounded />}
         >
-          {t("profiles.page.actions.import")}
+          {t("profiles.page.actions.syncSubscriptions")}
         </LoadingButton>
-        <Button
-          variant="contained"
+        <LoadingButton
+          variant="outlined"
           size="small"
           sx={{ borderRadius: "6px" }}
-          onClick={() => viewerRef.current?.create()}
+          onClick={onUpdateAll}
+          startIcon={<RefreshRounded />}
         >
-          {t("shared.actions.new")}
-        </Button>
+          {t("profiles.page.actions.updateAll")}
+        </LoadingButton>
       </Stack>
 
       <DndContext

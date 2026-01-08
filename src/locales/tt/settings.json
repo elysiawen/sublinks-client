@@ -1,10 +1,5 @@
 {
   "page": {
-    "actions": {
-      "manual": "Документация",
-      "telegram": "Telegram каналы",
-      "github": "GitHub репозиториясе"
-    },
     "title": "Көйләүләр"
   },
   "sections": {
@@ -33,10 +28,6 @@
         "systemProxy": "Системалы прокси көйләүләрен үзгәртү рөхсәтен бирегез. Әгәр рөхсәт алу мөмкин түгел икән, прокси көйләүләрен кулдан үзгәртегез",
         "tunMode": "Tun режимы бөтен системаның трафигын тотып ала. Аны кабызган очракта системалы проксины аерым кабызу таләп ителми.",
         "tunUnavailable": "TUN requires Service Mode or Admin Mode"
-      },
-      "actions": {
-        "installService": "Хезмәтне урнаштыру",
-        "uninstallService": "Uninstall Service"
       },
       "fields": {
         "systemProxy": "Системалы прокси",
@@ -73,9 +64,6 @@
       },
       "placeholders": {
         "origin": "Please enter a valid url"
-      },
-      "actions": {
-        "add": "Add"
       },
       "messages": {
         "alwaysIncluded": "Always included origins: {{urls}}"
@@ -127,9 +115,6 @@
     "verge": {
       "basic": {
         "title": "Verge Төп көйләүләр",
-        "actions": {
-          "browse": "Карау"
-        },
         "trayOptions": {
           "showMainWindow": "Төп тәрәзәне күрсәтү",
           "showTrayMenu": "Show Tray Menu",
@@ -154,9 +139,6 @@
           "backupInfo": "WebDAV аша конфигурация файлын саклауны хуплый",
           "openConfDir": "Әгәр программада хаталар чыкса, бу папкадагы файлларны саклап калыгыз да, аннары барысын да бетереп, программаны яңадан башлагыз",
           "liteMode": "GUI-ны ябыгыз һәм бары тик төшне генә эшләтеп калдырыгыз"
-        },
-        "actions": {
-          "copyVersion": "Copy Version"
         },
         "notifications": {
           "latestVersion": "Сездә иң соңгы версия урнаштырылган",
@@ -189,9 +171,6 @@
           "successColor": "Уңыш төсе",
           "fontFamily": "Шрифтлар гаиләсе",
           "cssInjection": "CSS кертү"
-        },
-        "actions": {
-          "editCss": "Edit CSS"
         },
         "dialogs": {
           "editCssTitle": "Edit CSS"
@@ -253,9 +232,6 @@
         "redir": "Redir — үтә күренмәле прокси порты",
         "tproxy": "Tproxy — үтә күренмәле прокси порты"
       },
-      "actions": {
-        "random": "Очраклы порт"
-      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "Port settings saved",
@@ -270,9 +246,6 @@
     },
     "liteMode": {
       "title": "LightWeight Mode Settings",
-      "actions": {
-        "enterNow": "Enter LightWeight Mode Now"
-      },
       "toggles": {
         "autoEnter": "Auto Enter LightWeight Mode"
       },
@@ -291,17 +264,6 @@
       "tabs": {
         "local": "Local backup",
         "webdav": "WebDAV backup"
-      },
-      "actions": {
-        "selectTarget": "Select backup target",
-        "backup": "Резерв копия",
-        "export": "Export",
-        "exportBackup": "Export Backup",
-        "importBackup": "Import Backup",
-        "deleteBackup": "Резерв копияне бетерү",
-        "restore": "Кайтару",
-        "restoreBackup": "Резерв копияне кайтару",
-        "viewHistory": "View history"
       },
       "fields": {
         "webdavUrl": "WebDAV сервер URL-ы (http(s)://)",
@@ -398,10 +360,6 @@
     },
     "update": {
       "title": "New Version v{{version}}",
-      "actions": {
-        "goToRelease": "Релизлар битенә күчү",
-        "update": "Яңарту"
-      },
       "messages": {
         "portableError": "Портатив версиядә кушымта эчендә яңарту хупланмый, кулдан төшереп алыгыз",
         "breakChangeError": "Бу зур яңарту, ул кушымта эчендә яңартылмый. Борып алып ташлап, яңадан урнаштыру сорала."
@@ -554,9 +512,6 @@
       }
     },
     "webUI": {
-      "actions": {
-        "openUrl": "URL ачарга"
-      },
       "title": "Веб-интерфейс",
       "messages": {
         "supportedPlaceholders": "%host, %port, %secret макросларын хуплау",

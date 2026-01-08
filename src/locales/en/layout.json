@@ -5,11 +5,17 @@
         "home": "Home",
         "proxies": "Proxies",
         "profiles": "Profiles",
+        "test": "Test",
+        "test_web": "Website Test",
+        "test_media": "Media Test",
         "connections": "Connections",
         "rules": "Rules",
         "logs": "Logs",
-        "unlock": "Test",
-        "settings": "Settings"
+        "settings": "Settings",
+        "about": "About"
+      },
+      "aboutPage": {
+        "attribution": "Based on clash-verge-rev"
       },
       "menu": {
         "reorderMode": "Menu reorder mode",
@@ -18,6 +24,10 @@
         "lock": "Lock menu order",
         "collapseNavBar": "Collapse navigation bar",
         "expandNavBar": "Expand navigation bar"
+      },
+      "userInfo": {
+        "loggedIn": "Logged in",
+        "logout": "Logout"
       }
     }
   }

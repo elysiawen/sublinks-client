@@ -130,6 +130,25 @@
         "global": "Forward all network requests through the selected proxy.",
         "direct": "Bypass the proxy and connect to the internet directly."
       }
+    },
+    "welcomeBanner": {
+      "greetings": {
+        "earlyMorning": "صبح بخیر",
+        "morning": "صبح بخیر",
+        "forenoon": "روز بخیر",
+        "noon": "ظهر بخیر",
+        "afternoon": "بعدازظهر بخیر",
+        "evening": "عصر بخیر",
+        "night": "شب بخیر",
+        "lateNight": "دیر وقت است"
+      },
+      "hitokoto": {
+        "loading": "در حال بارگذاری...",
+        "fallback": "بارگذاری ناموفق"
+      },
+      "tooltips": {
+        "refreshBackground": "بروزرسانی پس‌زمینه"
+      }
     }
   }
 }

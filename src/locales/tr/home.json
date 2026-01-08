@@ -130,6 +130,25 @@
         "global": "Forward all network requests through the selected proxy.",
         "direct": "Bypass the proxy and connect to the internet directly."
       }
+    },
+    "welcomeBanner": {
+      "greetings": {
+        "earlyMorning": "Günaydın",
+        "morning": "Günaydın",
+        "forenoon": "İyi günler",
+        "noon": "İyi günler",
+        "afternoon": "İyi günler",
+        "evening": "İyi akşamlar",
+        "night": "İyi geceler",
+        "lateNight": "Geç oldu"
+      },
+      "hitokoto": {
+        "loading": "Yükleniyor...",
+        "fallback": "Yükleme başarısız"
+      },
+      "tooltips": {
+        "refreshBackground": "Arka Planı Yenile"
+      }
     }
   }
 }

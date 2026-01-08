@@ -4,7 +4,8 @@
       "updateAll": "Update All Profiles",
       "viewRuntimeConfig": "View Runtime Config",
       "reactivate": "Reactivate Profiles",
-      "import": "Import"
+      "import": "Import",
+      "syncSubscriptions": "Sync Subscriptions"
     },
     "batch": {
       "actions": {

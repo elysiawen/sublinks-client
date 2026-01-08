@@ -90,6 +90,11 @@ impl IProfiles {
             self.items = Some(vec![]);
         }
 
+        // If patch provides an items array, replace the current items
+        if patch.items.is_some() {
+            self.items = patch.items.clone();
+        }
+
         if let Some(current) = &patch.current
             && let Some(items) = self.items.as_ref()
         {
@@ -97,6 +102,11 @@ impl IProfiles {
             if items.iter().any(|e| e.uid.as_ref() == some_uid) {
                 self.current = some_uid.cloned();
             }
+        }
+        
+        // If patch.current is None and patch.items is Some (empty array), clear current
+        if patch.current.is_none() && patch.items.is_some() {
+            self.current = None;
         }
     }
 

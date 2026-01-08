@@ -251,6 +251,9 @@ pub struct IVerge {
 
     /// 启用外部控制器
     pub enable_external_controller: Option<bool>,
+
+    /// 启用迷你悬浮窗
+    pub enable_mini_window: Option<bool>,
 }
 
 #[derive(Default, Debug, Clone, Deserialize, Serialize)]
@@ -441,6 +444,7 @@ impl IVerge {
             enable_dns_settings: Some(false),
             home_cards: None,
             enable_external_controller: Some(false),
+            enable_mini_window: Some(false),
             ..Self::default()
         }
     }
@@ -543,6 +547,7 @@ impl IVerge {
         patch!(enable_dns_settings);
         patch!(home_cards);
         patch!(enable_external_controller);
+        patch!(enable_mini_window);
     }
 
     pub const fn get_singleton_port() -> u16 {

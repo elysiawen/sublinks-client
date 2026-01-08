@@ -1,10 +1,5 @@
 {
   "page": {
-    "actions": {
-      "manual": "使用手冊",
-      "telegram": "Telegram 頻道",
-      "github": "GitHub 專案位址"
-    },
     "title": "設定"
   },
   "sections": {
@@ -33,10 +28,6 @@
         "systemProxy": "修改作業系統的代理設定，如果開啟失敗，可手動修改作業系統的代理設定",
         "tunMode": "TUN（虛擬網路介面卡）模式接管系統所有流量，啟用時無需開啟系統代理",
         "tunUnavailable": "虛擬網路介面卡模式需要安裝服務模式或以系統管理員身分執行"
-      },
-      "actions": {
-        "installService": "安裝服務",
-        "uninstallService": "解除安裝服務"
       },
       "fields": {
         "systemProxy": "系統代理",
@@ -73,9 +64,6 @@
       },
       "placeholders": {
         "origin": "請輸入有效的網址"
-      },
-      "actions": {
-        "add": "新增"
       },
       "messages": {
         "alwaysIncluded": "始終包含來源：{{urls}}"
@@ -127,9 +115,6 @@
     "verge": {
       "basic": {
         "title": "Verge 基礎設定",
-        "actions": {
-          "browse": "瀏覽"
-        },
         "trayOptions": {
           "showMainWindow": "顯示主視窗",
           "showTrayMenu": "顯示系統匣選單",
@@ -154,9 +139,6 @@
           "backupInfo": "支援本機或 WebDAV 方式備份配置檔案",
           "openConfDir": "如果軟體執行異常，!備份!並刪除此資料夾下的所有檔案，重新啟動軟體",
           "liteMode": "關閉圖形介面，僅保留內核執行"
-        },
-        "actions": {
-          "copyVersion": "複製Verge版本號"
         },
         "notifications": {
           "latestVersion": "目前已是最新版本",
@@ -189,9 +171,6 @@
           "successColor": "成功顏色",
           "fontFamily": "字型系列",
           "cssInjection": "CSS 注入"
-        },
-        "actions": {
-          "editCss": "編輯 CSS"
         },
         "dialogs": {
           "editCssTitle": "編輯 CSS"
@@ -253,9 +232,6 @@
         "redir": "Redir 透明連接埠",
         "tproxy": "Tproxy 連接埠"
       },
-      "actions": {
-        "random": "隨機連接埠"
-      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "連結埠設定已儲存",
@@ -270,9 +246,6 @@
     },
     "liteMode": {
       "title": "輕量模式設定",
-      "actions": {
-        "enterNow": "立即進入輕量模式"
-      },
       "toggles": {
         "autoEnter": "自動進入輕量模式"
       },
@@ -291,17 +264,6 @@
       "tabs": {
         "local": "本機備份",
         "webdav": "WebDAV 備份"
-      },
-      "actions": {
-        "selectTarget": "選擇備份目標",
-        "backup": "備份",
-        "export": "匯出",
-        "exportBackup": "匯出備份",
-        "importBackup": "匯入備份",
-        "deleteBackup": "刪除備份",
-        "restore": "還原",
-        "restoreBackup": "還原備份",
-        "viewHistory": "檢視紀錄"
       },
       "fields": {
         "webdavUrl": "WebDAV 伺服器位址 http(s)://",
@@ -398,10 +360,6 @@
     },
     "update": {
       "title": "新版本 v{{version}}",
-      "actions": {
-        "goToRelease": "前往發佈頁面",
-        "update": "更新"
-      },
       "messages": {
         "portableError": "可攜式版不支援應用程式內更新，請手動下載替換",
         "breakChangeError": "此版本為重大更新，不支援應用程式內更新，請解除安裝後手動下載安裝"
@@ -554,9 +512,6 @@
       }
     },
     "webUI": {
-      "actions": {
-        "openUrl": "開啟網址"
-      },
       "title": "網頁介面",
       "messages": {
         "supportedPlaceholders": "支援 %host, %port, %secret",

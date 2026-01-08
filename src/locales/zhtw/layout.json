@@ -5,11 +5,14 @@
         "home": "首 頁",
         "proxies": "代 理",
         "profiles": "訂 閱",
+        "test": "測 試",
+        "test_web": "網站測試",
+        "test_media": "媒體測試",
         "connections": "連 線",
         "rules": "規 則",
         "logs": "日 誌",
-        "unlock": "解 鎖",
-        "settings": "設 定"
+        "settings": "設 定",
+        "about": "關 於"
       },
       "menu": {
         "reorderMode": "選單排序模式",
@@ -18,6 +21,10 @@
         "lock": "鎖定選單排序",
         "collapseNavBar": "收起導覽列",
         "expandNavBar": "展開導覽列"
+      },
+      "userInfo": {
+        "loggedIn": "已登入",
+        "logout": "登出"
       }
     }
   }

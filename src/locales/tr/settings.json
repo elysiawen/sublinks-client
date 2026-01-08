@@ -1,10 +1,5 @@
 {
   "page": {
-    "actions": {
-      "manual": "Kılavuz",
-      "telegram": "Telegram Kanalı",
-      "github": "Github Repo"
-    },
     "title": "Ayarlar"
   },
   "sections": {
@@ -33,10 +28,6 @@
         "systemProxy": "İşletim sisteminin vekil ayarlarını değiştirmek için etkinleştirin. Etkinleştirme başarısız olursa, işletim sisteminin proxy ayarlarını manuel olarak değiştirin",
         "tunMode": "Tun (Sanal Ağ Kartı) modu: Tüm sistem trafiğini yakalar, etkinleştirildiğinde sistem vekil'ini etkinleştirmeye gerek yoktur.",
         "tunUnavailable": "TUN requires Service Mode or Admin Mode"
-      },
-      "actions": {
-        "installService": "Hizmeti Kur",
-        "uninstallService": "Uninstall Service"
       },
       "fields": {
         "systemProxy": "Sistem Vekil'i",
@@ -73,9 +64,6 @@
       },
       "placeholders": {
         "origin": "Geçerli bir URL girin"
-      },
-      "actions": {
-        "add": "Ekle"
       },
       "messages": {
         "alwaysIncluded": "Her zaman dahil edilen kökenler: {{urls}}"
@@ -127,9 +115,6 @@
     "verge": {
       "basic": {
         "title": "Verge Temel Ayarı",
-        "actions": {
-          "browse": "Gözat"
-        },
         "trayOptions": {
           "showMainWindow": "Ana Pencereyi Göster",
           "showTrayMenu": "Tepsi Menüsünü Göster",
@@ -154,9 +139,6 @@
           "backupInfo": "WebDAV yedekleme yapılandırma dosyalarını destekler",
           "openConfDir": "Yazılım anormal çalışıyorsa, bu klasördeki tüm dosyaları YEDEKLEYİN ve silin, ardından yazılımı yeniden başlatın",
           "liteMode": "GUI'yi kapatın ve yalnızca çekirdeği çalışır durumda tutun"
-        },
-        "actions": {
-          "copyVersion": "Copy Version"
         },
         "notifications": {
           "latestVersion": "Şu Anda En Son Sürümdesiniz",
@@ -189,9 +171,6 @@
           "successColor": "Başarı Rengi",
           "fontFamily": "Yazı Tipi Ailesi",
           "cssInjection": "CSS Enjeksiyonu"
-        },
-        "actions": {
-          "editCss": "Edit CSS"
         },
         "dialogs": {
           "editCssTitle": "Edit CSS"
@@ -253,9 +232,6 @@
         "redir": "Redir Portu",
         "tproxy": "Tvekil Portu"
       },
-      "actions": {
-        "random": "Rastgele Port"
-      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "Port settings saved",
@@ -270,9 +246,6 @@
     },
     "liteMode": {
       "title": "Hafif Mod Ayarları",
-      "actions": {
-        "enterNow": "Şimdi Hafif Moda Gir"
-      },
       "toggles": {
         "autoEnter": "Otomatik Hafif Moda Gir"
       },
@@ -291,17 +264,6 @@
       "tabs": {
         "local": "Local backup",
         "webdav": "WebDAV backup"
-      },
-      "actions": {
-        "selectTarget": "Select backup target",
-        "backup": "Yedekle",
-        "export": "Export",
-        "exportBackup": "Export Backup",
-        "importBackup": "Import Backup",
-        "deleteBackup": "Yedeği Sil",
-        "restore": "Geri Yükle",
-        "restoreBackup": "Yedeği Geri Yükle",
-        "viewHistory": "View history"
       },
       "fields": {
         "webdavUrl": "WebDAV Sunucu URL'si",
@@ -398,10 +360,6 @@
     },
     "update": {
       "title": "New Version v{{version}}",
-      "actions": {
-        "goToRelease": "Sürüm Sayfasına Git",
-        "update": "Güncelle"
-      },
       "messages": {
         "portableError": "Taşınabilir sürüm uygulama içi güncellemeleri desteklemez. Lütfen manuel olarak indirip değiştirin",
         "breakChangeError": "Bu sürüm büyük bir güncellemedir ve uygulama içi güncellemeleri desteklemez. Lütfen kaldırın ve yeni sürümü manuel olarak indirip kurun"
@@ -554,9 +512,6 @@
       }
     },
     "webUI": {
-      "actions": {
-        "openUrl": "URL Aç"
-      },
       "title": "Web Arayüzü",
       "messages": {
         "supportedPlaceholders": "%host, %port, %secret destekler",

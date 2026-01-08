@@ -5,11 +5,17 @@
         "home": "首 页",
         "proxies": "代 理",
         "profiles": "订 阅",
+        "test": "测 试",
+        "test_web": "网站测试",
+        "test_media": "流媒体测试",
         "connections": "连 接",
         "rules": "规 则",
         "logs": "日 志",
-        "unlock": "测 试",
-        "settings": "设 置"
+        "settings": "设 置",
+        "about": "关 于"
+      },
+      "aboutPage": {
+        "attribution": "本项目基于 clash-verge-rev"
       },
       "menu": {
         "reorderMode": "菜单排序模式",
@@ -18,6 +24,10 @@
         "lock": "锁定菜单排序",
         "collapseNavBar": "收起导航栏",
         "expandNavBar": "展开导航栏"
+      },
+      "userInfo": {
+        "loggedIn": "已登录",
+        "logout": "登出"
       }
     }
   }

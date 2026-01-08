@@ -1,10 +1,5 @@
 {
   "page": {
-    "actions": {
-      "manual": "Bedienungsanleitung",
-      "telegram": "Telegram-Kanal",
-      "github": "GitHub-Projektadresse"
-    },
     "title": "Einstellungen"
   },
   "sections": {
@@ -33,10 +28,6 @@
         "systemProxy": "Ändern Sie die Proxy-Einstellungen des Betriebssystems. Wenn die Aktivierung fehlschlägt, können Sie die Proxy-Einstellungen des Betriebssystems manuell ändern.",
         "tunMode": "Der TUN-Modus (Virtual Network Interface) übernimmt den gesamten Systemverkehr. Wenn dieser Modus aktiviert ist, muss der Systemproxy nicht geöffnet werden.",
         "tunUnavailable": "TUN-Modus erfordert Service-Modus oder Administrator-Modus"
-      },
-      "actions": {
-        "installService": "Service installieren",
-        "uninstallService": "Dienst deinstallieren"
       },
       "fields": {
         "systemProxy": "Systemproxy",
@@ -73,9 +64,6 @@
       },
       "placeholders": {
         "origin": "Bitte eine gültige URL eingeben"
-      },
-      "actions": {
-        "add": "Hinzufügen"
       },
       "messages": {
         "alwaysIncluded": "Immer enthaltene Ursprünge: {{urls}}"
@@ -127,9 +115,6 @@
     "verge": {
       "basic": {
         "title": "Verge-Grundeinstellungen",
-        "actions": {
-          "browse": "Durchsuchen"
-        },
         "trayOptions": {
           "showMainWindow": "Hauptfenster anzeigen",
           "showTrayMenu": "Tray-Menü anzeigen",
@@ -154,9 +139,6 @@
           "backupInfo": "Unterstützt die Sicherung von Konfigurationsdateien über WebDAV",
           "openConfDir": "Wenn die Software fehlerhaft funktioniert, !sichern Sie! alle Dateien in diesem Verzeichnis, löschen Sie sie und starten Sie die Software neu.",
           "liteMode": "GUI-Oberfläche schließen, nur den Kern laufen lassen"
-        },
-        "actions": {
-          "copyVersion": "Copy Version"
         },
         "notifications": {
           "latestVersion": "Sie verwenden bereits die neueste Version",
@@ -189,9 +171,6 @@
           "successColor": "Erfolgsfarbe",
           "fontFamily": "Schriftfamilie",
           "cssInjection": "CSS-Einbindung"
-        },
-        "actions": {
-          "editCss": "Edit CSS"
         },
         "dialogs": {
           "editCssTitle": "Edit CSS"
@@ -253,9 +232,6 @@
         "redir": "Redir-Transparenter Proxy-Port",
         "tproxy": "TPROXY-Transparenter Proxy-Port"
       },
-      "actions": {
-        "random": "Zufälliger Port"
-      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "Port settings saved",
@@ -270,9 +246,6 @@
     },
     "liteMode": {
       "title": "Einstellungen für den Leichtgewichtigen Modus",
-      "actions": {
-        "enterNow": "Sofort in den Leichtgewichtigen Modus wechseln"
-      },
       "toggles": {
         "autoEnter": "Automatisch in den Leichtgewichtigen Modus wechseln"
       },
@@ -291,17 +264,6 @@
       "tabs": {
         "local": "Local backup",
         "webdav": "WebDAV backup"
-      },
-      "actions": {
-        "selectTarget": "Select backup target",
-        "backup": "Sichern",
-        "export": "Export",
-        "exportBackup": "Export Backup",
-        "importBackup": "Import Backup",
-        "deleteBackup": "Sicherung löschen",
-        "restore": "Wiederherstellen",
-        "restoreBackup": "Sicherung wiederherstellen",
-        "viewHistory": "View history"
       },
       "fields": {
         "webdavUrl": "WebDAV-Serveradresse http(s)://",
@@ -398,10 +360,6 @@
     },
     "update": {
       "title": "New Version v{{version}}",
-      "actions": {
-        "goToRelease": "Zur Veröffentlichungsseite gehen",
-        "update": "Aktualisieren"
-      },
       "messages": {
         "portableError": "Die portable Version unterstützt keine In-App-Aktualisierung. Bitte laden Sie die Dateien manuell herunter und ersetzen Sie sie.",
         "breakChangeError": "Dies ist eine wichtige Aktualisierung. Die In-App-Aktualisierung wird nicht unterstützt. Bitte deinstallieren Sie die Software und laden Sie die neue Version manuell herunter und installieren Sie sie."
@@ -554,9 +512,6 @@
       }
     },
     "webUI": {
-      "actions": {
-        "openUrl": "Link öffnen"
-      },
       "title": "Web-Oberfläche",
       "messages": {
         "supportedPlaceholders": "Unterstützt %host, %port, %secret",

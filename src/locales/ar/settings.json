@@ -1,10 +1,5 @@
 {
   "page": {
-    "actions": {
-      "manual": "دليل",
-      "telegram": "قناة تيليجرام",
-      "github": "مستودع Github"
-    },
     "title": "الإعدادات"
   },
   "sections": {
@@ -33,10 +28,6 @@
         "systemProxy": "عند التمكين، سيتم تعديل إعدادات الوكيل في نظام التشغيل. إذا فشل التمكين، فقم بتعديل إعدادات الوكيل في النظام يدويًا.",
         "tunMode": "وضع TUN (بطاقة شبكة افتراضية): يلتقط كل حركة المرور في النظام. عند تمكينه، لا حاجة لتفعيل وكيل النظام.",
         "tunUnavailable": "TUN requires Service Mode or Admin Mode"
-      },
-      "actions": {
-        "installService": "تثبيت الخدمة ",
-        "uninstallService": "Uninstall Service"
       },
       "fields": {
         "systemProxy": "وكيل النظام",
@@ -73,9 +64,6 @@
       },
       "placeholders": {
         "origin": "Please enter a valid url"
-      },
-      "actions": {
-        "add": "Add"
       },
       "messages": {
         "alwaysIncluded": "Always included origins: {{urls}}"
@@ -127,9 +115,6 @@
     "verge": {
       "basic": {
         "title": "الإعدادات الأساسية  Verge",
-        "actions": {
-          "browse": "استعراض"
-        },
         "trayOptions": {
           "showMainWindow": "إظهار النافذة الرئيسية",
           "showTrayMenu": "Show Tray Menu",
@@ -154,9 +139,6 @@
           "backupInfo": "Support local or WebDAV backup of configuration files",
           "openConfDir": "إذا عمل البرنامج بشكل غير طبيعي، قم بالنسخ الاحتياطي ثم حذف جميع الملفات في هذا المجلد ثم أعد تشغيل البرنامج",
           "liteMode": "إيقاف الواجهة الرسومية والإبقاء على تشغيل النواة"
-        },
-        "actions": {
-          "copyVersion": "Copy Version"
         },
         "notifications": {
           "latestVersion": "أنت على أحدث إصدار حاليًا",
@@ -189,9 +171,6 @@
           "successColor": "لون النجاح",
           "fontFamily": "عائلة الخط",
           "cssInjection": "حقن CSS"
-        },
-        "actions": {
-          "editCss": "Edit CSS"
         },
         "dialogs": {
           "editCssTitle": "Edit CSS"
@@ -253,9 +232,6 @@
         "redir": "منفذ إعادة التوجيه",
         "tproxy": "منفذ Tproxy"
       },
-      "actions": {
-        "random": "منفذ عشوائي"
-      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "Port settings saved",
@@ -270,9 +246,6 @@
     },
     "liteMode": {
       "title": "LightWeight Mode Settings",
-      "actions": {
-        "enterNow": "Enter LightWeight Mode Now"
-      },
       "toggles": {
         "autoEnter": "Auto Enter LightWeight Mode"
       },
@@ -291,17 +264,6 @@
       "tabs": {
         "local": "Local backup",
         "webdav": "WebDAV backup"
-      },
-      "actions": {
-        "selectTarget": "Select backup target",
-        "backup": "نسخ احتياطي",
-        "export": "Export",
-        "exportBackup": "Export Backup",
-        "importBackup": "Import Backup",
-        "deleteBackup": "حذف النسخة الاحتياطية",
-        "restore": "استعادة",
-        "restoreBackup": "استعادة النسخة الاحتياطية",
-        "viewHistory": "View history"
       },
       "fields": {
         "webdavUrl": "عنوان خادم WebDAV",
@@ -398,10 +360,6 @@
     },
     "update": {
       "title": "New Version v{{version}}",
-      "actions": {
-        "goToRelease": "الانتقال إلى صفحة الإصدارات",
-        "update": "تحديث"
-      },
       "messages": {
         "portableError": "الإصدار المحمول لا يدعم التحديث داخل التطبيق. يرجى التنزيل والاستبدال يدويًا",
         "breakChangeError": "هذا الإصدار هو تحديث رئيسي ولا يدعم التحديث داخل التطبيق. يرجى إلغاء التثبيت وتنزيل الإصدار الجديد وتثبيته يدويًا"
@@ -554,9 +512,6 @@
       }
     },
     "webUI": {
-      "actions": {
-        "openUrl": "فتح الرابط"
-      },
       "title": "واجهة الويب",
       "messages": {
         "supportedPlaceholders": "يدعم %host و%port و%secret",

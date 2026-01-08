@@ -242,3 +242,39 @@ pub fn update_ui_stage(stage: UiReadyStage) {
     logging!(info, Type::Cmd, "UI加载阶段更新: {:?}", &stage);
     ui::update_ui_ready_stage(stage);
 }
+
+/// 打开迷你悬浮窗
+#[tauri::command]
+pub async fn open_mini_window(app_handle: AppHandle) -> CmdResult<()> {
+    if let Some(window) = app_handle.get_webview_window("mini") {
+        window.set_size(tauri::Size::Logical(tauri::LogicalSize::new(90.0, 56.0))).stringify_err()?;
+        window.show().stringify_err()?;
+        window.set_focus().stringify_err()?;
+        return Ok(());
+    }
+
+    let window = tauri::WebviewWindowBuilder::new(&app_handle, "mini", tauri::WebviewUrl::App("mini".into()))
+        .title("SubLinks Mini")
+        .inner_size(90.0, 56.0)
+        .decorations(false)
+        .transparent(true)
+        .always_on_top(true)
+        .skip_taskbar(true)
+        .resizable(false)
+        .visible(true)
+        .build()
+        .stringify_err()?;
+
+    window.set_size(tauri::Size::Logical(tauri::LogicalSize::new(90.0, 56.0))).stringify_err()?;
+
+    Ok(())
+}
+
+/// 关闭迷你悬浮窗
+#[tauri::command]
+pub async fn close_mini_window(app_handle: AppHandle) -> CmdResult<()> {
+    if let Some(window) = app_handle.get_webview_window("mini") {
+        window.close().stringify_err()?;
+    }
+    Ok(())
+}

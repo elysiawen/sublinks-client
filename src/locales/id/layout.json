@@ -5,11 +5,14 @@
         "home": "Home",
         "proxies": "Proksi",
         "profiles": "Profil",
+        "test": "Tes",
+        "test_web": "Tes Situs Web",
+        "test_media": "Tes Media",
         "connections": "Koneksi",
         "rules": "Aturan",
         "logs": "Log",
-        "unlock": "Test",
-        "settings": "Pengaturan"
+        "settings": "Pengaturan",
+        "about": "Tentang"
       },
       "menu": {
         "reorderMode": "Menu reorder mode",
@@ -18,6 +21,10 @@
         "lock": "Lock menu order",
         "collapseNavBar": "Collapse navigation bar",
         "expandNavBar": "Expand navigation bar"
+      },
+      "userInfo": {
+        "loggedIn": "Sudah masuk",
+        "logout": "Keluar"
       }
     }
   }

@@ -130,6 +130,25 @@
         "global": "Forward all network requests through the selected proxy.",
         "direct": "Bypass the proxy and connect to the internet directly."
       }
+    },
+    "welcomeBanner": {
+      "greetings": {
+        "earlyMorning": "Доброе раннее утро",
+        "morning": "Доброе утро",
+        "forenoon": "Добрый день",
+        "noon": "Добрый день",
+        "afternoon": "Добрый день",
+        "evening": "Добрый вечер",
+        "night": "Доброй ночи",
+        "lateNight": "Уже поздно"
+      },
+      "hitokoto": {
+        "loading": "Загрузка...",
+        "fallback": "Не удалось загрузить"
+      },
+      "tooltips": {
+        "refreshBackground": "Обновить фон"
+      }
     }
   }
 }

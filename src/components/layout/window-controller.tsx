@@ -43,25 +43,31 @@ export const WindowControls = forwardRef(function WindowControls(props, ref) {
     <Box
       sx={{
         display: "flex",
-        gap: 1,
-        alignItems: "center",
-        "> button": {
-          cursor: "default",
-        },
+        alignItems: "stretch",
+        height: "100%",
+        WebkitAppRegion: "no-drag",
       }}
     >
       {OS === "macos" && (
-        <>
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center", px: 1 }}>
           {/* macOS 风格：关闭 → 最小化 → 全屏 */}
-          <IconButton size="small" sx={{ fontSize: 14 }} onClick={close}>
+          <IconButton
+            size="small"
+            sx={{ fontSize: 12, p: 0.5 }}
+            onClick={close}
+          >
             <Close fontSize="inherit" color="inherit" />
           </IconButton>
-          <IconButton size="small" sx={{ fontSize: 14 }} onClick={minimize}>
+          <IconButton
+            size="small"
+            sx={{ fontSize: 12, p: 0.5 }}
+            onClick={minimize}
+          >
             <Minimize fontSize="inherit" color="inherit" />
           </IconButton>
           <IconButton
             size="small"
-            sx={{ fontSize: 14 }}
+            sx={{ fontSize: 12, p: 0.5 }}
             onClick={toggleMaximize}
           >
             {maximized ? (
@@ -70,59 +76,87 @@ export const WindowControls = forwardRef(function WindowControls(props, ref) {
               <CropSquare fontSize="inherit" color="inherit" />
             )}
           </IconButton>
-        </>
+        </Box>
       )}
 
       {OS === "windows" && (
         <>
           {/* Windows 风格：最小化 → 最大化 → 关闭 */}
-          <IconButton size="small" sx={{ fontSize: 16 }} onClick={minimize}>
-            <Minimize fontSize="inherit" color="inherit" />
+          <IconButton
+            size="small"
+            sx={{
+              borderRadius: 0,
+              width: 46,
+              height: "100%",
+              ":hover": { bgcolor: "action.hover" },
+            }}
+            onClick={minimize}
+          >
+            <Minimize sx={{ fontSize: 16 }} />
           </IconButton>
           <IconButton
             size="small"
-            sx={{ fontSize: 16 }}
+            sx={{
+              borderRadius: 0,
+              width: 46,
+              height: "100%",
+              ":hover": { bgcolor: "action.hover" },
+            }}
             onClick={toggleMaximize}
           >
             {maximized ? (
-              <FilterNone fontSize="inherit" color="inherit" />
+              <FilterNone sx={{ fontSize: 14 }} />
             ) : (
-              <CropSquare fontSize="inherit" color="inherit" />
+              <CropSquare sx={{ fontSize: 14 }} />
             )}
           </IconButton>
           <IconButton
             size="small"
-            sx={{ fontSize: 16, ":hover": { bgcolor: "red", color: "white" } }}
+            sx={{
+              borderRadius: 0,
+              width: 46,
+              height: "100%",
+              ":hover": {
+                bgcolor: "#e81123",
+                color: "white",
+              },
+            }}
             onClick={close}
           >
-            <Close fontSize="inherit" color="inherit" />
+            <Close sx={{ fontSize: 16 }} />
           </IconButton>
         </>
       )}
 
       {OS === "linux" && (
         <>
-          {/* Linux 桌面常见布局（GNOME/KDE 多为：最小化 → 最大化 → 关闭） */}
-          <IconButton size="small" sx={{ fontSize: 16 }} onClick={minimize}>
-            <Minimize fontSize="inherit" color="inherit" />
+          {/* Linux 桌面常见布局 */}
+          <IconButton
+            size="small"
+            sx={{ ":hover": { bgcolor: "action.hover" } }}
+            onClick={minimize}
+          >
+            <Minimize fontSize="small" />
           </IconButton>
           <IconButton
             size="small"
-            sx={{ fontSize: 16 }}
+            sx={{ ":hover": { bgcolor: "action.hover" } }}
             onClick={toggleMaximize}
           >
             {maximized ? (
-              <FilterNone fontSize="inherit" color="inherit" />
+              <FilterNone fontSize="small" />
             ) : (
-              <CropSquare fontSize="inherit" color="inherit" />
+              <CropSquare fontSize="small" />
             )}
           </IconButton>
           <IconButton
             size="small"
-            sx={{ fontSize: 16, ":hover": { bgcolor: "red", color: "white" } }}
+            sx={{
+              ":hover": { bgcolor: "#e81123", color: "white" },
+            }}
             onClick={close}
           >
-            <Close fontSize="inherit" color="inherit" />
+            <Close fontSize="small" />
           </IconButton>
         </>
       )}

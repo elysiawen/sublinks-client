@@ -143,6 +143,25 @@ export interface TranslationResources {
             minutes: string;
           };
         };
+        welcomeBanner: {
+          greetings: {
+            afternoon: string;
+            earlyMorning: string;
+            evening: string;
+            forenoon: string;
+            lateNight: string;
+            morning: string;
+            night: string;
+            noon: string;
+          };
+          hitokoto: {
+            fallback: string;
+            loading: string;
+          };
+          tooltips: {
+            refreshBackground: string;
+          };
+        };
       };
       page: {
         cards: {
@@ -175,6 +194,9 @@ export interface TranslationResources {
     layout: {
       components: {
         navigation: {
+          aboutPage: {
+            attribution: string;
+          };
           menu: {
             collapseNavBar: string;
             expandNavBar: string;
@@ -184,6 +206,7 @@ export interface TranslationResources {
             unlock: string;
           };
           tabs: {
+            about: string;
             connections: string;
             home: string;
             logs: string;
@@ -191,7 +214,13 @@ export interface TranslationResources {
             proxies: string;
             rules: string;
             settings: string;
-            unlock: string;
+            test: string;
+            test_media: string;
+            test_web: string;
+          };
+          userInfo: {
+            loggedIn: string;
+            logout: string;
           };
         };
       };
@@ -342,6 +371,7 @@ export interface TranslationResources {
         actions: {
           import: string;
           reactivate: string;
+          syncSubscriptions: string;
           updateAll: string;
           viewRuntimeConfig: string;
         };
@@ -561,6 +591,10 @@ export interface TranslationResources {
     };
     settings: {
       components: {
+        sidebar: {
+          essential: string;
+          title: string;
+        };
         verge: {
           advanced: {
             actions: {
@@ -599,6 +633,7 @@ export interface TranslationResources {
               hotkeySetting: string;
               language: string;
               layoutSetting: string;
+              miniWindow: string;
               misc: string;
               startPage: string;
               startupScript: string;
@@ -1050,11 +1085,6 @@ export interface TranslationResources {
         };
       };
       page: {
-        actions: {
-          github: string;
-          manual: string;
-          telegram: string;
-        };
         title: string;
       };
       sections: {
