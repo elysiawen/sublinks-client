@@ -42,7 +42,6 @@ import { SUBLINKS_CONFIG } from "@/configs/sublinks-config"; // [NEW] Import con
 import { useI18n } from "@/hooks/use-i18n";
 import { useVerge } from "@/hooks/use-verge";
 import { useWindowDecorations } from "@/hooks/use-window";
-
 // [NEW] Updated imports for cleanup
 import { useThemeMode } from "@/services/states";
 import {
@@ -229,7 +228,7 @@ const Layout = () => {
           <WindowControls ref={windowControlsRef} />
         </div>
       ) : null,
-    [decorated, SUBLINKS_CONFIG.PRODUCT_NAME],
+    [decorated],
   );
 
   useLoadingOverlay(themeReady);
@@ -240,8 +239,8 @@ const Layout = () => {
       const [status, msg] = payload;
       try {
         handleNoticeMessage(status, msg, t, navigate);
-      } catch (error) {
-        console.error("[通知处理] 失败:", error);
+      } catch (_error) {
+        console.error("[通知处理] 失败:", _error);
       }
     },
     [t, navigate],
@@ -265,7 +264,7 @@ const Layout = () => {
     if (saved) {
       try {
         return JSON.parse(saved);
-      } catch (e) {
+      } catch (ignore) {
         return {};
       }
     }
@@ -304,6 +303,35 @@ const Layout = () => {
     );
   }, [menuOrder, sidebarVisibility]);
 
+  // [NEW] Auth Guard - Moved up to avoid conditional hooks
+  let token = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
+  const userStr = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER);
+
+  // Handle "undefined" string from previous bugs
+  if (token === "undefined") {
+    localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
+    token = null;
+  }
+
+  let user = null;
+  try {
+    if (userStr) user = JSON.parse(userStr);
+  } catch (ignore) {}
+
+  // [NEW] Auto-sync subscriptions on startup
+  const syncAttemptedRef = useRef(false);
+
+  useEffect(() => {
+    if (token && !syncAttemptedRef.current) {
+      syncAttemptedRef.current = true;
+      // Delay sync to allow core and app to stabilize
+      const timer = setTimeout(() => {
+        syncSubLinksSubscriptions({ silent: true });
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [token]);
+
   if (!themeReady) {
     return (
       <div
@@ -320,34 +348,6 @@ const Layout = () => {
       ></div>
     );
   }
-
-  // [NEW] Auth Guard
-  let token = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
-  const userStr = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER);
-
-  // Handle "undefined" string from previous bugs
-  if (token === "undefined") {
-    localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
-    token = null;
-  }
-
-  let user = null;
-  try {
-    if (userStr) user = JSON.parse(userStr);
-  } catch (e) {}
-
-  // [NEW] Auto-sync subscriptions on startup
-  const syncAttempted = useRef(false);
-
-  useEffect(() => {
-    if (token && !syncAttempted.current) {
-      syncAttempted.current = true;
-      // Delay sync to allow core and app to stabilize
-      setTimeout(() => {
-        syncSubLinksSubscriptions({ silent: true });
-      }, 1000);
-    }
-  }, [token]);
 
   if (!token) {
     return (

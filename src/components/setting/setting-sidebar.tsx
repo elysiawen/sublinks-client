@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Switch } from "@/components/base";
@@ -11,27 +11,24 @@ const SettingSidebar = () => {
   const { t } = useTranslation();
 
   // Visibility state: Record<path, isVisible>
-  const [visibility, setVisibility] = useState<Record<string, boolean>>({});
-
-  useEffect(() => {
+  const [visibility, setVisibility] = useState<Record<string, boolean>>(() => {
     const saved = localStorage.getItem(
       SUBLINKS_CONFIG.STORAGE_KEYS.SIDEBAR_VISIBILITY,
     );
     if (saved) {
       try {
-        setVisibility(JSON.parse(saved));
+        return JSON.parse(saved);
       } catch (e) {
         console.error("Failed to parse sidebar visibility", e);
       }
-    } else {
-      // Default: all visible
-      const defaultVisibility: Record<string, boolean> = {};
-      navItems.forEach((item) => {
-        defaultVisibility[item.path] = true;
-      });
-      setVisibility(defaultVisibility);
     }
-  }, []);
+    // Default: all visible
+    const defaultVisibility: Record<string, boolean> = {};
+    navItems.forEach((item) => {
+      defaultVisibility[item.path] = true;
+    });
+    return defaultVisibility;
+  });
 
   const toggleVisibility = (path: string) => {
     const newVisibility = {

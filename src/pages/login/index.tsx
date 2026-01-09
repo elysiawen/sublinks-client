@@ -8,23 +8,22 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useState } from "react";
-import { useNavigate } from "react-router";
 
 import logoIcon from "@/assets/image/logo.ico";
 import { WindowControls } from "@/components/layout/window-controller";
 import { SUBLINKS_CONFIG } from "@/configs/sublinks-config";
 import { showNotice } from "@/services/notice-service";
-import { useThemeMode } from "@/services/states";
+// import { useThemeMode } from "@/services/states"; // This import is no longer needed if mode/isDark are removed
 import { syncSubLinksSubscriptions } from "@/services/sublinks-service";
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState("");
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // Removed as per instruction
 
-  const mode = useThemeMode();
-  const isDark = mode !== "light";
+  // const mode = useThemeMode(); // Removed as per instruction
+  // const isDark = mode !== "light"; // Removed as per instruction
   const apiUrl = SUBLINKS_CONFIG.DEFAULT_API_URL;
 
   const [username, setUsername] = useState("");

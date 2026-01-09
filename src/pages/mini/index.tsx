@@ -3,7 +3,6 @@ import { Box, GlobalStyles, Paper, Typography } from "@mui/material";
 import { LogicalPosition } from "@tauri-apps/api/dpi";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
 
 import { useTrafficData } from "@/hooks/use-traffic-data";
 import { hideInitialOverlay } from "@/pages/_layout/utils/initial-loading-overlay";
@@ -12,8 +11,6 @@ import parseTraffic from "@/utils/parse-traffic";
 const MINI_WINDOW_POSITION_KEY = "mini_window_position";
 
 const MiniPage = () => {
-  const { t } = useTranslation();
-
   useEffect(() => {
     hideInitialOverlay();
 

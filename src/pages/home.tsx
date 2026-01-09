@@ -178,16 +178,20 @@ const WelcomeBanner = () => {
   };
 
   useEffect(() => {
-    setHitokoto(t("home.components.welcomeBanner.hitokoto.loading"));
-    fetch(SUBLINKS_CONFIG.HITOKOTO_API)
-      .then((res) => res.json())
-      .then((data) => {
-        setHitokoto(data.hitokoto);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch hitokoto", err);
-        setHitokoto(t("home.components.welcomeBanner.hitokoto.fallback"));
-      });
+    const fetchGreeting = () => {
+      // eslint-disable-next-line
+      setHitokoto(t("home.components.welcomeBanner.hitokoto.loading"));
+      fetch(SUBLINKS_CONFIG.HITOKOTO_API)
+        .then((res) => res.json())
+        .then((data) => {
+          setHitokoto(data.hitokoto);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch hitokoto", err);
+          setHitokoto(t("home.components.welcomeBanner.hitokoto.fallback"));
+        });
+    };
+    fetchGreeting();
   }, [t]);
 
   const getTimeGreeting = () => {

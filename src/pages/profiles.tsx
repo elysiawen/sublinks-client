@@ -41,12 +41,10 @@ import {
   ProfileViewerRef,
 } from "@/components/profile/profile-viewer";
 import { ConfigViewer } from "@/components/setting/mods/config-viewer";
-import { useListen } from "@/hooks/use-listen";
 import { useProfiles } from "@/hooks/use-profiles";
 import {
   deleteProfile,
   enhanceProfiles,
-  getProfiles,
   //restartCore,
   getRuntimeLogs,
   reorderProfile,
@@ -95,10 +93,10 @@ const isOperationAborted = (
 const ProfilePage = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { addListener } = useListen();
+  // const { addListener } = useListen();
   const [syncing, setSyncing] = useState(false);
   const [activatings, setActivatings] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   // Batch selection states
   const [batchMode, setBatchMode] = useState(false);
@@ -237,55 +235,6 @@ const ProfilePage = () => {
   };
 
   // 强化的刷新策略
-  const performRobustRefresh = async () => {
-    let retryCount = 0;
-    const maxRetries = 5;
-    const baseDelay = 200;
-
-    while (retryCount < maxRetries) {
-      try {
-        debugLog(`[导入刷新] 第${retryCount + 1}次尝试刷新配置数据`);
-
-        // 强制刷新，绕过所有缓存
-        await mutateProfiles(undefined, {
-          revalidate: true,
-          rollbackOnError: false,
-        });
-
-        // 等待状态稳定
-        await new Promise((resolve) =>
-          setTimeout(resolve, baseDelay * (retryCount + 1)),
-        );
-
-        await onEnhance(false);
-        return;
-      } catch (error) {
-        console.error(`[导入刷新] 第${retryCount + 1}次刷新失败:`, error);
-        retryCount++;
-        await new Promise((resolve) =>
-          setTimeout(resolve, baseDelay * retryCount),
-        );
-      }
-    }
-
-    // 所有重试失败后的最后尝试
-    console.warn(`[导入刷新] 常规刷新失败，尝试清除缓存重新获取`);
-    try {
-      // 清除SWR缓存并重新获取
-      await mutate("getProfiles", getProfiles(), { revalidate: true });
-      await onEnhance(false);
-      showNotice.error(
-        "profiles.page.feedback.notifications.importNeedsRefresh",
-        3000,
-      );
-    } catch (finalError) {
-      console.error(`[导入刷新] 最终刷新尝试失败:`, finalError);
-      showNotice.error(
-        "profiles.page.feedback.notifications.importSuccess",
-        5000,
-      );
-    }
-  };
 
   const onDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
