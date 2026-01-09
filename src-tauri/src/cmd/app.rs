@@ -247,7 +247,9 @@ pub fn update_ui_stage(stage: UiReadyStage) {
 #[tauri::command]
 pub async fn open_mini_window(app_handle: AppHandle) -> CmdResult<()> {
     if let Some(window) = app_handle.get_webview_window("mini") {
-        window.set_size(tauri::Size::Logical(tauri::LogicalSize::new(90.0, 56.0))).stringify_err()?;
+        window
+            .set_size(tauri::Size::Logical(tauri::LogicalSize::new(90.0, 56.0)))
+            .stringify_err()?;
         window.show().stringify_err()?;
         window.set_focus().stringify_err()?;
         return Ok(());
@@ -265,7 +267,9 @@ pub async fn open_mini_window(app_handle: AppHandle) -> CmdResult<()> {
         .build()
         .stringify_err()?;
 
-    window.set_size(tauri::Size::Logical(tauri::LogicalSize::new(90.0, 56.0))).stringify_err()?;
+    window
+        .set_size(tauri::Size::Logical(tauri::LogicalSize::new(90.0, 56.0)))
+        .stringify_err()?;
 
     Ok(())
 }

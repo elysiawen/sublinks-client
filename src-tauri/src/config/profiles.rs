@@ -103,7 +103,7 @@ impl IProfiles {
                 self.current = some_uid.cloned();
             }
         }
-        
+
         // If patch.current is None and patch.items is Some (empty array), clear current
         if patch.current.is_none() && patch.items.is_some() {
             self.current = None;
