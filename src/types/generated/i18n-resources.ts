@@ -224,6 +224,13 @@ export interface TranslationResources {
           };
         };
       };
+      notifications: {
+        autoSyncFailed: string;
+        autoSyncSuccess: string;
+        loginSuccess: string;
+        logoutSuccess: string;
+        sessionExpired: string;
+      };
     };
     logs: {
       actions: {
@@ -1181,6 +1188,15 @@ export interface TranslationResources {
             tunMode: string;
             tunUnavailable: string;
           };
+        };
+        sublinks: {
+          descriptions: {
+            autoSync: string;
+          };
+          fields: {
+            autoSync: string;
+          };
+          title: string;
         };
         system: {
           fields: {

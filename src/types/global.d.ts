@@ -947,6 +947,7 @@ interface IVergeConfig {
   enable_auto_delay_detection?: boolean;
   enable_builtin_enhanced?: boolean;
   auto_log_clean?: 0 | 1 | 2 | 3 | 4;
+  sublinks_auto_sync?: boolean;
   enable_auto_backup_schedule?: boolean;
   auto_backup_interval_hours?: number;
   auto_backup_on_change?: boolean;

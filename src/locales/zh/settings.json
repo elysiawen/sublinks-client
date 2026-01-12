@@ -23,6 +23,15 @@
         }
       }
     },
+    "sublinks": {
+      "title": "SubLinks 设置",
+      "fields": {
+        "autoSync": "启动时自动同步"
+      },
+      "descriptions": {
+        "autoSync": "应用启动时自动同步订阅列表"
+      }
+    },
     "proxyControl": {
       "tooltips": {
         "systemProxy": "修改操作系统的代理设置，如果开启失败，可手动修改操作系统的代理设置",

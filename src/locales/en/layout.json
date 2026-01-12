@@ -30,5 +30,12 @@
         "logout": "Logout"
       }
     }
+  },
+  "notifications": {
+    "autoSyncSuccess": "Subscriptions synced successfully",
+    "autoSyncFailed": "Failed to sync subscriptions",
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logged out",
+    "sessionExpired": "Session expired, please login again"
   }
 }

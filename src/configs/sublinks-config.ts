@@ -6,7 +6,7 @@ export const SUBLINKS_CONFIG = {
   PRODUCT_NAME: "SubLinks Client",
 
   // Default API URL for SubLinks service
-  DEFAULT_API_URL: "http://localhost:3001",
+  DEFAULT_API_URL: import.meta.env.VITE_SUBLINKS_API_URL || "",
 
   // Background Image API for Home Page Welcome Banner
   // Example: https://api.paugram.com/wallpaper/

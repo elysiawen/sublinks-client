@@ -8,6 +8,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import logoIcon from "@/assets/image/logo.ico";
 import { WindowControls } from "@/components/layout/window-controller";
@@ -17,6 +18,7 @@ import { showNotice } from "@/services/notice-service";
 import { syncSubLinksSubscriptions } from "@/services/sublinks-service";
 
 const LoginPage = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState("");
@@ -72,10 +74,10 @@ const LoginPage = () => {
         },
       });
 
-      showNotice("success", "登录及同步成功，正在进入系统...");
+      showNotice("success", t("layout.notifications.loginSuccess") as string);
 
-      // Reload to ensure Layout picks up the token and triggers auto-sync
-      window.location.reload();
+      // Trigger auth change event for seamless login
+      window.dispatchEvent(new Event("sublinks-auth-change"));
     } catch (err: any) {
       setError(err.message || "无法连接到服务器");
     } finally {

@@ -177,6 +177,9 @@ pub struct IVerge {
     /// Create backups automatically when critical configs change
     pub auto_backup_on_change: Option<bool>,
 
+    /// SubLinks: Auto sync subscriptions on startup
+    pub sublinks_auto_sync: Option<bool>,
+
     /// verge 的各种 port 用于覆盖 clash 的各种 port
     #[cfg(not(target_os = "windows"))]
     pub verge_redir_port: Option<u16>,
@@ -534,6 +537,7 @@ impl IVerge {
         patch!(enable_auto_backup_schedule);
         patch!(auto_backup_interval_hours);
         patch!(auto_backup_on_change);
+        patch!(sublinks_auto_sync);
 
         patch!(webdav_url);
         patch!(webdav_username);

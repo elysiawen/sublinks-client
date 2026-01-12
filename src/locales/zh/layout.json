@@ -30,5 +30,12 @@
         "logout": "登出"
       }
     }
+  },
+  "notifications": {
+    "autoSyncSuccess": "订阅列表同步成功",
+    "autoSyncFailed": "订阅列表同步失败",
+    "loginSuccess": "登录成功",
+    "logoutSuccess": "已登出",
+    "sessionExpired": "登录已过期，请重新登录"
   }
 }

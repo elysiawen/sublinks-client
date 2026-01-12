@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { BasePage } from "@/components/base";
 import SettingClash from "@/components/setting/setting-clash";
 import SettingSidebar from "@/components/setting/setting-sidebar";
+import SettingSubLinks from "@/components/setting/setting-sublinks";
 import SettingSystem from "@/components/setting/setting-system";
 import SettingVergeAdvanced from "@/components/setting/setting-verge-advanced";
 import SettingVergeBasic from "@/components/setting/setting-verge-basic";
@@ -41,6 +42,15 @@ const SettingPage = () => {
             }}
           >
             <SettingClash onError={onError} />
+          </Box>
+          <Box
+            sx={{
+              borderRadius: 2,
+              marginBottom: 1.5,
+              backgroundColor: isDark ? "#282a36" : "#ffffff",
+            }}
+          >
+            <SettingSubLinks onError={onError} />
           </Box>
           <Box
             sx={{

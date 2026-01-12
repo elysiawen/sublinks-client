@@ -43,6 +43,7 @@ import { useI18n } from "@/hooks/use-i18n";
 import { useVerge } from "@/hooks/use-verge";
 import { useWindowDecorations } from "@/hooks/use-window";
 // [NEW] Updated imports for cleanup
+import { showNotice } from "@/services/notice-service";
 import { useThemeMode } from "@/services/states";
 import {
   syncSubLinksSubscriptions,
@@ -303,16 +304,29 @@ const Layout = () => {
     );
   }, [menuOrder, sidebarVisibility]);
 
-  // [NEW] Auth Guard - Moved up to avoid conditional hooks
-  let token = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
+  // [NEW] Auth State - Use state to support seamless login/logout
+  const [token, setToken] = useState<string | null>(() => {
+    const t = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
+    // Handle "undefined" string from previous bugs
+    if (t === "undefined") {
+      localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
+      return null;
+    }
+    return t;
+  });
+
+  useEffect(() => {
+    const handleAuthChange = () => {
+      const newToken = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
+      setToken(newToken);
+    };
+    window.addEventListener("sublinks-auth-change", handleAuthChange);
+    return () =>
+      window.removeEventListener("sublinks-auth-change", handleAuthChange);
+  }, []);
+
+  // Sync user object (optional, mostly for display if needed)
   const userStr = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER);
-
-  // Handle "undefined" string from previous bugs
-  if (token === "undefined") {
-    localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
-    token = null;
-  }
-
   let user = null;
   try {
     if (userStr) user = JSON.parse(userStr);
@@ -320,17 +334,49 @@ const Layout = () => {
 
   // [NEW] Auto-sync subscriptions on startup
   const syncAttemptedRef = useRef(false);
+  const syncTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (token && !syncAttemptedRef.current) {
+    // Check if auto-sync is enabled in settings
+    const autoSyncEnabled = verge?.sublinks_auto_sync ?? false;
+
+    if (token && !syncAttemptedRef.current && autoSyncEnabled) {
       syncAttemptedRef.current = true;
+
+      // Clear any existing timer
+      if (syncTimerRef.current) {
+        clearTimeout(syncTimerRef.current);
+      }
+
       // Delay sync to allow core and app to stabilize
-      const timer = setTimeout(() => {
-        syncSubLinksSubscriptions({ silent: true });
+      syncTimerRef.current = setTimeout(() => {
+        syncSubLinksSubscriptions({ silent: true })
+          .then(() => {
+            showNotice(
+              "success",
+              t("layout.notifications.autoSyncSuccess") as string,
+            );
+          })
+          .catch((err) => {
+            console.error("[Auto-Sync] Failed:", err);
+            showNotice(
+              "error",
+              t("layout.notifications.autoSyncFailed") as string,
+            );
+          });
+        syncTimerRef.current = null;
       }, 1000);
-      return () => clearTimeout(timer);
     }
-  }, [token]);
+
+    // Cleanup function - but don't clear the timer if sync was already scheduled
+    return () => {
+      // Only clear if we haven't started syncing yet
+      if (syncTimerRef.current && !syncAttemptedRef.current) {
+        clearTimeout(syncTimerRef.current);
+        syncTimerRef.current = null;
+      }
+    };
+  }, [token, verge?.sublinks_auto_sync, t]);
 
   if (!themeReady) {
     return (

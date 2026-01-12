@@ -51,6 +51,7 @@ export const syncSubLinksSubscriptions = async (options?: {
         console.warn(
           "[SubLinks Service] Session expired (401), logging out...",
         );
+        showNotice("error", "登录已过期，请重新登录");
         await logoutSubLinks();
         return false;
       }
@@ -213,6 +214,9 @@ export const logoutSubLinks = async () => {
     console.error("[SubLinks Service] Error during logout cleanup", err);
   }
 
-  // Reload only after cleanup is complete
-  window.location.reload();
+  // Show notification before reload
+  showNotice("success", "已登出"); // Note: Text will be managed by caller or hardcoded for now inside service
+
+  // Trigger auth change event for seamless logout
+  window.dispatchEvent(new Event("sublinks-auth-change"));
 };
