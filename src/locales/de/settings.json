@@ -402,6 +402,7 @@
         "stack": "TUN-Modus-Stack",
         "device": "Device Name",
         "autoRoute": "Globale Routing automatisch einstellen",
+        "routeExcludeAddress": "Routen-Ausnahmeadressen",
         "strictRoute": "Strenges Routing",
         "autoDetectInterface": "Netzwerkschnittstelle automatisch auswählen",
         "dnsHijack": "DNS-Hijacking",
