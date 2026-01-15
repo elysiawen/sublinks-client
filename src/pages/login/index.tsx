@@ -51,6 +51,7 @@ const LoginPage = () => {
 
       // Extract token robustly
       const token = data.token || data.accessToken || data.access_token;
+      const refreshToken = data.refreshToken;
 
       if (!token) {
         console.error("[Login] No token found in response", data);
@@ -60,6 +61,12 @@ const LoginPage = () => {
       // Save Token and Config
       localStorage.setItem(SUBLINKS_CONFIG.STORAGE_KEYS.API_URL, apiUrl);
       localStorage.setItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN, token);
+      if (refreshToken) {
+        localStorage.setItem(
+          SUBLINKS_CONFIG.STORAGE_KEYS.REFRESH_TOKEN,
+          refreshToken,
+        );
+      }
       localStorage.setItem(
         SUBLINKS_CONFIG.STORAGE_KEYS.USER,
         JSON.stringify(data.user),

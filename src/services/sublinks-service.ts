@@ -9,6 +9,52 @@ import {
 } from "@/services/cmds";
 import { showNotice } from "@/services/notice-service";
 
+/**
+ * Refresh access token using refresh token
+ */
+export const refreshAccessToken = async (): Promise<boolean> => {
+  const refreshToken = localStorage.getItem(
+    SUBLINKS_CONFIG.STORAGE_KEYS.REFRESH_TOKEN,
+  );
+
+  if (!refreshToken) {
+    console.warn("[SubLinks Service] No refresh token found");
+    return false;
+  }
+
+  const apiUrl = SUBLINKS_CONFIG.DEFAULT_API_URL;
+  const baseUrl = apiUrl.replace(/\/$/, "");
+
+  try {
+    const response = await fetch(`${baseUrl}/api/client/auth/refresh`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (!response.ok) {
+      console.warn("[SubLinks Service] Refresh token expired or invalid");
+      return false;
+    }
+
+    const data = await response.json();
+    const newAccessToken = data.accessToken || data.access_token;
+
+    if (newAccessToken) {
+      localStorage.setItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN, newAccessToken);
+      console.log("[SubLinks Service] Access token refreshed successfully");
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.error("[SubLinks Service] Failed to refresh token:", error);
+    return false;
+  }
+};
+
 export const syncSubLinksSubscriptions = async (options?: {
   onProgress?: (status: string) => void;
   silent?: boolean;
@@ -46,20 +92,46 @@ export const syncSubLinksSubscriptions = async (options?: {
       getProfiles(),
     ]);
 
-    if (!subResponse.ok) {
-      if (subResponse.status === 401) {
+    // Handle 401 with token refresh and retry
+    let finalResponse = subResponse;
+    if (!subResponse.ok && subResponse.status === 401) {
+      console.log("[SubLinks Service] Token expired, attempting refresh...");
+      const refreshed = await refreshAccessToken();
+
+      if (refreshed) {
+        // Retry with new token
+        const newToken = localStorage.getItem(
+          SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN,
+        );
+        if (newToken) {
+          finalResponse = await fetch(`${baseUrl}/api/client/subscriptions`, {
+            headers: {
+              Authorization: `Bearer ${newToken}`,
+              "User-Agent": "sublinks-client",
+            },
+          });
+        }
+      }
+
+      // If still 401 after refresh attempt, logout
+      if (!finalResponse.ok && finalResponse.status === 401) {
         console.warn(
-          "[SubLinks Service] Session expired (401), logging out...",
+          "[SubLinks Service] Session expired after refresh attempt, logging out...",
         );
         showNotice("error", "登录已过期，请重新登录");
         await logoutSubLinks();
         return false;
       }
-      const errorData = await subResponse.json().catch(() => ({}));
-      throw new Error(errorData.message || `请求失败 (${subResponse.status})`);
     }
 
-    const subData = await subResponse.json();
+    if (!finalResponse.ok) {
+      const errorData = await finalResponse.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `请求失败 (${finalResponse.status})`,
+      );
+    }
+
+    const subData = await finalResponse.json();
     const serverSubs = subData.subscriptions || [];
     const serverUrls = new Set(
       serverSubs.map((s: any) => s.url).filter(Boolean),

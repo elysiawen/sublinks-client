@@ -19,6 +19,7 @@ export const SUBLINKS_CONFIG = {
   // Storage keys
   STORAGE_KEYS: {
     TOKEN: "sublinks_token",
+    REFRESH_TOKEN: "sublinks_refresh_token",
     USER: "sublinks_user",
     API_URL: "sublinks_api_url",
     SIDEBAR_VISIBILITY: "sublinks_sidebar_visibility",
