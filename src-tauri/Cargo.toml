@@ -5,14 +5,10 @@ description = "clash verge"
 authors = ["zzzgydi", "Tunglies", "wonfen", "MystiPanda"]
 license = "GPL-3.0-only"
 repository = "https://github.com/clash-verge-rev/clash-verge-rev.git"
-default-run = "SubLinks Client"
+default-run = "sublinks-client"
 build = "build.rs"
 edition = "2024"
 rust-version = "1.91"
-
-[[bin]]
-name = "SubLinks Client"
-path = "src/main.rs"
 
 [lib]
 name = "app_lib"
