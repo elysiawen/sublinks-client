@@ -39,6 +39,34 @@
 
 详见 [CONTRIBUTING.md](./CONTRIBUTING.md)。
 
+---
+
+### TG 频道: [@clash_verge_rev](https://t.me/clash_verge_re)
+
+## Features
+
+- 基于性能强劲的 Rust 和 Tauri 2 框架
+- 内置[Clash.Meta(mihomo)](https://github.com/MetaCubeX/mihomo)内核，并支持切换 `Alpha` 版本内核。
+- 简洁美观的用户界面，支持自定义主题颜色、代理组/托盘图标以及 `CSS Injection`。
+- 配置文件管理和增强（Merge 和 Script），配置文件语法提示。
+- 系统代理和守卫、`TUN(虚拟网卡)` 模式。
+- 可视化节点和规则编辑
+- WebDav 配置备份和同步
+
+### FAQ
+
+Refer to [Doc FAQ Page](https://clash-verge-rev.github.io/faq/windows.html)
+
+### Donation
+
+[捐助Clash Verge Rev的开发](https://github.com/sponsors/clash-verge-rev)
+
+## Development
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for more details.
+
+To run the development server, execute the following commands after all prerequisites for **Tauri** are installed:
+
 ```shell
 pnpm i
 pnpm run prebuild
