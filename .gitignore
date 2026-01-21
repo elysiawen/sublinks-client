@@ -14,4 +14,4 @@ scripts/_env.sh
 .changelog_backups
 target
 
-.env
+.env*

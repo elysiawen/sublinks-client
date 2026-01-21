@@ -41,8 +41,6 @@
 
 ---
 
-### TG 频道: [@clash_verge_rev](https://t.me/clash_verge_re)
-
 ## Features
 
 - 基于性能强劲的 Rust 和 Tauri 2 框架
