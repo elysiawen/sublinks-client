@@ -329,7 +329,6 @@ export const logoutSubLinks = async (): Promise<{
   success: boolean;
   message?: string;
 }> => {
-  const token = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
   const refreshToken = localStorage.getItem(
     SUBLINKS_CONFIG.STORAGE_KEYS.REFRESH_TOKEN,
   );

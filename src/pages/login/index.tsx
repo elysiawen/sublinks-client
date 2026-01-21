@@ -13,13 +13,13 @@ import { useTranslation } from "react-i18next";
 import logoIcon from "@/assets/image/logo.ico";
 import { WindowControls } from "@/components/layout/window-controller";
 import { SUBLINKS_CONFIG } from "@/configs/sublinks-config";
+import { getSystemHostname } from "@/services/cmds";
 import { showNotice } from "@/services/notice-service";
 // import { useThemeMode } from "@/services/states"; // This import is no longer needed if mode/isDark are removed
 import {
   syncSubLinksSubscriptions,
   USER_AGENT,
 } from "@/services/sublinks-service";
-import { getSystemHostname } from "@/services/cmds";
 
 const LoginPage = () => {
   const { t } = useTranslation();
@@ -65,7 +65,7 @@ const LoginPage = () => {
       let data;
       try {
         data = text ? JSON.parse(text) : {};
-      } catch (e) {
+      } catch {
         if (!response.ok) {
           throw new Error(`请求失败 (${response.status}): ${text}`);
         }
