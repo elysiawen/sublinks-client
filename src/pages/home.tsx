@@ -213,7 +213,7 @@ const WelcomeBanner = () => {
     return t("home.components.welcomeBanner.greetings.lateNight");
   };
 
-  const username = user?.username || "Guest";
+  const username = user?.nickname || user?.username || "Guest";
   const greeting = getTimeGreeting();
 
   return (

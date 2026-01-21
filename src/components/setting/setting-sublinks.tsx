@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { Switch } from "@/components/base";
 import { useVerge } from "@/hooks/use-verge";
+import { openMiniWindow, closeMiniWindow } from "@/services/cmds";
 
 import { GuardState } from "./mods/guard-state";
 import { SettingList, SettingItem } from "./mods/setting-comp";
@@ -16,7 +17,7 @@ const SettingSubLinks = ({ onError }: Props) => {
 
   const { verge, mutateVerge, patchVerge } = useVerge();
 
-  const { sublinks_auto_sync } = verge ?? {};
+  const { sublinks_auto_sync, enable_mini_window } = verge ?? {};
 
   const onSwitchFormat = (
     _e: React.ChangeEvent<HTMLInputElement>,
@@ -45,6 +46,28 @@ const SettingSubLinks = ({ onError }: Props) => {
           onFormat={onSwitchFormat}
           onChange={(e) => onChangeData({ sublinks_auto_sync: e })}
           onGuard={(e) => patchVerge({ sublinks_auto_sync: e })}
+        >
+          <Switch edge="end" />
+        </GuardState>
+      </SettingItem>
+
+      <SettingItem
+        label={t("settings.components.verge.basic.fields.miniWindow")}
+      >
+        <GuardState
+          value={enable_mini_window ?? false}
+          valueProps="checked"
+          onFormat={(_e, checked) => checked}
+          onCatch={onError}
+          onChange={(e) => onChangeData({ enable_mini_window: e })}
+          onGuard={async (e: boolean) => {
+            patchVerge({ enable_mini_window: e });
+            if (e) {
+              await openMiniWindow();
+            } else {
+              await closeMiniWindow();
+            }
+          }}
         >
           <Switch edge="end" />
         </GuardState>

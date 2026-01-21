@@ -27,7 +27,12 @@
       },
       "userInfo": {
         "loggedIn": "Logged in",
-        "logout": "Logout"
+        "logout": "Logout",
+        "logoutConfirmationTitle": "Confirm Logout",
+        "logoutConfirmationMessage": "Are you sure you want to logout?",
+        "loggingOut": "Logging out...",
+        "amountLogout": "Logout",
+        "cancel": "Cancel"
       }
     }
   },
@@ -36,6 +41,7 @@
     "autoSyncFailed": "Failed to sync subscriptions",
     "loginSuccess": "Login successful",
     "logoutSuccess": "Logged out",
+    "logoutFailed": "Logout failed",
     "sessionExpired": "Session expired, please login again"
   }
 }

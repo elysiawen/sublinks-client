@@ -8,6 +8,11 @@ import {
   patchProfile,
 } from "@/services/cmds";
 import { showNotice } from "@/services/notice-service";
+import getSystem from "@/utils/get-system";
+
+// Hardcoded version from package.json to avoid import issues
+const APP_VERSION = "1.0.0";
+export const USER_AGENT = `SubLinks Client Desktop/v${APP_VERSION} (${getSystem()})`;
 
 /**
  * Refresh access token using refresh token
@@ -30,6 +35,7 @@ export const refreshAccessToken = async (): Promise<boolean> => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "User-Agent": USER_AGENT,
       },
       body: JSON.stringify({ refreshToken }),
     });
@@ -86,7 +92,7 @@ export const syncSubLinksSubscriptions = async (options?: {
       fetch(`${baseUrl}/api/client/subscriptions`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "User-Agent": "sublinks-client",
+          "User-Agent": USER_AGENT,
         },
       }),
       getProfiles(),
@@ -107,7 +113,7 @@ export const syncSubLinksSubscriptions = async (options?: {
           finalResponse = await fetch(`${baseUrl}/api/client/subscriptions`, {
             headers: {
               Authorization: `Bearer ${newToken}`,
-              "User-Agent": "sublinks-client",
+              "User-Agent": USER_AGENT,
             },
           });
         }
@@ -254,9 +260,119 @@ export const syncSubLinksSubscriptions = async (options?: {
   }
 };
 
-export const logoutSubLinks = async () => {
+export const fetchSubLinksUserInfo = async () => {
+  const token = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
+  if (!token) return;
+
+  const apiUrl = SUBLINKS_CONFIG.DEFAULT_API_URL;
+  const baseUrl = apiUrl.replace(/\/$/, "");
+
+  try {
+    const response = await fetch(`${baseUrl}/api/client/auth/user`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "User-Agent": USER_AGENT,
+      },
+    });
+
+    // Check for 401 Unauthorized
+    if (response.status === 401) {
+      console.warn("[SubLinks Service] User Info 401, attempting refresh...");
+      const refreshed = await refreshAccessToken();
+      if (refreshed) {
+        // Retry with new token
+        const newToken = localStorage.getItem(
+          SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN,
+        );
+        if (newToken) {
+          const retryResponse = await fetch(`${baseUrl}/api/client/auth/user`, {
+            headers: {
+              Authorization: `Bearer ${newToken}`,
+              "User-Agent": USER_AGENT,
+            },
+          });
+          if (retryResponse.ok) {
+            const data = await retryResponse.json();
+            const userObj = data.user || data;
+            localStorage.setItem(
+              SUBLINKS_CONFIG.STORAGE_KEYS.USER,
+              JSON.stringify(userObj),
+            );
+            window.dispatchEvent(new Event("sublinks-auth-change"));
+            return;
+          }
+        }
+      }
+      // If refresh failed or retry failed, force logout
+      console.warn("[SubLinks Service] Refresh failed, logging out...");
+      await logoutSubLinks();
+      return;
+    }
+
+    if (response.ok) {
+      const data = await response.json();
+      // Logic from Android: if data has "user" field, use that; otherwise use data itself
+      const userObj = data.user || data;
+      localStorage.setItem(
+        SUBLINKS_CONFIG.STORAGE_KEYS.USER,
+        JSON.stringify(userObj),
+      );
+      // Trigger update
+      window.dispatchEvent(new Event("sublinks-auth-change"));
+    }
+  } catch (error) {
+    console.error("[SubLinks Service] Failed to fetch user info:", error);
+  }
+};
+
+export const logoutSubLinks = async (): Promise<{
+  success: boolean;
+  message?: string;
+}> => {
+  const token = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
+  const refreshToken = localStorage.getItem(
+    SUBLINKS_CONFIG.STORAGE_KEYS.REFRESH_TOKEN,
+  );
+  const apiUrl = SUBLINKS_CONFIG.DEFAULT_API_URL;
+  const baseUrl = apiUrl.replace(/\/$/, "");
+
+  let apiResult = { success: false, message: "" };
+
+  // Call Logout API if possible
+  if (refreshToken) {
+    try {
+      const response = await fetch(`${baseUrl}/api/client/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": USER_AGENT,
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (response.ok || data.success) {
+        apiResult = {
+          success: true,
+          message: data.message || "已登出",
+        };
+      } else {
+        apiResult = {
+          success: false,
+          message: data.message || `HTTP ${response.status}`,
+        };
+      }
+    } catch (e: any) {
+      console.error("[SubLinks Service] Logout API failed", e);
+      apiResult = { success: false, message: e.message || "Network Error" };
+    }
+  } else {
+    apiResult = { success: true, message: "已登出 (本地)" };
+  }
+
   // Clear auth data immediately
   localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
+  localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.REFRESH_TOKEN); // Also clear refresh token
   localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER);
 
   try {
@@ -286,9 +402,8 @@ export const logoutSubLinks = async () => {
     console.error("[SubLinks Service] Error during logout cleanup", err);
   }
 
-  // Show notification before reload
-  showNotice("success", "已登出"); // Note: Text will be managed by caller or hardcoded for now inside service
-
   // Trigger auth change event for seamless logout
   window.dispatchEvent(new Event("sublinks-auth-change"));
+
+  return apiResult;
 };

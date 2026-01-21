@@ -130,9 +130,14 @@ impl NetworkManager {
         if let Some(ua) = user_agent {
             headers.insert(USER_AGENT, HeaderValue::from_str(ua.as_str())?);
         } else {
+            let os = std::env::consts::OS;
             headers.insert(
                 USER_AGENT,
-                HeaderValue::from_str(&format!("sublinks-client/v{}", env!("CARGO_PKG_VERSION")))?,
+                HeaderValue::from_str(&format!(
+                    "SubLinks Client Desktop/v{} ({})",
+                    env!("CARGO_PKG_VERSION"),
+                    os
+                ))?,
             );
         }
 

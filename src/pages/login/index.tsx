@@ -15,7 +15,11 @@ import { WindowControls } from "@/components/layout/window-controller";
 import { SUBLINKS_CONFIG } from "@/configs/sublinks-config";
 import { showNotice } from "@/services/notice-service";
 // import { useThemeMode } from "@/services/states"; // This import is no longer needed if mode/isDark are removed
-import { syncSubLinksSubscriptions } from "@/services/sublinks-service";
+import {
+  syncSubLinksSubscriptions,
+  USER_AGENT,
+} from "@/services/sublinks-service";
+import { getSystemHostname } from "@/services/cmds";
 
 const LoginPage = () => {
   const { t } = useTranslation();
@@ -27,6 +31,7 @@ const LoginPage = () => {
   // const mode = useThemeMode(); // Removed as per instruction
   // const isDark = mode !== "light"; // Removed as per instruction
   const apiUrl = SUBLINKS_CONFIG.DEFAULT_API_URL;
+  console.log("[Login] Using API URL:", apiUrl);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -37,16 +42,38 @@ const LoginPage = () => {
     setError(null);
 
     try {
+      let deviceInfo = USER_AGENT;
+      try {
+        const hostname = await getSystemHostname();
+        if (hostname) {
+          deviceInfo = hostname;
+        }
+      } catch (e) {
+        console.warn("[Login] Failed to get hostname, using UA:", e);
+      }
+
       const response = await fetch(`${apiUrl}/api/client/auth/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": USER_AGENT,
+        },
+        body: JSON.stringify({ username, password, deviceInfo }),
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      let data;
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (e) {
+        if (!response.ok) {
+          throw new Error(`请求失败 (${response.status}): ${text}`);
+        }
+        throw new Error("服务器返回了无效的响应");
+      }
 
       if (!response.ok) {
-        throw new Error(data.message || "登录失败");
+        throw new Error(data.message || `登录失败 (${response.status})`);
       }
 
       // Extract token robustly

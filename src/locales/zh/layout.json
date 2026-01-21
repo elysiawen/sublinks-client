@@ -27,7 +27,12 @@
       },
       "userInfo": {
         "loggedIn": "已登录",
-        "logout": "登出"
+        "logout": "登出",
+        "logoutConfirmationTitle": "确认登出",
+        "logoutConfirmationMessage": "确定要登出吗？",
+        "loggingOut": "正在登出...",
+        "amountLogout": "登出",
+        "cancel": "取消"
       }
     }
   },
@@ -36,6 +41,7 @@
     "autoSyncFailed": "订阅列表同步失败",
     "loginSuccess": "登录成功",
     "logoutSuccess": "已登出",
+    "logoutFailed": "登出失败",
     "sessionExpired": "登录已过期，请重新登录"
   }
 }

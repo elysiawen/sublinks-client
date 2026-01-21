@@ -24,8 +24,21 @@
       },
       "userInfo": {
         "loggedIn": "Вход выполнен",
-        "logout": "Выйти"
+        "logout": "Выйти",
+        "logoutConfirmationTitle": "Подтверждение выхода",
+        "logoutConfirmationMessage": "Вы уверены, что хотите выйти из аккаунта?",
+        "loggingOut": "Выход...",
+        "amountLogout": "Выйти",
+        "cancel": "Отмена"
       }
     }
+  },
+  "notifications": {
+    "autoSyncSuccess": "Подписки успешно синхронизированы",
+    "autoSyncFailed": "Не удалось синхронизировать подписки",
+    "loginSuccess": "Вход выполнен успешно",
+    "logoutSuccess": "Выход выполнен",
+    "logoutFailed": "Ошибка выхода",
+    "sessionExpired": "Сессия истекла, пожалуйста, войдите снова"
   }
 }

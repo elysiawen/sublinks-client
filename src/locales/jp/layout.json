@@ -24,8 +24,21 @@
       },
       "userInfo": {
         "loggedIn": "ログイン済み",
-        "logout": "ログアウト"
+        "logout": "ログアウト",
+        "logoutConfirmationTitle": "ログアウトの確認",
+        "logoutConfirmationMessage": "本当にログアウトしますか？",
+        "loggingOut": "ログアウト中...",
+        "amountLogout": "ログアウト",
+        "cancel": "キャンセル"
       }
     }
+  },
+  "notifications": {
+    "autoSyncSuccess": "サブスクリプションの同期に成功しました",
+    "autoSyncFailed": "サブスクリプションの同期に失敗しました",
+    "loginSuccess": "ログイン成功",
+    "logoutSuccess": "ログアウトしました",
+    "logoutFailed": "ログアウトに失敗しました",
+    "sessionExpired": "セッションが期限切れです。再度ログインしてください"
   }
 }

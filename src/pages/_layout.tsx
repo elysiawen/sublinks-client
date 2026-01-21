@@ -23,6 +23,12 @@ import {
   Typography,
   IconButton,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -48,6 +54,7 @@ import { useThemeMode } from "@/services/states";
 import {
   syncSubLinksSubscriptions,
   logoutSubLinks,
+  fetchSubLinksUserInfo,
 } from "@/services/sublinks-service"; // [NEW] Updated imports
 import getSystem from "@/utils/get-system";
 
@@ -133,6 +140,10 @@ const Layout = () => {
   const [menuUnlocked, setMenuUnlocked] = useState(false);
   const [menuContextPosition, setMenuContextPosition] =
     useState<MenuContextPosition | null>(null);
+
+  // [NEW] Logout Dialog State
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const windowControlsRef = useRef<any>(null);
   const { decorated } = useWindowDecorations();
@@ -332,7 +343,10 @@ const Layout = () => {
     if (userStr) user = JSON.parse(userStr);
   } catch (ignore) {}
 
-  // [NEW] Auto-sync subscriptions on startup
+  // [NEW] Use API for user info sync
+  // fetchSubLinksUserInfo is imported from @/services/sublinks-service
+
+  // [NEW] Auto-sync subscriptions and user info on startup
   const syncAttemptedRef = useRef(false);
   const syncTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -340,32 +354,37 @@ const Layout = () => {
     // Check if auto-sync is enabled in settings
     const autoSyncEnabled = verge?.sublinks_auto_sync ?? false;
 
-    if (token && !syncAttemptedRef.current && autoSyncEnabled) {
-      syncAttemptedRef.current = true;
+    if (token) {
+      // Always fetch user info on startup if logged in
+      fetchSubLinksUserInfo();
 
-      // Clear any existing timer
-      if (syncTimerRef.current) {
-        clearTimeout(syncTimerRef.current);
+      if (!syncAttemptedRef.current && autoSyncEnabled) {
+        syncAttemptedRef.current = true;
+
+        // Clear any existing timer
+        if (syncTimerRef.current) {
+          clearTimeout(syncTimerRef.current);
+        }
+
+        // Delay sync to allow core and app to stabilize
+        syncTimerRef.current = setTimeout(() => {
+          syncSubLinksSubscriptions({ silent: true })
+            .then(() => {
+              showNotice(
+                "success",
+                t("layout.notifications.autoSyncSuccess") as string,
+              );
+            })
+            .catch((err) => {
+              console.error("[Auto-Sync] Failed:", err);
+              showNotice(
+                "error",
+                t("layout.notifications.autoSyncFailed") as string,
+              );
+            });
+          syncTimerRef.current = null;
+        }, 1000);
       }
-
-      // Delay sync to allow core and app to stabilize
-      syncTimerRef.current = setTimeout(() => {
-        syncSubLinksSubscriptions({ silent: true })
-          .then(() => {
-            showNotice(
-              "success",
-              t("layout.notifications.autoSyncSuccess") as string,
-            );
-          })
-          .catch((err) => {
-            console.error("[Auto-Sync] Failed:", err);
-            showNotice(
-              "error",
-              t("layout.notifications.autoSyncFailed") as string,
-            );
-          });
-        syncTimerRef.current = null;
-      }, 1000);
     }
 
     // Cleanup function - but don't clear the timer if sync was already scheduled
@@ -403,8 +422,33 @@ const Layout = () => {
     );
   }
 
-  const handleLogout = async () => {
-    await logoutSubLinks();
+  const handleLogoutClick = () => {
+    setLogoutDialogOpen(true);
+  };
+
+  const handleLogoutConfirm = async () => {
+    setLoggingOut(true);
+    try {
+      const result = await logoutSubLinks();
+      showNotice(
+        result.success ? "success" : "error",
+        result.message || (t("layout.notifications.logoutSuccess") as string),
+      );
+    } catch (e: any) {
+      showNotice(
+        "error",
+        t("layout.notifications.logoutFailed") + ": " + e.message,
+      );
+    } finally {
+      setLoggingOut(false);
+      setLogoutDialogOpen(false);
+    }
+  };
+
+  const handleLogoutCancel = () => {
+    if (!loggingOut) {
+      setLogoutDialogOpen(false);
+    }
   };
 
   return (
@@ -438,6 +482,7 @@ const Layout = () => {
             }
           `}
         </style>
+
         <Paper
           square
           elevation={0}
@@ -628,7 +673,7 @@ const Layout = () => {
                 sx={{
                   mx: 2,
                   mt: "auto",
-                  mb: 1,
+                  mb: 2,
                   p: 1.5,
                   borderRadius: 2,
                   bgcolor: (theme) =>
@@ -636,8 +681,8 @@ const Layout = () => {
                       ? "rgba(0, 0, 0, 0.05)"
                       : "rgba(255, 255, 255, 0.05)",
                   display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
+                  flexDirection: "column",
+                  gap: 1.5,
                 }}
               >
                 <Box
@@ -647,10 +692,35 @@ const Layout = () => {
                     overflow: "hidden",
                   }}
                 >
-                  <PersonRounded sx={{ fontSize: 20, mr: 1, opacity: 0.7 }} />
+                  {user?.avatar ? (
+                    <Box
+                      component="img"
+                      src={user.avatar}
+                      sx={{
+                        height: 44,
+                        width: 44,
+                        borderRadius: "50%",
+                        mr: 1.5,
+                        objectFit: "cover",
+                        flexShrink: 0,
+                      }}
+                      onError={(e: any) => {
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <PersonRounded
+                      sx={{
+                        fontSize: 44,
+                        mr: 1.5,
+                        opacity: 0.7,
+                        flexShrink: 0,
+                      }}
+                    />
+                  )}
                   <Box sx={{ minWidth: 0 }}>
-                    <Typography variant="body2" fontWeight="bold" noWrap>
-                      {user?.username || "User"}
+                    <Typography variant="subtitle2" fontWeight="bold" noWrap>
+                      {user?.nickname || user?.username || "User"}
                     </Typography>
                     <Typography
                       variant="caption"
@@ -662,17 +732,18 @@ const Layout = () => {
                     </Typography>
                   </Box>
                 </Box>
-                <Tooltip
-                  title={t("layout.components.navigation.userInfo.logout")}
+
+                <Button
+                  onClick={handleLogoutClick}
+                  variant="outlined"
+                  color="error"
+                  size="small"
+                  fullWidth
+                  startIcon={<LogoutRounded fontSize="small" />}
+                  sx={{ borderRadius: 1.5 }}
                 >
-                  <IconButton
-                    onClick={handleLogout}
-                    size="small"
-                    sx={{ ml: 0.5 }}
-                  >
-                    <LogoutRounded fontSize="small" />
-                  </IconButton>
-                </Tooltip>
+                  {t("layout.components.navigation.userInfo.logout")}
+                </Button>
               </Box>
 
               <div className="the-traffic">
@@ -690,6 +761,44 @@ const Layout = () => {
             </div>
           </div>
         </Paper>
+
+        <Dialog
+          open={logoutDialogOpen}
+          onClose={handleLogoutCancel}
+          aria-labelledby="logout-dialog-title"
+          aria-describedby="logout-dialog-description"
+        >
+          <DialogTitle id="logout-dialog-title" sx={{ fontWeight: "bold" }}>
+            {t("layout.components.navigation.userInfo.logoutConfirmationTitle")}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="logout-dialog-description">
+              {t(
+                "layout.components.navigation.userInfo.logoutConfirmationMessage",
+              )}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 3 }}>
+            <Button
+              onClick={handleLogoutCancel}
+              color="inherit"
+              disabled={loggingOut}
+            >
+              {t("layout.components.navigation.userInfo.cancel")}
+            </Button>
+            <Button
+              onClick={handleLogoutConfirm}
+              color="error"
+              variant="contained"
+              disabled={loggingOut}
+              autoFocus
+            >
+              {loggingOut
+                ? t("layout.components.navigation.userInfo.loggingOut")
+                : t("layout.components.navigation.userInfo.amountLogout")}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </ThemeProvider>
     </SWRConfig>
   );

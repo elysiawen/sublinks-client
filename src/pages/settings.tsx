@@ -43,15 +43,7 @@ const SettingPage = () => {
           >
             <SettingClash onError={onError} />
           </Box>
-          <Box
-            sx={{
-              borderRadius: 2,
-              marginBottom: 1.5,
-              backgroundColor: isDark ? "#282a36" : "#ffffff",
-            }}
-          >
-            <SettingSubLinks onError={onError} />
-          </Box>
+
           <Box
             sx={{
               borderRadius: 2,
@@ -62,6 +54,15 @@ const SettingPage = () => {
           </Box>
         </Grid>
         <Grid size={6}>
+          <Box
+            sx={{
+              borderRadius: 2,
+              marginBottom: 1.5,
+              backgroundColor: isDark ? "#282a36" : "#ffffff",
+            }}
+          >
+            <SettingSubLinks onError={onError} />
+          </Box>
           <Box
             sx={{
               borderRadius: 2,

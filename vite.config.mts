@@ -149,6 +149,7 @@ const chunkRules: ChunkRule[] = [
 ];
 export default defineConfig({
   root: "src",
+  envDir: CONFIG_DIR,
   server: { port: 3000 },
   plugins: [
     svgr(),
