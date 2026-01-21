@@ -27,7 +27,7 @@
     "removeUnusedCommands": true
   },
   "productName": "SubLinks Client",
-  "identifier": "io.github.clash-verge-rev.clash-verge-rev",
+  "identifier": "com.sublinks.client",
   "plugins": {
     "deep-link": {
       "desktop": {

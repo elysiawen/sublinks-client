@@ -219,8 +219,13 @@ export interface TranslationResources {
             test_web: string;
           };
           userInfo: {
+            amountLogout: string;
+            cancel: string;
             loggedIn: string;
+            loggingOut: string;
             logout: string;
+            logoutConfirmationMessage: string;
+            logoutConfirmationTitle: string;
           };
         };
       };
@@ -228,6 +233,7 @@ export interface TranslationResources {
         autoSyncFailed: string;
         autoSyncSuccess: string;
         loginSuccess: string;
+        logoutFailed: string;
         logoutSuccess: string;
         sessionExpired: string;
       };
