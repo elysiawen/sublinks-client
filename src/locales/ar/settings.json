@@ -166,7 +166,12 @@
         },
         "notifications": {
           "latestVersion": "أنت على أحدث إصدار حاليًا",
-          "versionCopied": "Version copied to clipboard"
+          "versionCopied": "Version copied to clipboard",
+          "checking": "جاري التحقق من وجود تحديثات...",
+          "newVersion": "تم العثور على نسخة جديدة {{version}}",
+          "failed": "فشل التحقق من وجود تحديثات",
+          "refreshTokenFailed": "فشل تحديث الرمز",
+          "fetchUserInfoFailed": "فشل جلب معلومات المستخدم"
         },
         "fields": {
           "backupSetting": "إعداد النسخ الاحتياطي",
@@ -181,6 +186,13 @@
           "exportDiagnostics": "Export Diagnostic Info",
           "vergeVersion": "إصدار Verge"
         }
+      },
+      "updateDialog": {
+        "title": "تم العثور على نسخة جديدة",
+        "version": "إصدار",
+        "releaseTime": "وقت الإصدار",
+        "download": "تنزيل التحديث",
+        "cancel": "إلغاء"
       },
       "theme": {
         "title": "إعدادات السمة",

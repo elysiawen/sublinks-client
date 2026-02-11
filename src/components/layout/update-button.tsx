@@ -1,10 +1,9 @@
 import { Button } from "@mui/material";
-import { useRef } from "react";
+import { useState } from "react";
 
-import { DialogRef } from "@/components/base";
 import { useUpdate } from "@/hooks/use-update";
 
-import { UpdateViewer } from "../setting/mods/update-viewer";
+import { UpdateDialog } from "../setting/mods/update-dialog";
 
 interface Props {
   className?: string;
@@ -12,7 +11,7 @@ interface Props {
 
 export const UpdateButton = (props: Props) => {
   const { className } = props;
-  const viewerRef = useRef<DialogRef>(null);
+  const [open, setOpen] = useState(false);
 
   const { updateInfo } = useUpdate();
 
@@ -20,14 +19,18 @@ export const UpdateButton = (props: Props) => {
 
   return (
     <>
-      <UpdateViewer ref={viewerRef} />
+      <UpdateDialog
+        open={open}
+        data={updateInfo}
+        onClose={() => setOpen(false)}
+      />
 
       <Button
         color="error"
         variant="contained"
         size="small"
         className={className}
-        onClick={() => viewerRef.current?.open()}
+        onClick={() => setOpen(true)}
       >
         New
       </Button>

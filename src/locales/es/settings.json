@@ -166,7 +166,12 @@
         },
         "notifications": {
           "latestVersion": "Actualmente está en la última versión",
-          "versionCopied": "Version copied to clipboard"
+          "versionCopied": "Version copied to clipboard",
+          "checking": "Buscando actualizaciones...",
+          "newVersion": "Nueva versión encontrada {{version}}",
+          "failed": "Error al buscar actualizaciones",
+          "refreshTokenFailed": "Error al actualizar el token",
+          "fetchUserInfoFailed": "Error al obtener información del usuario"
         },
         "fields": {
           "backupSetting": "Configuración de copia de seguridad",
@@ -181,6 +186,13 @@
           "exportDiagnostics": "Exportar información de diagnóstico",
           "vergeVersion": "Versión de Verge"
         }
+      },
+      "updateDialog": {
+        "title": "Nueva versión encontrada",
+        "version": "Versión",
+        "releaseTime": "Hora de lanzamiento",
+        "download": "Descargar actualización",
+        "cancel": "Cancelar"
       },
       "theme": {
         "title": "Configuración de tema",

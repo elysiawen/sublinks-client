@@ -193,7 +193,12 @@
         },
         "notifications": {
           "latestVersion": "Currently on the Latest Version",
-          "versionCopied": "Version copied to clipboard"
+          "versionCopied": "Version copied to clipboard",
+          "checking": "Checking for updates...",
+          "newVersion": "New version found {{version}}",
+          "failed": "Check for update failed",
+          "refreshTokenFailed": "Refresh token failed",
+          "fetchUserInfoFailed": "Fetch user info failed"
         },
         "fields": {
           "backupSetting": "Backup Setting",
@@ -208,6 +213,13 @@
           "exportDiagnostics": "Export Diagnostic Info",
           "vergeVersion": "Verge Version"
         }
+      },
+      "updateDialog": {
+        "title": "New Version Found",
+        "version": "Version",
+        "releaseTime": "Release Time",
+        "download": "Download Update",
+        "cancel": "Cancel"
       },
       "theme": {
         "title": "Theme Setting",

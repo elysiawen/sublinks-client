@@ -166,7 +166,12 @@
         },
         "notifications": {
           "latestVersion": "Sie verwenden bereits die neueste Version",
-          "versionCopied": "Version copied to clipboard"
+          "versionCopied": "Version copied to clipboard",
+          "checking": "Nach Updates suchen...",
+          "newVersion": "Neue Version gefunden {{version}}",
+          "failed": "Suche nach Updates fehlgeschlagen",
+          "refreshTokenFailed": "Aktualisierung des Tokens fehlgeschlagen",
+          "fetchUserInfoFailed": "Abrufen der Benutzerinformationen fehlgeschlagen"
         },
         "fields": {
           "backupSetting": "Sicherungseinstellungen",
@@ -181,6 +186,13 @@
           "exportDiagnostics": "Diagnoseinformationen exportieren",
           "vergeVersion": "Verge-Version"
         }
+      },
+      "updateDialog": {
+        "title": "Neue Version gefunden",
+        "version": "Version",
+        "releaseTime": "Veröffentlichungszeit",
+        "download": "Update herunterladen",
+        "cancel": "Abbrechen"
       },
       "theme": {
         "title": "Thema-Einstellungen",

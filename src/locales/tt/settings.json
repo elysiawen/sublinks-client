@@ -166,7 +166,12 @@
         },
         "notifications": {
           "latestVersion": "Сездә иң соңгы версия урнаштырылган",
-          "versionCopied": "Version copied to clipboard"
+          "versionCopied": "Version copied to clipboard",
+          "checking": "Checking for updates...",
+          "newVersion": "New version found {{version}}",
+          "failed": "Failed to check for updates",
+          "refreshTokenFailed": "Failed to refresh token",
+          "fetchUserInfoFailed": "Failed to fetch user info"
         },
         "fields": {
           "backupSetting": "Резерв копия көйләүләре",
@@ -181,6 +186,13 @@
           "exportDiagnostics": "Export Diagnostic Info",
           "vergeVersion": "Verge версиясе"
         }
+      },
+      "updateDialog": {
+        "title": "New version found",
+        "version": "Version",
+        "releaseTime": "Release Time",
+        "download": "Download Update",
+        "cancel": "Cancel"
       },
       "theme": {
         "title": "Тема көйләүләре",

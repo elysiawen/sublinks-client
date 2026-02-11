@@ -30,7 +30,13 @@ export const SettingItem: React.FC<ItemProps> = ({
   const clickable = !!onClick;
 
   const primary = (
-    <Box sx={{ display: "flex", alignItems: "center", fontSize: "14px" }}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        fontSize: "14px",
+      }}
+    >
       <span>{label}</span>
       {extra ? extra : null}
     </Box>
@@ -52,6 +58,7 @@ export const SettingItem: React.FC<ItemProps> = ({
     <ListItem disablePadding>
       <ListItemButton onClick={handleClick} disabled={isLoading}>
         <ListItemText primary={primary} secondary={secondary} />
+        {children}
         {isLoading ? (
           <CircularProgress color="inherit" size={20} />
         ) : (

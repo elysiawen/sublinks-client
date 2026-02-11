@@ -166,7 +166,12 @@
         },
         "notifications": {
           "latestVersion": "Saat ini pada Versi Terbaru",
-          "versionCopied": "Version copied to clipboard"
+          "versionCopied": "Version copied to clipboard",
+          "checking": "Memeriksa pembaruan...",
+          "newVersion": "Versi baru ditemukan {{version}}",
+          "failed": "Gagal memeriksa pembaruan",
+          "refreshTokenFailed": "Gagal memperbarui token",
+          "fetchUserInfoFailed": "Gagal mengambil info pengguna"
         },
         "fields": {
           "backupSetting": "Pengaturan Cadangan",
@@ -181,6 +186,13 @@
           "exportDiagnostics": "Export Diagnostic Info",
           "vergeVersion": "Versi Verge"
         }
+      },
+      "updateDialog": {
+        "title": "Versi baru ditemukan",
+        "version": "Versi",
+        "releaseTime": "Waktu Rilis",
+        "download": "Unduh Pembaruan",
+        "cancel": "Batal"
       },
       "theme": {
         "title": "Pengaturan Tema",

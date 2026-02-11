@@ -166,7 +166,12 @@
         },
         "notifications": {
           "latestVersion": "現在は最新バージョンです。",
-          "versionCopied": "Version copied to clipboard"
+          "versionCopied": "Version copied to clipboard",
+          "checking": "更新を確認中...",
+          "newVersion": "新しいバージョンが見つかりました {{version}}",
+          "failed": "更新の確認に失敗しました",
+          "refreshTokenFailed": "トークンの更新に失敗しました",
+          "fetchUserInfoFailed": "ユーザー情報の取得に失敗しました"
         },
         "fields": {
           "backupSetting": "バックアップ設定",
@@ -181,6 +186,13 @@
           "exportDiagnostics": "診断情報をエクスポート",
           "vergeVersion": "Vergeバージョン"
         }
+      },
+      "updateDialog": {
+        "title": "新しいバージョンが見つかりました",
+        "version": "バージョン",
+        "releaseTime": "リリース時間",
+        "download": "更新をダウンロード",
+        "cancel": "キャンセル"
       },
       "theme": {
         "title": "テーマ設定",

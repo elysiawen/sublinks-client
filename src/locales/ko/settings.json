@@ -166,7 +166,12 @@
         },
         "notifications": {
           "latestVersion": "현재 최신 버전입니다",
-          "versionCopied": "버전이 클립보드에 복사되었습니다"
+          "versionCopied": "버전이 클립보드에 복사되었습니다",
+          "checking": "업데이트 확인 중...",
+          "newVersion": "새 버전 발견 {{version}}",
+          "failed": "업데이트 확인 실패",
+          "refreshTokenFailed": "토큰 갱신 실패",
+          "fetchUserInfoFailed": "사용자 정보 가져오기 실패"
         },
         "fields": {
           "backupSetting": "백업 설정",
@@ -181,6 +186,13 @@
           "exportDiagnostics": "진단 정보 내보내기",
           "vergeVersion": "Verge 버전"
         }
+      },
+      "updateDialog": {
+        "title": "새 버전 발견",
+        "version": "버전",
+        "releaseTime": "배포 시간",
+        "download": "업데이트 다운로드",
+        "cancel": "취소"
       },
       "theme": {
         "title": "테마 설정",

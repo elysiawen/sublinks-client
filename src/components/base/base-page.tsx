@@ -21,7 +21,10 @@ export const BasePage: React.FC<Props> = (props) => {
   return (
     <BaseErrorBoundary>
       <div className="base-page">
-        <header data-tauri-drag-region="true" style={{ userSelect: "none" }}>
+        <header
+          data-tauri-drag-region="true"
+          style={{ userSelect: "none", position: "relative" }}
+        >
           <Typography
             sx={{ fontSize: "20px", fontWeight: "700 " }}
             data-tauri-drag-region="true"

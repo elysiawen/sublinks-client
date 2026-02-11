@@ -19,6 +19,8 @@ export const MiscViewer = forwardRef<DialogRef>((props, ref) => {
   const { t } = useTranslation();
   const { verge, patchVerge } = useVerge();
 
+  const updateEnabled = import.meta.env.UPDATE_ENABLED === "true";
+
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState({
     appLogLevel: "warn",
@@ -198,18 +200,20 @@ export const MiscViewer = forwardRef<DialogRef>((props, ref) => {
           />
         </ListItem>
 
-        <ListItem sx={{ padding: "5px 2px" }}>
-          <ListItemText
-            primary={t("settings.modals.misc.fields.autoCheckUpdate")}
-          />
-          <Switch
-            edge="end"
-            checked={values.autoCheckUpdate}
-            onChange={(_, c) =>
-              setValues((v) => ({ ...v, autoCheckUpdate: c }))
-            }
-          />
-        </ListItem>
+        {updateEnabled && (
+          <ListItem sx={{ padding: "5px 2px" }}>
+            <ListItemText
+              primary={t("settings.modals.misc.fields.autoCheckUpdate")}
+            />
+            <Switch
+              edge="end"
+              checked={values.autoCheckUpdate}
+              onChange={(_, c) =>
+                setValues((v) => ({ ...v, autoCheckUpdate: c }))
+              }
+            />
+          </ListItem>
+        )}
 
         <ListItem sx={{ padding: "5px 2px" }}>
           <ListItemText

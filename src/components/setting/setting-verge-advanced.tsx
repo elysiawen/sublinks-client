@@ -1,9 +1,10 @@
 import { ContentCopyRounded } from "@mui/icons-material";
-import { Typography } from "@mui/material";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DialogRef, TooltipIcon } from "@/components/base";
+import { DialogRef, Switch, TooltipIcon } from "@/components/base";
+import { useUpdate } from "@/hooks/use-update";
+import { useVerge } from "@/hooks/use-verge";
 import {
   exitApp,
   exportDiagnosticInfo,
@@ -13,7 +14,9 @@ import {
   openLogsDir,
 } from "@/services/cmds";
 import { showNotice } from "@/services/notice-service";
-import { version } from "@root/package.json";
+import { checkUpdate, IUpdateInfo } from "@/services/update-service";
+
+const version = import.meta.env.APP_VERSION;
 
 import { BackupViewer } from "./mods/backup-viewer";
 import { ConfigViewer } from "./mods/config-viewer";
@@ -23,6 +26,7 @@ import { LiteModeViewer } from "./mods/lite-mode-viewer";
 import { MiscViewer } from "./mods/misc-viewer";
 import { SettingItem, SettingList } from "./mods/setting-comp";
 import { ThemeViewer } from "./mods/theme-viewer";
+import { UpdateDialog } from "./mods/update-dialog";
 
 interface Props {
   onError?: (err: Error) => void;
@@ -30,6 +34,15 @@ interface Props {
 
 const SettingVergeAdvanced = ({ onError: _ }: Props) => {
   const { t } = useTranslation();
+  const { verge, patchVerge, mutateVerge } = useVerge();
+
+  const { auto_check_update } = verge || {};
+
+  const onChangeData = (patch: any) => {
+    mutateVerge({ ...verge, ...patch }, false);
+  };
+
+  const updateEnabled = import.meta.env.UPDATE_ENABLED === "true";
 
   const configRef = useRef<DialogRef>(null);
   const hotkeyRef = useRef<DialogRef>(null);
@@ -38,6 +51,15 @@ const SettingVergeAdvanced = ({ onError: _ }: Props) => {
   const layoutRef = useRef<DialogRef>(null);
   const backupRef = useRef<DialogRef>(null);
   const liteModeRef = useRef<DialogRef>(null);
+
+  const [updateInfo, setUpdateInfo] = useState<IUpdateInfo | null>(null);
+
+  const onCheckUpdate = useCallback(async () => {
+    const info = await checkUpdate();
+    if (info) {
+      setUpdateInfo(info);
+    }
+  }, []);
 
   const onExportDiagnosticInfo = useCallback(async () => {
     await exportDiagnosticInfo();
@@ -55,6 +77,8 @@ const SettingVergeAdvanced = ({ onError: _ }: Props) => {
       );
     });
   }, []);
+
+  const { updateInfo: autoUpdateInfo } = useUpdate();
 
   return (
     <SettingList title={t("settings.components.verge.advanced.title")}>
@@ -136,18 +160,59 @@ const SettingVergeAdvanced = ({ onError: _ }: Props) => {
         }
       ></SettingItem>
 
-      <SettingItem
-        label={t("settings.components.verge.advanced.fields.vergeVersion")}
-        extra={
-          <TooltipIcon
-            icon={ContentCopyRounded}
-            onClick={copyVersion}
-            title={t("settings.components.verge.advanced.actions.copyVersion")}
+      {updateEnabled && (
+        <SettingItem label={t("settings.modals.misc.fields.autoCheckUpdate")}>
+          <Switch
+            edge="end"
+            checked={auto_check_update !== false}
+            onChange={(_, checked) => {
+              onChangeData({ auto_check_update: checked });
+              patchVerge({ auto_check_update: checked });
+            }}
           />
+        </SettingItem>
+      )}
+
+      <SettingItem
+        onClick={updateEnabled ? onCheckUpdate : undefined}
+        label={
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {t("settings.components.verge.advanced.fields.vergeVersion")}
+            <TooltipIcon
+              icon={ContentCopyRounded}
+              onClick={(e) => {
+                e.stopPropagation();
+                copyVersion();
+              }}
+              title={t(
+                "settings.components.verge.advanced.actions.copyVersion",
+              )}
+            />
+            {updateEnabled && autoUpdateInfo?.available && (
+              <span
+                style={{
+                  fontSize: 12,
+                  color: "#fff",
+                  background: "#4caf50",
+                  padding: "0 6px",
+                  borderRadius: 4,
+                  fontWeight: "bold",
+                }}
+              >
+                NEW
+              </span>
+            )}
+          </div>
         }
       >
-        <Typography sx={{ py: "7px", pr: 1 }}>v{version}</Typography>
+        <span style={{ opacity: 0.7, paddingRight: 8 }}>v{version}</span>
       </SettingItem>
+
+      <UpdateDialog
+        open={!!updateInfo}
+        data={updateInfo}
+        onClose={() => setUpdateInfo(null)}
+      />
     </SettingList>
   );
 };

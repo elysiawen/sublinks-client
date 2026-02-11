@@ -150,6 +150,7 @@ const chunkRules: ChunkRule[] = [
 export default defineConfig({
   root: "src",
   envDir: CONFIG_DIR,
+  envPrefix: ["UPDATE_", "SUBLINKS_", "APP_"],
   server: { port: 3000 },
   plugins: [
     svgr(),

@@ -14,3 +14,6 @@ scripts/_env.sh
 .changelog_backups
 target
 CLAUDE.md
+.env.*
+
+mock-update-api.mjs

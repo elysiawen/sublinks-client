@@ -708,7 +708,11 @@ const Layout = () => {
                   {user?.avatar ? (
                     <Box
                       component="img"
-                      src={user.avatar}
+                      src={
+                        localStorage.getItem(
+                          SUBLINKS_CONFIG.STORAGE_KEYS.AVATAR_CACHE,
+                        ) || user.avatar
+                      }
                       sx={{
                         height: 44,
                         width: 44,

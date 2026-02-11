@@ -1,3 +1,5 @@
+import { jwtDecode } from "jwt-decode";
+
 import { SUBLINKS_CONFIG } from "@/configs/sublinks-config";
 import {
   importProfile,
@@ -7,6 +9,7 @@ import {
   deleteProfile,
   patchProfile,
 } from "@/services/cmds";
+import i18n from "@/services/i18n";
 import { showNotice } from "@/services/notice-service";
 import getSystem from "@/utils/get-system";
 
@@ -55,9 +58,45 @@ export const refreshAccessToken = async (): Promise<boolean> => {
     }
 
     return false;
-  } catch (error) {
+  } catch (error: any) {
     console.error("[SubLinks Service] Failed to refresh token:", error);
+    showNotice.error(
+      `${i18n.t("settings.components.verge.advanced.notifications.refreshTokenFailed" as any)}: ${error.message || "网络错误"}`,
+    );
     return false;
+  }
+};
+
+/**
+ * Check if access token is expiring (or expired) and refresh it proactively.
+ * Threshold: 5 minutes (300 seconds)
+ */
+const checkAndRefreshAccessToken = async () => {
+  const token = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
+  if (!token) return;
+
+  try {
+    const decoded: any = jwtDecode(token);
+    const exp = decoded.exp;
+    if (!exp) return;
+
+    // exp is in seconds, Date.now() is in ms
+    const now = Date.now() / 1000;
+    const threshold = 300; // 5 minutes
+
+    const timeLeft = exp - now;
+
+    if (timeLeft < threshold) {
+      console.log(
+        `[SubLinks Service] Token expiring in ${timeLeft.toFixed(0)}s (threshold ${threshold}s), refreshing proactively...`,
+      );
+      await refreshAccessToken();
+    } else {
+      // debug log can be removed later
+      // console.log(`[SubLinks Service] Token valid for ${(timeLeft / 60).toFixed(1)} min`);
+    }
+  } catch (error) {
+    console.warn("[SubLinks Service] Failed to decode token for check:", error);
   }
 };
 
@@ -66,6 +105,10 @@ export const syncSubLinksSubscriptions = async (options?: {
   silent?: boolean;
 }) => {
   const { onProgress, silent } = options || {};
+
+  // Proactive Token Refresh
+  await checkAndRefreshAccessToken();
+
   let token = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
   const userStr = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER);
 
@@ -260,7 +303,52 @@ export const syncSubLinksSubscriptions = async (options?: {
   }
 };
 
+/**
+ * Download and cache avatar as base64 data URL in localStorage.
+ * Only re-downloads if the avatar URL has changed.
+ */
+const cacheAvatarIfChanged = async (avatarUrl: string | undefined) => {
+  if (!avatarUrl) {
+    // No avatar, clear cache
+    localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.AVATAR_URL);
+    localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.AVATAR_CACHE);
+    return;
+  }
+
+  const cachedUrl = localStorage.getItem(
+    SUBLINKS_CONFIG.STORAGE_KEYS.AVATAR_URL,
+  );
+
+  // Avatar URL hasn't changed, skip download
+  if (cachedUrl === avatarUrl) return;
+
+  try {
+    const response = await fetch(avatarUrl);
+    if (!response.ok) return;
+
+    const blob = await response.blob();
+    const reader = new FileReader();
+
+    const base64 = await new Promise<string>((resolve, reject) => {
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+
+    localStorage.setItem(SUBLINKS_CONFIG.STORAGE_KEYS.AVATAR_URL, avatarUrl);
+    localStorage.setItem(SUBLINKS_CONFIG.STORAGE_KEYS.AVATAR_CACHE, base64);
+    console.log("[SubLinks Service] Avatar cached successfully");
+    // Trigger UI update
+    window.dispatchEvent(new Event("sublinks-auth-change"));
+  } catch (error) {
+    console.warn("[SubLinks Service] Failed to cache avatar:", error);
+  }
+};
+
 export const fetchSubLinksUserInfo = async () => {
+  // Proactive Token Refresh
+  await checkAndRefreshAccessToken();
+
   const token = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
   if (!token) return;
 
@@ -298,6 +386,8 @@ export const fetchSubLinksUserInfo = async () => {
               SUBLINKS_CONFIG.STORAGE_KEYS.USER,
               JSON.stringify(userObj),
             );
+            // Cache avatar if changed
+            await cacheAvatarIfChanged(userObj.avatar);
             window.dispatchEvent(new Event("sublinks-auth-change"));
             return;
           }
@@ -317,11 +407,16 @@ export const fetchSubLinksUserInfo = async () => {
         SUBLINKS_CONFIG.STORAGE_KEYS.USER,
         JSON.stringify(userObj),
       );
+      // Cache avatar if changed
+      await cacheAvatarIfChanged(userObj.avatar);
       // Trigger update
       window.dispatchEvent(new Event("sublinks-auth-change"));
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("[SubLinks Service] Failed to fetch user info:", error);
+    showNotice.error(
+      `${i18n.t("settings.components.verge.advanced.notifications.fetchUserInfoFailed" as any)}: ${error.message || "网络错误"}`,
+    );
   }
 };
 
@@ -342,7 +437,7 @@ export const logoutSubLinks = async (
     localStorage.setItem(SUBLINKS_CONFIG.STORAGE_KEYS.LOGOUT_REASON, reason);
   }
 
-  let apiResult = { success: false, message: "" };
+  let apiResult: { success: boolean; message?: string };
 
   // Call Logout API if possible
   if (refreshToken) {
@@ -380,6 +475,8 @@ export const logoutSubLinks = async (
   localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
   localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.REFRESH_TOKEN); // Also clear refresh token
   localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER);
+  localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.AVATAR_URL);
+  localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.AVATAR_CACHE);
 
   try {
     const profilesData = await getProfiles();

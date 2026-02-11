@@ -166,7 +166,12 @@
         },
         "notifications": {
           "latestVersion": "Обновление не требуется",
-          "versionCopied": "Version copied to clipboard"
+          "versionCopied": "Version copied to clipboard",
+          "checking": "Проверка обновлений...",
+          "newVersion": "Найдена новая версия {{version}}",
+          "failed": "Ошибка проверки обновлений",
+          "refreshTokenFailed": "Ошибка обновления токена",
+          "fetchUserInfoFailed": "Ошибка получения данных пользователя"
         },
         "fields": {
           "backupSetting": "Настройки резервного копирования",
@@ -181,6 +186,13 @@
           "exportDiagnostics": "Экспорт диагностической информации",
           "vergeVersion": "Версия Clash Verge Rev"
         }
+      },
+      "updateDialog": {
+        "title": "Найдена новая версия",
+        "version": "Версия",
+        "releaseTime": "Время выпуска",
+        "download": "Скачать обновление",
+        "cancel": "Отмена"
       },
       "theme": {
         "title": "Настройки темы",

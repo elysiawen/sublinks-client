@@ -1,16 +1,8 @@
 import useSWR, { SWRConfiguration } from "swr";
 
-import { checkUpdateSafe } from "@/services/update";
+import { getUpdateInfo } from "@/services/update-service";
 
 import { useVerge } from "./use-verge";
-
-export interface UpdateInfo {
-  version: string;
-  body: string;
-  date: string;
-  available: boolean;
-  downloadAndInstall: (onEvent?: any) => Promise<void>;
-}
 
 export const useUpdate = (
   enabled: boolean = true,
@@ -22,13 +14,14 @@ export const useUpdate = (
   // Determine if we should check for updates
   // If enabled is explicitly false, don't check
   // Otherwise, respect the auto_check_update setting (or default to true if null/undefined for manual triggers)
-  const shouldCheck = enabled && auto_check_update !== false;
+  const updateEnabled = import.meta.env.UPDATE_ENABLED === "true";
+  const shouldCheck = enabled && updateEnabled && auto_check_update !== false;
 
   const {
     data: updateInfo,
     mutate: checkUpdate,
     isValidating,
-  } = useSWR(shouldCheck ? "checkUpdate" : null, checkUpdateSafe, {
+  } = useSWR(shouldCheck ? "checkUpdate" : null, getUpdateInfo, {
     errorRetryCount: 2,
     revalidateIfStale: false,
     revalidateOnFocus: false,

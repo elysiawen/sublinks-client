@@ -166,7 +166,12 @@
         },
         "notifications": {
           "latestVersion": "目前已是最新版本",
-          "versionCopied": "Verge版本已複製到剪貼簿"
+          "versionCopied": "Verge版本已複製到剪貼簿",
+          "checking": "正在檢查更新...",
+          "newVersion": "發現新版本 {{version}}",
+          "failed": "檢查更新失敗",
+          "refreshTokenFailed": "重新整理權杖失敗",
+          "fetchUserInfoFailed": "獲取使用者資訊失敗"
         },
         "fields": {
           "backupSetting": "備份設定",
@@ -181,6 +186,13 @@
           "exportDiagnostics": "匯出診斷資訊",
           "vergeVersion": "Verge 版本"
         }
+      },
+      "updateDialog": {
+        "title": "發現新版本",
+        "version": "版本",
+        "releaseTime": "發布時間",
+        "download": "下載更新",
+        "cancel": "取消"
       },
       "theme": {
         "title": "主題設定",

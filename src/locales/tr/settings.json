@@ -166,7 +166,12 @@
         },
         "notifications": {
           "latestVersion": "Şu Anda En Son Sürümdesiniz",
-          "versionCopied": "Version copied to clipboard"
+          "versionCopied": "Version copied to clipboard",
+          "checking": "Güncellemeler kontrol ediliyor...",
+          "newVersion": "Yeni sürüm bulundu {{version}}",
+          "failed": "Güncelleme kontrolü başarısız",
+          "refreshTokenFailed": "Token yenileme başarısız",
+          "fetchUserInfoFailed": "Kullanıcı bilgisi alma başarısız"
         },
         "fields": {
           "backupSetting": "Yedekleme Ayarı",
@@ -181,6 +186,13 @@
           "exportDiagnostics": "Tanılama Bilgilerini Dışa Aktar",
           "vergeVersion": "Verge Sürümü"
         }
+      },
+      "updateDialog": {
+        "title": "Yeni sürüm bulundu",
+        "version": "Sürüm",
+        "releaseTime": "Yayınlanma Zamanı",
+        "download": "Güncellemeyi İndir",
+        "cancel": "İptal"
       },
       "theme": {
         "title": "Tema Ayarı",

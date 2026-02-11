@@ -166,7 +166,12 @@
         },
         "notifications": {
           "latestVersion": "در حال حاضر در آخرین نسخه",
-          "versionCopied": "نسخه در کلیپ بورد کپی شد"
+          "versionCopied": "نسخه در کلیپ بورد کپی شد",
+          "checking": "در حال بررسی بروزرسانی...",
+          "newVersion": "نسخه جدید پیدا شد {{version}}",
+          "failed": "بررسی بروزرسانی ناموفق بود",
+          "refreshTokenFailed": "تجدید توکن ناموفق بود",
+          "fetchUserInfoFailed": "دریافت اطلاعات کاربر ناموفق بود"
         },
         "fields": {
           "backupSetting": "تنظیمات پشتیبان گیری",
@@ -181,6 +186,13 @@
           "exportDiagnostics": "Export Diagnostic Info",
           "vergeVersion": "نسخه Verge"
         }
+      },
+      "updateDialog": {
+        "title": "نسخه جدید پیدا شد",
+        "version": "نسخه",
+        "releaseTime": "زمان انتشار",
+        "download": "دانلود بروزرسانی",
+        "cancel": "لغو"
       },
       "theme": {
         "title": "تنظیمات تم",

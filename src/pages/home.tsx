@@ -1,10 +1,12 @@
 import {
+  CloseRounded,
   DnsOutlined,
   HistoryEduOutlined,
   RouterOutlined,
   SettingsOutlined,
   SpeedOutlined,
   RefreshRounded,
+  NewReleasesRounded,
 } from "@mui/icons-material";
 import {
   Box,
@@ -20,6 +22,8 @@ import {
   IconButton,
   Tooltip,
   Typography,
+  Slide,
+  alpha,
 } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -31,8 +35,10 @@ import { EnhancedCard } from "@/components/home/enhanced-card";
 import { EnhancedTrafficStats } from "@/components/home/enhanced-traffic-stats";
 import { HomeProfileCard } from "@/components/home/home-profile-card";
 import { ProxyTunCard } from "@/components/home/proxy-tun-card";
+import { UpdateDialog } from "@/components/setting/mods/update-dialog";
 import { SUBLINKS_CONFIG } from "@/configs/sublinks-config";
 import { useProfiles } from "@/hooks/use-profiles";
+import { useUpdate } from "@/hooks/use-update";
 import { useVerge } from "@/hooks/use-verge";
 import { entry_lightweight_mode } from "@/services/cmds";
 // Removed local welcomeBg import to use API
@@ -300,7 +306,7 @@ const WelcomeBanner = () => {
 };
 
 const HomePage = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation() as any;
   const { verge } = useVerge();
   const { current, mutateProfiles } = useProfiles();
 
@@ -419,28 +425,135 @@ const HomePage = () => {
     () => `${serializeCardFlags(effectiveHomeCards)}:${settingsOpen ? 1 : 0}`,
     [effectiveHomeCards, settingsOpen],
   );
+  // Home Update Notification Logic
+
+  const { updateInfo } = useUpdate();
+  const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
+  const [skippedVersion, setSkippedVersion] = useState(() =>
+    localStorage.getItem("home_skipped_version"),
+  );
+
+  const showUpdateNotification = useMemo(() => {
+    if (!updateInfo?.available) return false;
+    // Fix: updateInfo.version is an object, updateInfo.version.version is the string
+    if (updateInfo.version.version === skippedVersion) return false;
+    return true;
+  }, [updateInfo, skippedVersion]);
+
+  const handleSkipVersion = useCallback(() => {
+    if (updateInfo?.version) {
+      localStorage.setItem("home_skipped_version", updateInfo.version.version);
+      setSkippedVersion(updateInfo.version.version);
+    }
+  }, [updateInfo]);
+
   return (
     <BasePage
       title={t("home.page.title")}
       contentStyle={{ padding: 2 }}
       header={
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Tooltip title={t("home.page.tooltips.lightweightMode")} arrow>
-            <IconButton
-              onClick={async () => await entry_lightweight_mode()}
-              size="small"
-              color="inherit"
+        <>
+          <Box
+            sx={{
+              position: "absolute",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 10,
+            }}
+          >
+            <Slide
+              direction="down"
+              in={showUpdateNotification}
+              mountOnEnter
+              unmountOnExit
             >
-              <HistoryEduOutlined />
-            </IconButton>
-          </Tooltip>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                  color: "primary.main",
+                  border: "1px solid",
+                  borderColor: (theme) =>
+                    alpha(theme.palette.primary.main, 0.3),
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  borderRadius: "20px",
+                  pl: 2,
+                  pr: 0.6,
+                  py: 0.65,
+                  backdropFilter: "blur(8px)",
+                }}
+              >
+                <NewReleasesRounded sx={{ fontSize: 18, ml: 0.5 }} />
+                <Typography
+                  variant="body2"
+                  fontWeight="600"
+                  sx={{ whiteSpace: "nowrap", fontSize: 13 }}
+                >
+                  {t("home.page.tooltips.updateAvailable")}
+                </Typography>
+                <Button
+                  size="small"
+                  variant="contained"
+                  onClick={() => setUpdateDialogOpen(true)}
+                  sx={{
+                    minWidth: 0,
+                    px: 1.5,
+                    py: 0.25,
+                    borderRadius: "16px",
+                    fontSize: 11,
+                    height: 24,
+                    boxShadow: 0,
+                    fontWeight: "bold",
+                    textTransform: "none",
+                    "&:hover": {
+                      boxShadow: (theme) =>
+                        `0 2px 8px ${alpha(theme.palette.primary.main, 0.4)}`,
+                    },
+                  }}
+                >
+                  {t("home.page.tooltips.updateNow")}
+                </Button>
+                <Tooltip title={t("home.page.tooltips.skipVersion")}>
+                  <IconButton
+                    size="small"
+                    onClick={handleSkipVersion}
+                    color="inherit"
+                    sx={{
+                      p: 0.5,
+                      "&:hover": {
+                        bgcolor: (theme) =>
+                          alpha(theme.palette.primary.main, 0.1),
+                      },
+                    }}
+                  >
+                    <CloseRounded sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Slide>
+          </Box>
 
-          <Tooltip title={t("home.page.tooltips.settings")} arrow>
-            <IconButton onClick={openSettings} size="small" color="inherit">
-              <SettingsOutlined />
-            </IconButton>
-          </Tooltip>
-        </Box>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Tooltip title={t("home.page.tooltips.lightweightMode")} arrow>
+              <IconButton
+                onClick={async () => await entry_lightweight_mode()}
+                size="small"
+                color="inherit"
+              >
+                <HistoryEduOutlined />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title={t("home.page.tooltips.settings")} arrow>
+              <IconButton onClick={openSettings} size="small" color="inherit">
+                <SettingsOutlined />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </>
       }
     >
       <WelcomeBanner />
@@ -458,6 +571,12 @@ const HomePage = () => {
         onClose={() => setSettingsOpen(false)}
         homeCards={effectiveHomeCards}
         onSave={handleSaveSettings}
+      />
+
+      <UpdateDialog
+        open={updateDialogOpen}
+        data={updateInfo ?? null}
+        onClose={() => setUpdateDialogOpen(false)}
       />
     </BasePage>
   );

@@ -154,3 +154,5 @@ export const initializeLanguage = async (
 ) => {
   await changeLanguage(initialLanguage);
 };
+
+export default i18n;
