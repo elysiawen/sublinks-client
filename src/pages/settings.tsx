@@ -32,7 +32,7 @@ const SettingPage = () => {
               backgroundColor: isDark ? "#282a36" : "#ffffff",
             }}
           >
-            <SettingSystem onError={onError} />
+            <SettingSubLinks onError={onError} />
           </Box>
           <Box
             sx={{
@@ -61,7 +61,7 @@ const SettingPage = () => {
               backgroundColor: isDark ? "#282a36" : "#ffffff",
             }}
           >
-            <SettingSubLinks onError={onError} />
+            <SettingSystem onError={onError} />
           </Box>
           <Box
             sx={{

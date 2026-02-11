@@ -4,10 +4,9 @@ import {
   TextField,
   Typography,
   Paper,
-  Alert,
   CircularProgress,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import logoIcon from "@/assets/image/logo.ico";
@@ -24,10 +23,7 @@ import {
 const LoginPage = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState("");
-  // const navigate = useNavigate(); // Removed as per instruction
-
   // const mode = useThemeMode(); // Removed as per instruction
   // const isDark = mode !== "light"; // Removed as per instruction
   const apiUrl = SUBLINKS_CONFIG.DEFAULT_API_URL;
@@ -36,10 +32,24 @@ const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  useEffect(() => {
+    const reason = localStorage.getItem(
+      SUBLINKS_CONFIG.STORAGE_KEYS.LOGOUT_REASON,
+    );
+    if (reason) {
+      if (reason.includes("过期") || reason.includes("失效")) {
+        showNotice("error", reason);
+      } else {
+        showNotice("success", reason);
+      }
+      localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.LOGOUT_REASON);
+    }
+  }, []);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
+    setLoading(true);
 
     try {
       let deviceInfo = USER_AGENT;
@@ -113,7 +123,7 @@ const LoginPage = () => {
       // Trigger auth change event for seamless login
       window.dispatchEvent(new Event("sublinks-auth-change"));
     } catch (err: any) {
-      setError(err.message || "无法连接到服务器");
+      showNotice("error", err.message || "无法连接到服务器");
     } finally {
       setLoading(false);
     }
@@ -182,12 +192,6 @@ const LoginPage = () => {
           SubLinks 客户端
         </Typography>
 
-        {error && (
-          <Alert severity="error" sx={{ width: "100%" }}>
-            {error}
-          </Alert>
-        )}
-
         <Box
           component="form"
           onSubmit={handleLogin}
@@ -218,26 +222,17 @@ const LoginPage = () => {
             disabled={loading}
             sx={{ mt: 3, mb: 2 }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "登录"}
+            {loading ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <CircularProgress size={20} color="inherit" />
+                <Typography variant="button">
+                  {syncStatus || "正在登录..."}
+                </Typography>
+              </Box>
+            ) : (
+              "登录"
+            )}
           </Button>
-
-          {loading && syncStatus && (
-            <Box sx={{ width: "100%", textAlign: "center", mt: 1 }}>
-              <Typography
-                variant="body2"
-                color="primary"
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 1,
-                }}
-              >
-                <CircularProgress size={16} color="inherit" />
-                {syncStatus}
-              </Typography>
-            </Box>
-          )}
         </Box>
       </Paper>
     </Box>

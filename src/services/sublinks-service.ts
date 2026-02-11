@@ -125,7 +125,7 @@ export const syncSubLinksSubscriptions = async (options?: {
           "[SubLinks Service] Session expired after refresh attempt, logging out...",
         );
         showNotice("error", "登录已过期，请重新登录");
-        await logoutSubLinks();
+        await logoutSubLinks("登录已过期，请重新登录");
         return false;
       }
     }
@@ -305,7 +305,7 @@ export const fetchSubLinksUserInfo = async () => {
       }
       // If refresh failed or retry failed, force logout
       console.warn("[SubLinks Service] Refresh failed, logging out...");
-      await logoutSubLinks();
+      await logoutSubLinks("登录已过期，请重新登录");
       return;
     }
 
@@ -325,7 +325,9 @@ export const fetchSubLinksUserInfo = async () => {
   }
 };
 
-export const logoutSubLinks = async (): Promise<{
+export const logoutSubLinks = async (
+  reason?: string,
+): Promise<{
   success: boolean;
   message?: string;
 }> => {
@@ -334,6 +336,11 @@ export const logoutSubLinks = async (): Promise<{
   );
   const apiUrl = SUBLINKS_CONFIG.DEFAULT_API_URL;
   const baseUrl = apiUrl.replace(/\/$/, "");
+
+  // Save logout reason for Login page to display
+  if (reason) {
+    localStorage.setItem(SUBLINKS_CONFIG.STORAGE_KEYS.LOGOUT_REASON, reason);
+  }
 
   let apiResult = { success: false, message: "" };
 

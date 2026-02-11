@@ -415,6 +415,7 @@ const Layout = () => {
   if (!token) {
     return (
       <ThemeProvider theme={theme}>
+        <NoticeManager position={verge?.notice_position} />
         <LoginPage />
       </ThemeProvider>
     );
@@ -427,11 +428,13 @@ const Layout = () => {
   const handleLogoutConfirm = async () => {
     setLoggingOut(true);
     try {
-      const result = await logoutSubLinks();
-      showNotice(
-        result.success ? "success" : "error",
-        result.message || (t("layout.notifications.logoutSuccess") as string),
-      );
+      const result = await logoutSubLinks("已成功退出登录");
+      if (!result.success) {
+        showNotice(
+          "error",
+          result.message || (t("layout.notifications.logoutFailed") as string),
+        );
+      }
     } catch (e: any) {
       showNotice(
         "error",

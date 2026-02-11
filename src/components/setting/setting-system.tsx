@@ -5,6 +5,7 @@ import { mutate } from "swr";
 import { DialogRef, Switch, TooltipIcon } from "@/components/base";
 import ProxyControlSwitches from "@/components/shared/proxy-control-switches";
 import { useVerge } from "@/hooks/use-verge";
+import { openMiniWindow, closeMiniWindow } from "@/services/cmds";
 
 import { GuardState } from "./mods/guard-state";
 import { SettingList, SettingItem } from "./mods/setting-comp";
@@ -20,7 +21,8 @@ const SettingSystem = ({ onError }: Props) => {
 
   const { verge, mutateVerge, patchVerge } = useVerge();
 
-  const { enable_auto_launch, enable_silent_start } = verge ?? {};
+  const { enable_auto_launch, enable_silent_start, enable_mini_window } =
+    verge ?? {};
 
   const sysproxyRef = useRef<DialogRef>(null);
   const tunRef = useRef<DialogRef>(null);
@@ -91,6 +93,27 @@ const SettingSystem = ({ onError }: Props) => {
           onFormat={onSwitchFormat}
           onChange={(e) => onChangeData({ enable_silent_start: e })}
           onGuard={(e) => patchVerge({ enable_silent_start: e })}
+        >
+          <Switch edge="end" />
+        </GuardState>
+      </SettingItem>
+      <SettingItem
+        label={t("settings.components.verge.basic.fields.miniWindow")}
+      >
+        <GuardState
+          value={enable_mini_window ?? false}
+          valueProps="checked"
+          onFormat={onSwitchFormat}
+          onCatch={onError}
+          onChange={(e) => onChangeData({ enable_mini_window: e })}
+          onGuard={async (e: boolean) => {
+            patchVerge({ enable_mini_window: e });
+            if (e) {
+              await openMiniWindow();
+            } else {
+              await closeMiniWindow();
+            }
+          }}
         >
           <Switch edge="end" />
         </GuardState>

@@ -23,5 +23,6 @@ export const SUBLINKS_CONFIG = {
     USER: "sublinks_user",
     API_URL: "sublinks_api_url",
     SIDEBAR_VISIBILITY: "sublinks_sidebar_visibility",
+    LOGOUT_REASON: "sublinks_logout_reason",
   },
 };
