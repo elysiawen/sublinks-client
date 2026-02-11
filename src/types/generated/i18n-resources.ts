@@ -472,6 +472,8 @@ export interface TranslationResources {
           disconnectFailed: string;
           duplicateNode: string;
           empty: string;
+          entryNode: string;
+          exitNode: string;
           header: string;
           instruction: string;
           minimumNodes: string;
@@ -989,6 +991,7 @@ export interface TranslationResources {
             autoCheckUpdate: string;
             autoCloseConnections: string;
             autoDelayDetection: string;
+            autoDelayDetectionInterval: string;
             autoLogClean: string;
             defaultLatencyTest: string;
             defaultLatencyTimeout: string;
@@ -1118,6 +1121,30 @@ export interface TranslationResources {
               logLevel: string;
               openUwpTool: string;
               portConfig: string;
+              tunnels: {
+                actions: {
+                  add: string;
+                  addNew: string;
+                };
+                default: string;
+                existing: string;
+                localAddr: string;
+                localPort: string;
+                messages: {
+                  incomplete: string;
+                  invalidLocalAddr: string;
+                  invalidLocalPort: string;
+                  invalidTargetAddr: string;
+                  invalidTargetPort: string;
+                };
+                optional: string;
+                protocols: string;
+                proxyGroup: string;
+                proxyNode: string;
+                targetAddr: string;
+                targetPort: string;
+                title: string;
+              };
               unifiedDelay: string;
               updateGeoData: string;
               webUI: string;
@@ -1343,6 +1370,7 @@ export interface TranslationResources {
         usedTotal: string;
       };
       placeholders: {
+        resetInput: string;
         filter: string;
         matchCase: string;
         matchWholeWord: string;

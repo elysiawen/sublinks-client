@@ -13,5 +13,4 @@ scripts/_env.sh
 .eslintcache
 .changelog_backups
 target
-
-.env*
+CLAUDE.md

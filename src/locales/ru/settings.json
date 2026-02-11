@@ -91,7 +91,31 @@
           "webUI": "Веб-интерфейс",
           "clashCore": "Ядро Clash",
           "openUwpTool": "Открыть UWP инструмент",
-          "updateGeoData": "Обновить GeoData"
+          "updateGeoData": "Обновить GeoData",
+          "tunnels": {
+            "title": "Управление туннелями",
+            "localAddr": "Локальный адрес прослушивания",
+            "localPort": "Локальный порт прослушивания",
+            "targetAddr": "Целевой адрес",
+            "targetPort": "Целевой порт",
+            "proxyGroup": "Группа прокси",
+            "proxyNode": "Прокси-узел",
+            "protocols": "Протокол",
+            "existing": "Существующие туннели",
+            "default": "Следовать текущей конфигурации",
+            "optional": "Необязательно",
+            "messages": {
+              "incomplete": "Пожалуйста, заполните все обязательные поля туннеля",
+              "invalidLocalAddr": "Недопустимый локальный адрес прослушивания",
+              "invalidLocalPort": "Недопустимый локальный порт прослушивания",
+              "invalidTargetAddr": "Неверный целевой адрес",
+              "invalidTargetPort": "Неверный целевой порт"
+            },
+            "actions": {
+              "add": "Добавить",
+              "addNew": "Добавить новый туннель"
+            }
+          }
         },
         "tooltips": {
           "networkInterface": "Сетевой интерфейс",
@@ -339,6 +363,7 @@
         "proxyLayoutColumns": "Количество столбцов в макете прокси",
         "autoLogClean": "Автоматическая очистка логов",
         "autoDelayDetection": "Автоматическое измерение задержки",
+        "autoDelayDetectionInterval": "Интервал автоматического измерения задержки",
         "defaultLatencyTest": "Ссылка на тест задержки",
         "defaultLatencyTimeout": "Таймаут задержки по умолчанию"
       },
