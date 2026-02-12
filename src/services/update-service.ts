@@ -99,7 +99,8 @@ export const getUpdateInfo = async (): Promise<
     return null;
   } catch (error: any) {
     console.error("[Update] Failed to get update info:", error);
-    return null;
+    // Rethrow to allow checkUpdate to differentiate
+    throw error;
   }
 };
 
@@ -117,26 +118,29 @@ export const checkUpdate = async (): Promise<IUpdateInfo | null> => {
     2000,
   );
 
-  const info = await getUpdateInfo();
+  try {
+    const info = await getUpdateInfo();
 
-  if (info) {
-    showNotice.success(
-      i18n.t(
-        "settings.components.verge.advanced.notifications.newVersion" as any,
-        { version: `v${info.version.version}` },
-      ) as string,
-      5000,
-    );
-    return info;
-  } else {
-    // If getUpdateInfo returned null, it could be error or no update.
-    // We might want to differentiate for manual check, but keeping it simple for now.
-    // Or we can duplicate logic if we want specific error messages.
-    // For now, let's just say "Latest Version" if no info returned, assuming strictly valid config.
-    showNotice.info(
-      i18n.t(
-        "settings.components.verge.advanced.notifications.latestVersion" as any,
-      ),
+    if (info) {
+      showNotice.success(
+        i18n.t(
+          "settings.components.verge.advanced.notifications.newVersion" as any,
+          { version: `v${info.version.version}` },
+        ) as string,
+        5000,
+      );
+      return info;
+    } else {
+      showNotice.info(
+        i18n.t(
+          "settings.components.verge.advanced.notifications.latestVersion" as any,
+        ),
+      );
+      return null;
+    }
+  } catch (ignore) {
+    showNotice.error(
+      i18n.t("settings.components.verge.advanced.notifications.failed" as any),
     );
     return null;
   }
