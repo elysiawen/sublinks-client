@@ -10,65 +10,142 @@
 </h3>
 
 <p align="center">
-  专为 SubLinks 服务优化的定制版本。
+  专为 SubLinks 服务优化的定制版本，提供独立的运行环境与流畅的更新体验。
 </p>
 
-## 主要特性
+---
 
-- **极简登录**: 直接集成 SubLinks API，支持账号密码一键登录。
-- **自动配置**: 登录后自动拉取并配置订阅，无需手动操作。
-- **界面增强**: 移除冗余设置，提供更清爽的用户界面。
-- **一键同步**: 在配置页增加“同步 SubLinks 订阅”按钮，随时保持节点最新。
-- **窗口优化**: 自定义窗口控制与无边框设计，体验更丝滑。
+## 主要定制特性
 
-## 基础功能 (继承自 Clash Verge Rev)
+### 1. SubLinks 核心集成
 
-- 基于高性能的 Rust 和 Tauri 2 框架构建。
-- 内置 [Clash.Meta(mihomo)](https://github.com/MetaCubeX/mihomo) 核心。
-- 支持系统代理自动配置与守护进程。
-- 可视化的配置文件与规则管理。
-- 完整的 Clash 功能支持。
+- **极简登录**: 直接集成 SubLinks API，支持账号密码一键登录，摆脱繁琐的 URL 配置。
+- **全自动配置**: 登录后自动从云端拉取、解析并配置所有订阅节点，实现“开箱即用”。
+- **一键同步**: 在配置页增加“同步 SubLinks 订阅”按钮，随时保持节点信息的即时同步。
 
-## 开发指南
+### 2. 独立运行环境 (Rebranding)
 
-详见 [CONTRIBUTING.md](./CONTRIBUTING.md)。
+- **品牌重塑**: 全面更名为 **SubLinks Client**，拥有独立的图标与产品标识 (`com.sublinks.client`)。
+- **路径隔离**: 使用独立的数据存储路径 (`AppData/Roaming/sublinks`)，不与原版 Clash Verge 共享配置，方便多版本并存。
+- **备份优化**: 拥有独立的本地备份系统 (`sublinks-backup`)。
+
+### 3. 高级更新系统 (Enhanced Update System)
+
+- **药丸式提醒**: 首页采用全新设计的“药丸”风格更新提示条，支持毛玻璃背景、平滑下滑动画及 Material Icons。
+- **智能报错逻辑**:
+  - **手动检查**: 点击检查更新时，会明确告知用户是“已经是最新版本”还是“网络连接失败”，不再统一提示“已经是最新版”。
+  - **后台检查**: 应用启动时的自动检查保持静默报错，不干扰正常使用。
+- **自主控制**: 在“高级设置”中可手动开启/关闭“自动检查更新”功能。
+- **全域开关**: 支持通过环境变量 `UPDATE_ENABLED` 全局禁用所有更新相关 UI（包括按钮、弹窗和设置项）。
+
+### 4. 界面与性能优化
+
+- **界面精简**: 移除了原项目中与 SubLinks 无关的冗余设置项。
+- **架构升级**: 持续合入 [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev) 的上游 `dev` 分支，保持内核 (`Mihomo`) 与 Tauri 框架 (`v2`) 的最新特性。
+- **视觉增强**: 优化了弹窗动画、主题衔接以及移动端/桌面端的响应式布局。
 
 ---
 
 ## Features
 
-- 基于性能强劲的 Rust 和 Tauri 2 框架
-- 内置[Clash.Meta(mihomo)](https://github.com/MetaCubeX/mihomo)内核，并支持切换 `Alpha` 版本内核。
-- 简洁美观的用户界面，支持自定义主题颜色、代理组/托盘图标以及 `CSS Injection`。
-- 配置文件管理和增强（Merge 和 Script），配置文件语法提示。
-- 系统代理和守卫、`TUN(虚拟网卡)` 模式。
-- 可视化节点和规则编辑
-- WebDav 配置备份和同步
+- **SubLinks Native Support**: Integrated API for seamless account authentication and profile synchronization.
+- **Environment Isolation**: Fully independent data directory (`sublinks`) and application identifier (`com.sublinks.client`), co-existing safely with original Clash Verge versions.
+- **Premium Update Experience**:
+  - Aesthetic "Pill-style" notification bar with `BackdropFilter` blur and smooth Entrance animations.
+  - Transparent error reporting: clearly distinguishes between "Network Connection Failure" and "Already Latest Version" during manual checks.
+  - Granular control over auto-update logic in Advanced and Miscellaneous settings.
+- **Continuous Improvement**: Successfully merged the latest `upstream/dev` branch for top-tier stability and kernel performance.
+- **Modern Tech Stack**: Built with performance-oriented **Rust** and the latest **Tauri v2** framework.
+- **Clean Aesthetic**: Simplified UI layouts, refined iconography, and reduced configuration clutter.
 
-### FAQ
+---
 
-Refer to [Doc FAQ Page](https://clash-verge-rev.github.io/faq/windows.html)
+## 开发与编译指南
 
-### Donation
+### 1. 环境准备
 
-[捐助Clash Verge Rev的开发](https://github.com/sponsors/clash-verge-rev)
+本项目需要 **Rust** (1.75+) 和 **Node.js** (18+) 环境。
 
-## Development
+- **Windows 用户**: 推荐使用 MSVC 工具链，并安装 GNU `patch` 工具。
+- **macOS/Linux 用户**: 确保已安装必要的编译依赖（如 `webkit2gtk`, `libayatana-appindicator` 等）。
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for more details.
+### 2. 初始化项目
 
-To run the development server, execute the following commands after all prerequisites for **Tauri** are installed:
+启用 `corepack` 并安装依赖：
 
 ```shell
-pnpm i
-pnpm run prebuild
-pnpm dev
+corepack enable
+pnpm install
 ```
+
+下载必要的内核二进制文件（SubLinks 专属内核）：
+
+```shell
+pnpm run prebuild
+```
+
+### 3. 环境配置 (.env)
+
+你可以通过根目录下的 `.env` 文件定制客户端行为：
+
+- `UPDATE_ENABLED`: 是否启用更新系统。设置为 `false` 将隐藏所有更新相关的 UI。
+- `VITE_SUBLINKS_API_URL`: SubLinks API 的基础地址。
+
+### 4. 常用命令
+
+- **本地开发**: `pnpm dev`
+- **正式打包**: `pnpm build`
+- **代码规范**: `pnpm lint` / `cargo clippy-all`
+- **代码格式化**: `pnpm format` / `cargo fmt`
+
+### 5. 定制化开发说明
+
+- **数据目录**: 后端 ID 在 `src-tauri/src/utils/dirs.rs` 中定义为 `sublinks`。
+- **国际化**: 多语言文件位于 `src/locales/`，更新文案后需运行相应的同步脚本。
+- **自定义内核**: 如需更换内置的 Mihomo 内核，请修改 `crates/clash-verge-draft` 相关的资源引用。
+
+---
+
+## Development & Build Guide
+
+### 1. Prerequisites
+
+- **Rust** (1.75+)
+- **Node.js** (18+)
+- **pnpm** (via Corepack)
+
+### 2. Setup & Initialization
+
+```shell
+pnpm install
+pnpm run prebuild  # Download core binaries
+```
+
+### 3. Environment Variables
+
+Customize the client by editing `.env`:
+
+- `UPDATE_ENABLED`: Toggle the entire update notification system.
+- `VITE_SUBLINKS_API_URL`: Backend API endpoint for SubLinks services.
+
+### 4. Commands
+
+| Command       | Description                           |
+| :------------ | :------------------------------------ |
+| `pnpm dev`    | Start development server with HMR     |
+| `pnpm build`  | Bundle and build production installer |
+| `pnpm lint`   | Run ESLint and Cargo Clippy           |
+| `pnpm format` | Auto-format frontend and backend code |
+
+### 5. Architecture Notes
+
+- **App ID**: Hardcoded as `com.sublinks.client` in Tauri configs and `sublinks` in Rust utils.
+- **Upstream Sync**: This repo periodically merges from `clash-verge-rev/clash-verge-rev` dev branch.
 
 ## 致谢
 
 本项目基于 [clash-verge-rev](https://github.com/clash-verge-rev/clash-verge-rev) 进行定制开发。
-感谢原作者的杰出工作。
+感谢原作者团队在 Clash 客户端领域所做的杰出贡献。
 
 ## 许可证
 
