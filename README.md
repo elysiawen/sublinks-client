@@ -38,12 +38,6 @@
 - **自主控制**: 在“高级设置”中可手动开启/关闭“自动检查更新”功能。
 - **全域开关**: 支持通过环境变量 `UPDATE_ENABLED` 全局禁用所有更新相关 UI（包括按钮、弹窗和设置项）。
 
-### 4. 界面与性能优化
-
-- **界面精简**: 移除了原项目中与 SubLinks 无关的冗余设置项。
-- **架构升级**: 持续合入 [Clash Verge Rev](https://github.com/clash-verge-rev/clash-verge-rev) 的上游 `dev` 分支，保持内核 (`Mihomo`) 与 Tauri 框架 (`v2`) 的最新特性。
-- **视觉增强**: 优化了弹窗动画、主题衔接以及移动端/桌面端的响应式布局。
-
 ---
 
 ## Features
@@ -86,10 +80,18 @@ pnpm run prebuild
 
 ### 3. 环境配置 (.env)
 
-你可以通过根目录下的 `.env` 文件定制客户端行为：
+项目使用 [Vite 环境变量](https://cn.vitejs.dev/guide/env-and-mode.html) 进行配置。你可以通过根目录下的 `.env`（或 `.env.development` 等）文件定制行为：
 
-- `UPDATE_ENABLED`: 是否启用更新系统。设置为 `false` 将隐藏所有更新相关的 UI。
-- `VITE_SUBLINKS_API_URL`: SubLinks API 的基础地址。
+| 变量名             | 默认值  | 说明                                                       |
+| :----------------- | :------ | :--------------------------------------------------------- |
+| `UPDATE_ENABLED`   | `true`  | **更新系统总开关**。设置为 `false` 将完全隐藏所有更新 UI。 |
+| `SUBLINKS_API_URL` | -       | SubLinks API 的基础地址。                                  |
+| `UPDATE_API_URL`   | -       | 检查更新的 API 终点（返回 `version` 信息的 JSON）。        |
+| `UPDATE_APP_NAME`  | -       | 用于更新请求的应用名称标识。                               |
+| `APP_VERSION`      | `1.0.0` | 客户端当前显示的版本号。                                   |
+
+> [!TIP]
+> 变量前缀 `UPDATE_`, `SUBLINKS_`, `APP_` 均已在 `vite.config.ts` 中配置为自动暴露给前端。
 
 ### 4. 常用命令
 
@@ -123,10 +125,15 @@ pnpm run prebuild  # Download core binaries
 
 ### 3. Environment Variables
 
-Customize the client by editing `.env`:
+Customize the client behavior by editing `.env`. The following prefixes are exposed to the frontend: `UPDATE_`, `SUBLINKS_`, `APP_`.
 
-- `UPDATE_ENABLED`: Toggle the entire update notification system.
-- `VITE_SUBLINKS_API_URL`: Backend API endpoint for SubLinks services.
+| Variable           | Default | Description                                                  |
+| :----------------- | :------ | :----------------------------------------------------------- |
+| `UPDATE_ENABLED`   | `true`  | **Master Switch**. Hides all update-related UI when `false`. |
+| `SUBLINKS_API_URL` | -       | Base URL for SubLinks API services.                          |
+| `UPDATE_API_URL`   | -       | Endpoint URL for fetching update metadata (JSON).            |
+| `UPDATE_APP_NAME`  | -       | App identifier used in update requests.                      |
+| `APP_VERSION`      | `1.0.0` | The version string displayed and used for comparison.        |
 
 ### 4. Commands
 
