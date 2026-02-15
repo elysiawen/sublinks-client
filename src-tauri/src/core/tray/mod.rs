@@ -334,11 +334,7 @@ impl Tray {
         let tun_text = clash_verge_i18n::t!("tray.tooltip.tun");
         let profile_text = clash_verge_i18n::t!("tray.tooltip.profile");
 
-        let v = env!("CARGO_PKG_VERSION");
-        let reassembled_version = v.split_once('+').map_or_else(
-            || v.into(),
-            |(main, rest)| format!("{main}+{}", rest.split('.').next().unwrap_or("")),
-        );
+        let reassembled_version = env!("APP_VERSION");
 
         let tooltip = format!(
             "SubLinks Client {}\n{}: {}\n{}: {}\n{}: {}",
@@ -659,7 +655,7 @@ async fn create_tray_menu(
         .unwrap_or("default");
     let show_outbound_modes_inline = verge_settings.tray_inline_outbound_modes.unwrap_or(false);
 
-    let version = env!("CARGO_PKG_VERSION");
+    const APP_VERSION: &str = env!("APP_VERSION");
 
     let hotkeys = create_hotkeys(&verge_settings.hotkeys);
 
@@ -815,7 +811,7 @@ async fn create_tray_menu(
     let app_version = &MenuItem::with_id(
         app_handle,
         MenuIds::VERGE_VERSION,
-        format!("{} {version}", &texts.verge_version),
+        format!("{} {APP_VERSION}", &texts.verge_version),
         true,
         None::<&str>,
     )?;

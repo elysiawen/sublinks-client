@@ -52,7 +52,7 @@ pub fn resolve_setup_sync() {
 
 pub fn resolve_setup_async() {
     AsyncHandler::spawn(|| async {
-        logging!(info, Type::ClashVergeRev, "Version: {}", env!("CARGO_PKG_VERSION"));
+        logging!(info, Type::ClashVergeRev, "Version: {}", env!("APP_VERSION"));
 
         init_startup_script().await;
         init_verge_config().await;

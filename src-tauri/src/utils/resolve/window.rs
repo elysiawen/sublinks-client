@@ -53,6 +53,17 @@ pub async fn build_new_window() -> Result<WebviewWindow, String> {
     };
 
     let initial_script = build_window_initial_script(initial_theme_mode, DARK_BACKGROUND_HEX, LIGHT_BACKGROUND_HEX);
+    
+    let version = env!("APP_VERSION");
+    
+    #[cfg(target_os = "windows")]
+    let platform = "Windows";
+    #[cfg(target_os = "macos")]
+    let platform = "MacOS";
+    #[cfg(target_os = "linux")]
+    let platform = "Linux";
+
+    let ua = format!("SubLinks Client Desktop/{} ({})", version, platform);
 
     let mut builder = tauri::WebviewWindowBuilder::new(
         app_handle,
@@ -67,6 +78,7 @@ pub async fn build_new_window() -> Result<WebviewWindow, String> {
     .inner_size(DEFAULT_WIDTH, DEFAULT_HEIGHT)
     .min_inner_size(MINIMAL_WIDTH, MINIMAL_HEIGHT)
     .visible(false) // 等待主题色准备好后再展示，避免启动色差
+    .user_agent(&ua)
     .initialization_script(&initial_script);
 
     if let Some(theme) = resolved_theme {

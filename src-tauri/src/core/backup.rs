@@ -18,7 +18,7 @@ use tokio::{fs, time::timeout};
 use zip::write::SimpleFileOptions;
 
 // 应用版本常量，来自 tauri.conf.json
-const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
+const APP_VERSION: &str = env!("APP_VERSION");
 
 const TIMEOUT_UPLOAD: u64 = 300; // 上传超时 5 分钟
 const TIMEOUT_DOWNLOAD: u64 = 300; // 下载超时 5 分钟
