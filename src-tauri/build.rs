@@ -11,12 +11,10 @@ fn main() {
 
     for file in env_files {
         let path = root.join(file);
-        if path.exists() {
-            if let Ok(content) = std::fs::read_to_string(path) {
-                for line in content.lines() {
-                    if let Some(v) = line.strip_prefix("APP_VERSION=") {
-                        app_version = v.trim().to_string();
-                    }
+        if let Ok(content) = std::fs::read_to_string(path) {
+            for line in content.lines() {
+                if let Some(v) = line.strip_prefix("APP_VERSION=") {
+                    app_version = v.trim().to_string();
                 }
             }
         }
