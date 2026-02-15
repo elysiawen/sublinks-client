@@ -8,7 +8,7 @@ fn main() {
     let mut app_version = "1.0.0".to_string();
     let env_files = [".env.production", ".env.development", ".env"];
     let root = std::path::Path::new("..");
-    
+
     for file in env_files {
         let path = root.join(file);
         if path.exists() {

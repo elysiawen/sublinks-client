@@ -53,9 +53,9 @@ pub async fn build_new_window() -> Result<WebviewWindow, String> {
     };
 
     let initial_script = build_window_initial_script(initial_theme_mode, DARK_BACKGROUND_HEX, LIGHT_BACKGROUND_HEX);
-    
+
     let version = env!("APP_VERSION");
-    
+
     #[cfg(target_os = "windows")]
     let platform = "Windows";
     #[cfg(target_os = "macos")]
