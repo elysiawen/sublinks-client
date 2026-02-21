@@ -69,7 +69,7 @@ pub async fn import_profile(
     name: Option<std::string::String>,
     option: Option<PrfOption>,
 ) -> CmdResult {
-    logging!(info, Type::Cmd, "[导入订阅] 开始导入: {}", url);
+    logging!(info, Type::Cmd, "[导入订阅] 开始导入: {}", help::mask_url(&url));
 
     let name_smart: Option<String> = name.map(|s| s.into());
 
@@ -102,19 +102,18 @@ pub async fn import_profile(
 
     if let Some(uid) = &item.uid {
         logging!(info, Type::Cmd, "[导入订阅] 发送配置变更通知: {}", uid);
-        handle::Handle::notify_profile_changed(uid.clone());
+        handle::Handle::notify_profile_changed(uid);
     }
 
     // 异步保存配置文件并发送全局通知
-    let uid_clone = item.uid.clone();
-    if let Some(uid) = uid_clone {
+    if let Some(uid) = &item.uid {
         // 延迟发送，确保文件已完全写入
         tokio::time::sleep(Duration::from_millis(100)).await;
         logging!(info, Type::Cmd, "[导入订阅] 发送配置变更通知: {}", uid);
         handle::Handle::notify_profile_changed(uid);
     }
 
-    logging!(info, Type::Cmd, "[导入订阅] 导入完成: {}", url);
+    logging!(info, Type::Cmd, "[导入订阅] 导入完成: {}", help::mask_url(&url));
     AutoBackupManager::trigger_backup(AutoBackupTrigger::ProfileChange);
     Ok(())
 }
@@ -143,7 +142,7 @@ pub async fn create_profile(item: PrfItem, file_data: Option<String>) -> CmdResu
     match profiles_append_item_with_filedata_safe(&item, file_data).await {
         Ok(_) => {
             // 发送配置变更通知
-            if let Some(uid) = item.uid.clone() {
+            if let Some(uid) = &item.uid {
                 logging!(info, Type::Cmd, "[创建订阅] 发送配置变更通知: {}", uid);
                 handle::Handle::notify_profile_changed(uid);
             }
@@ -164,7 +163,7 @@ pub async fn create_profile(item: PrfItem, file_data: Option<String>) -> CmdResu
 /// 更新配置文件
 #[tauri::command]
 pub async fn update_profile(index: String, option: Option<PrfOption>) -> CmdResult {
-    match feat::update_profile(&index, option.as_ref(), true, true).await {
+    match feat::update_profile(&index, option.as_ref(), true, true, true).await {
         Ok(_) => {
             let _: () = Config::profiles().await.apply();
             Ok(())
@@ -190,7 +189,7 @@ pub async fn delete_profile(index: String) -> CmdResult {
                 handle::Handle::refresh_clash();
                 // 发送配置变更通知
                 logging!(info, Type::Cmd, "[删除订阅] 发送配置变更通知: {}", index);
-                handle::Handle::notify_profile_changed(index);
+                handle::Handle::notify_profile_changed(&index);
                 AutoBackupManager::trigger_backup(AutoBackupTrigger::ProfileChange);
             }
             Err(e) => {
@@ -321,7 +320,7 @@ async fn handle_success(current_value: Option<&String>) -> CmdResult<bool> {
         && WindowManager::get_main_window().is_some()
     {
         logging!(info, Type::Cmd, "向前端发送配置变更事件: {}", current);
-        handle::Handle::notify_profile_changed(current.to_owned());
+        handle::Handle::notify_profile_changed(current);
     }
 
     Ok(true)
@@ -440,7 +439,7 @@ pub async fn patch_profile(index: String, profile: PrfItem) -> CmdResult {
                 logging!(error, Type::Timer, "刷新定时器失败: {}", e);
             } else {
                 // 刷新成功后发送自定义事件，不触发配置重载
-                crate::core::handle::Handle::notify_timer_updated(index);
+                crate::core::handle::Handle::notify_timer_updated(&index);
             }
         });
     }

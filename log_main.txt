@@ -1,0 +1,5 @@
+15bb445d fix: typo
+d77d6558 Release 2.4.6
+ec6f2597 chore: replace node test with 1.0.0.1
+7a564b4e fix(linux): handle empty KDE proxy schema without error (#6316)
+cd4ff68b chore(deps): update rust crate zip to v8 (#6314)

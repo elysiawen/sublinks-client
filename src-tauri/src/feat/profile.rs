@@ -2,6 +2,7 @@ use crate::{
     cmd,
     config::{Config, PrfItem, PrfOption, profiles::profiles_draft_update_item_safe},
     core::{CoreManager, handle, tray},
+    utils::help::mask_url,
 };
 use anyhow::{Result, bail};
 use clash_verge_logging::{Type, logging, logging_error};
@@ -83,9 +84,11 @@ async fn should_update_profile(uid: &String, ignore_auto_update: bool) -> Result
             Type::Config,
             "[订阅更新] {} 是远程订阅，URL: {}",
             uid,
-            item.url
-                .as_ref()
-                .ok_or_else(|| anyhow::anyhow!("Profile URL is None"))?
+            mask_url(
+                item.url
+                    .as_ref()
+                    .ok_or_else(|| anyhow::anyhow!("Profile URL is None"))?
+            )
         );
         Ok(Some((
             item.url.clone().ok_or_else(|| anyhow::anyhow!("Profile URL is None"))?,
@@ -99,6 +102,7 @@ async fn perform_profile_update(
     url: &String,
     opt: Option<&PrfOption>,
     option: Option<&PrfOption>,
+    is_mannual_trigger: bool,
 ) -> Result<bool> {
     logging!(info, Type::Config, "[订阅更新] 开始下载新的订阅内容");
     let mut merged_opt = PrfOption::merge(opt, option);
@@ -173,7 +177,9 @@ async fn perform_profile_update(
         }
     }
 
-    handle::Handle::notice_message("update_failed_even_with_clash", format!("{profile_name} - {last_err}"));
+    if is_mannual_trigger {
+        handle::Handle::notice_message("update_failed_even_with_clash", format!("{profile_name} - {last_err}"));
+    }
     Ok(is_current)
 }
 
@@ -182,12 +188,15 @@ pub async fn update_profile(
     option: Option<&PrfOption>,
     auto_refresh: bool,
     ignore_auto_update: bool,
+    is_mannual_trigger: bool,
 ) -> Result<()> {
     logging!(info, Type::Config, "[订阅更新] 开始更新订阅 {}", uid);
     let url_opt = should_update_profile(uid, ignore_auto_update).await?;
 
     let should_refresh = match url_opt {
-        Some((url, opt)) => perform_profile_update(uid, &url, opt.as_ref(), option).await? && auto_refresh,
+        Some((url, opt)) => {
+            perform_profile_update(uid, &url, opt.as_ref(), option, is_mannual_trigger).await? && auto_refresh
+        }
         None => auto_refresh,
     };
 
