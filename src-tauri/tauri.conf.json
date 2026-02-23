@@ -11,14 +11,9 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "resources": [
-      "resources"
-    ],
+    "resources": ["resources"],
     "publisher": "SubLinks Client",
-    "externalBin": [
-      "sidecar/verge-mihomo",
-      "sidecar/verge-mihomo-alpha"
-    ],
+    "externalBin": ["sidecar/verge-mihomo", "sidecar/verge-mihomo-alpha"],
     "copyright": "GNU General Public License v3.0",
     "category": "DeveloperTool",
     "shortDescription": "SubLinks Client",
@@ -36,25 +31,17 @@
   "plugins": {
     "deep-link": {
       "desktop": {
-        "schemes": [
-          "clash",
-          "clash-verge"
-        ]
+        "schemes": ["clash", "clash-verge"]
       }
     }
   },
   "app": {
     "security": {
-      "capabilities": [
-        "desktop-capability",
-        "migrated"
-      ],
+      "capabilities": ["desktop-capability", "migrated"],
       "assetProtocol": {
         "enable": true,
         "scope": {
-          "allow": [
-            "**"
-          ],
+          "allow": ["**"],
           "requireLiteralLeadingDot": false
         }
       },
