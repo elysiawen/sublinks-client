@@ -1,5 +1,0 @@
-7f045943 chore: update changelog
-fa07dfbc feat: mask sensitive parts of a subscription URL for safe logging
-119aaee5 refactor: optimize profile change notifications to use references
-5f573ca2 refactor: simplfy backend notify message to frontend (#6323)
-e5dd127b feat: enhance profile update handling with manual trigger
