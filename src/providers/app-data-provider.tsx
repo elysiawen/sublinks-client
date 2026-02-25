@@ -1,5 +1,5 @@
 import { listen } from "@tauri-apps/api/event";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 import {
   getBaseConfig,
@@ -26,6 +26,8 @@ export const AppDataProvider = ({
   children: React.ReactNode;
 }) => {
   const { verge } = useVerge();
+
+  const [isProfileSwitching, setIsProfileSwitching] = useState(false);
 
   const { data: proxiesData, mutate: refreshProxy } = useSWR(
     "getProxies",
@@ -317,6 +319,9 @@ export const AppDataProvider = ({
       refreshProxyProviders,
       refreshRuleProviders,
       refreshAll,
+
+      isProfileSwitching,
+      setIsProfileSwitching,
     } as AppDataContextType;
   }, [
     proxiesData,
@@ -335,6 +340,7 @@ export const AppDataProvider = ({
     refreshProxyProviders,
     refreshRuleProviders,
     refreshAll,
+    isProfileSwitching,
   ]);
 
   return <AppDataContext value={value}>{children}</AppDataContext>;

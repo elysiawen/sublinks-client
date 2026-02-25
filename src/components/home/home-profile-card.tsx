@@ -9,6 +9,7 @@ import {
 import {
   Box,
   Button,
+  CircularProgress,
   FormControl,
   InputLabel,
   LinearProgress,
@@ -60,12 +61,14 @@ const ProfileDetails = ({
   onUpdateProfile,
   onProfileChange,
   updating,
+  switching,
 }: {
   current: IProfileItem;
   allProfiles: IProfileItem[];
   onUpdateProfile: () => void;
   onProfileChange: (uid: string) => void;
   updating: boolean;
+  switching: boolean;
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -97,6 +100,7 @@ const ProfileDetails = ({
             value={current.uid}
             label={t("profiles.page.title")}
             onChange={handleSelectChange}
+            disabled={switching || updating}
             MenuProps={{
               PaperProps: {
                 style: {
@@ -111,6 +115,18 @@ const ProfileDetails = ({
                 alignItems: "center",
               },
             }}
+            endAdornment={
+              switching ? (
+                <CircularProgress
+                  size={18}
+                  sx={{
+                    position: "absolute",
+                    right: 32,
+                    top: "calc(50% - 9px)",
+                  }}
+                />
+              ) : null
+            }
           >
             {allProfiles.map((profile) => (
               <MenuItem
@@ -249,7 +265,8 @@ export const HomeProfileCard = ({
 }: HomeProfileCardProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { refreshAll } = useAppData();
+  const { refreshAll, isProfileSwitching, setIsProfileSwitching } =
+    useAppData();
   const { profiles, patchProfiles, mutateProfiles } = useProfiles();
 
   // 优先使用来自 hook 的 current，如果没有则使用 props 里的
@@ -273,7 +290,7 @@ export const HomeProfileCard = ({
   const [updating, setUpdating] = useState(false);
 
   const onUpdateProfile = useLockFn(async () => {
-    if (!current?.uid) return;
+    if (!current?.uid || isProfileSwitching) return;
 
     setUpdating(true);
     try {
@@ -293,16 +310,26 @@ export const HomeProfileCard = ({
   // 切换订阅
   const onProfileChange = useCallback(
     async (uid: string) => {
-      if (uid === current?.uid) return;
+      if (uid === current?.uid || updating) return;
+      setIsProfileSwitching(true);
       try {
         await patchProfiles({ current: uid });
         onProfileUpdated?.();
         refreshAll();
       } catch (err) {
         showNotice.error(err, 3000);
+      } finally {
+        setIsProfileSwitching(false);
       }
     },
-    [current?.uid, patchProfiles, onProfileUpdated, refreshAll],
+    [
+      current?.uid,
+      patchProfiles,
+      onProfileUpdated,
+      refreshAll,
+      updating,
+      setIsProfileSwitching,
+    ],
   );
 
   // 导航到订阅页面
@@ -384,6 +411,7 @@ export const HomeProfileCard = ({
           onUpdateProfile={onUpdateProfile}
           onProfileChange={onProfileChange}
           updating={updating}
+          switching={isProfileSwitching}
         />
       ) : (
         <EmptyProfile onClick={goToProfiles} />

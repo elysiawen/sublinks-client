@@ -24,6 +24,9 @@ export interface AppDataContextType {
   refreshProxyProviders: () => Promise<any>;
   refreshRuleProviders: () => Promise<any>;
   refreshAll: () => Promise<any>;
+
+  isProfileSwitching: boolean;
+  setIsProfileSwitching: (switching: boolean) => void;
 }
 
 export interface ConnectionWithSpeed extends IConnectionsItem {

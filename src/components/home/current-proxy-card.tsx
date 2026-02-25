@@ -110,7 +110,8 @@ export const CurrentProxyCard = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const theme = useTheme();
-  const { proxies, clashConfig, refreshProxy, rules } = useAppData();
+  const { proxies, clashConfig, refreshProxy, rules, isProfileSwitching } =
+    useAppData();
   const { verge } = useVerge();
   const { current: currentProfile } = useProfiles();
   const autoDelayEnabled = verge?.enable_auto_delay_detection ?? false;
@@ -1003,7 +1004,7 @@ export const CurrentProxyCard = () => {
               value={state.selection.group}
               onChange={handleGroupChange}
               label={t("home.components.currentProxy.labels.group")}
-              disabled={isGlobalMode || isDirectMode}
+              disabled={isGlobalMode || isDirectMode || isProfileSwitching}
             >
               {state.proxyData.groups.map((group) => (
                 <MenuItem key={group.name} value={group.name}>
@@ -1023,7 +1024,7 @@ export const CurrentProxyCard = () => {
               value={state.selection.proxy}
               onChange={handleProxyChange}
               label={t("home.components.currentProxy.labels.proxy")}
-              disabled={isDirectMode}
+              disabled={isDirectMode || isProfileSwitching}
               renderValue={renderProxyValue}
               MenuProps={{
                 PaperProps: {
