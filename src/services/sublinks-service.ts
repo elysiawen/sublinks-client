@@ -102,9 +102,8 @@ const checkAndRefreshAccessToken = async () => {
 
 export const syncSubLinksSubscriptions = async (options?: {
   onProgress?: (status: string) => void;
-  silent?: boolean;
 }) => {
-  const { onProgress, silent } = options || {};
+  const { onProgress } = options || {};
 
   // Proactive Token Refresh
   await checkAndRefreshAccessToken();
@@ -277,28 +276,24 @@ export const syncSubLinksSubscriptions = async (options?: {
       }
     }
 
-    if (!silent) {
-      if (importedCount > 0 || deletedCount > 0 || renamedCount > 0) {
-        const msg = `成功从 SubLinks 同步：`;
-        const details = [];
-        if (importedCount > 0) details.push(`新增 ${importedCount} 个`);
-        if (renamedCount > 0) details.push(`更新 ${renamedCount} 个`);
-        if (deletedCount > 0) details.push(`删除 ${deletedCount} 个`);
-        showNotice.success(msg + details.join("、"));
-      } else if (onProgress) {
-        showNotice.info("SubLinks 订阅已是最新状态");
-      }
+    if (importedCount > 0 || deletedCount > 0 || renamedCount > 0) {
+      const msg = `成功从 SubLinks 同步：`;
+      const details = [];
+      if (importedCount > 0) details.push(`新增 ${importedCount} 个`);
+      if (renamedCount > 0) details.push(`更新 ${renamedCount} 个`);
+      if (deletedCount > 0) details.push(`删除 ${deletedCount} 个`);
+      showNotice.success(msg + details.join("、"));
+    } else if (onProgress) {
+      showNotice.info("SubLinks 订阅已是最新状态");
     }
 
     onProgress?.("同步完成");
     return true;
   } catch (err: any) {
     console.error("[SubLinks Service] Failed to sync subscriptions", err);
-    if (!silent) {
-      showNotice.error(
-        `同步 SubLinks 订阅失败: ${err.message || "网络错误或服务器无响应"}`,
-      );
-    }
+    showNotice.error(
+      `同步 SubLinks 订阅失败: ${err.message || "网络错误或服务器无响应"}`,
+    );
     return false;
   }
 };
@@ -345,9 +340,7 @@ const cacheAvatarIfChanged = async (avatarUrl: string | undefined) => {
   }
 };
 
-export const fetchSubLinksUserInfo = async (
-  options: { silent?: boolean } = {},
-) => {
+export const fetchSubLinksUserInfo = async () => {
   // Proactive Token Refresh
   await checkAndRefreshAccessToken();
 
@@ -416,11 +409,9 @@ export const fetchSubLinksUserInfo = async (
     }
   } catch (error: any) {
     console.error("[SubLinks Service] Failed to fetch user info:", error);
-    if (!options.silent) {
-      showNotice.error(
-        `${i18n.t("settings.components.verge.advanced.notifications.fetchUserInfoFailed" as any)}: ${error.message || "网络错误"}`,
-      );
-    }
+    showNotice.error(
+      `${i18n.t("settings.components.verge.advanced.notifications.fetchUserInfoFailed" as any)}: ${error.message || "网络错误"}`,
+    );
   }
 };
 

@@ -360,8 +360,7 @@ const Layout = () => {
       // 仅当内核就绪（proxies 不为空）且未获取过用户信息时，才发起请求
       if (proxies && !userInfoFetchedRef.current) {
         userInfoFetchedRef.current = true;
-        // 使用 silent: true 防止启动时因网络波动弹出错误
-        fetchSubLinksUserInfo({ silent: true });
+        fetchSubLinksUserInfo();
       }
 
       if (!syncAttemptedRef.current && autoSyncEnabled) {
@@ -374,7 +373,7 @@ const Layout = () => {
 
         // Delay sync to allow core and app to stabilize
         syncTimerRef.current = setTimeout(() => {
-          syncSubLinksSubscriptions({ silent: true })
+          syncSubLinksSubscriptions()
             .then(() => {
               showNotice(
                 "success",
