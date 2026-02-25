@@ -5,8 +5,14 @@ import path from "path";
  * 从 .env 文件中读取 APP_VERSION
  */
 function getVersionFromEnv() {
-  const envFiles = [".env.production", ".env.development", ".env"];
+  const mode = process.argv[2] || "production";
+  const envFiles = mode === "production" 
+    ? [".env.production", ".env"] 
+    : [".env.development", ".env"];
+  
   const root = process.cwd();
+
+  console.log(`[Sync Version] Searching for version in ${mode} mode...`);
 
   for (const file of envFiles) {
     const filePath = path.join(root, file);
@@ -14,6 +20,7 @@ function getVersionFromEnv() {
       const content = fs.readFileSync(filePath, "utf8");
       const match = content.match(/^APP_VERSION=(.+)$/m);
       if (match && match[1]) {
+        console.log(`[Sync Version] Found version in ${file}`);
         return match[1].trim();
       }
     }

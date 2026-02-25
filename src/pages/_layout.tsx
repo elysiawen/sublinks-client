@@ -47,6 +47,7 @@ import { useI18n } from "@/hooks/use-i18n";
 import { useVerge } from "@/hooks/use-verge";
 import { useWindowDecorations } from "@/hooks/use-window";
 // [NEW] Updated imports for cleanup
+import { useAppData } from "@/providers/app-data-context";
 import { showNotice } from "@/services/notice-service";
 import { useThemeMode } from "@/services/states";
 import {
@@ -341,20 +342,27 @@ const Layout = () => {
     if (userStr) user = JSON.parse(userStr);
   } catch (ignore) {}
 
+  const { proxies } = useAppData();
+
   // [NEW] Use API for user info sync
   // fetchSubLinksUserInfo is imported from @/services/sublinks-service
 
   // [NEW] Auto-sync subscriptions and user info on startup
   const syncAttemptedRef = useRef(false);
   const syncTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const userInfoFetchedRef = useRef(false);
 
   useEffect(() => {
     // Check if auto-sync is enabled in settings
     const autoSyncEnabled = verge?.sublinks_auto_sync ?? false;
 
     if (token) {
-      // Always fetch user info on startup if logged in
-      fetchSubLinksUserInfo();
+      // 仅当内核就绪（proxies 不为空）且未获取过用户信息时，才发起请求
+      if (proxies && !userInfoFetchedRef.current) {
+        userInfoFetchedRef.current = true;
+        // 使用 silent: true 防止启动时因网络波动弹出错误
+        fetchSubLinksUserInfo({ silent: true });
+      }
 
       if (!syncAttemptedRef.current && autoSyncEnabled) {
         syncAttemptedRef.current = true;
@@ -393,7 +401,7 @@ const Layout = () => {
         syncTimerRef.current = null;
       }
     };
-  }, [token, verge?.sublinks_auto_sync, t]);
+  }, [token, verge?.sublinks_auto_sync, proxies, t]);
 
   if (!themeReady) {
     return (

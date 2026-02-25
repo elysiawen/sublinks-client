@@ -13,9 +13,9 @@ import i18n from "@/services/i18n";
 import { showNotice } from "@/services/notice-service";
 import getSystem from "@/utils/get-system";
 
-// Hardcoded version from package.json to avoid import issues
-const APP_VERSION = "1.0.0";
-export const USER_AGENT = `SubLinks Client Desktop/v${APP_VERSION} (${getSystem()})`;
+// Dynamic version from vite env
+const APP_VERSION = import.meta.env.APP_VERSION || "1.0.0";
+export const USER_AGENT = `SubLinks Client Desktop/${APP_VERSION} (${getSystem()})`;
 
 /**
  * Refresh access token using refresh token
@@ -345,7 +345,9 @@ const cacheAvatarIfChanged = async (avatarUrl: string | undefined) => {
   }
 };
 
-export const fetchSubLinksUserInfo = async () => {
+export const fetchSubLinksUserInfo = async (
+  options: { silent?: boolean } = {},
+) => {
   // Proactive Token Refresh
   await checkAndRefreshAccessToken();
 
@@ -414,9 +416,11 @@ export const fetchSubLinksUserInfo = async () => {
     }
   } catch (error: any) {
     console.error("[SubLinks Service] Failed to fetch user info:", error);
-    showNotice.error(
-      `${i18n.t("settings.components.verge.advanced.notifications.fetchUserInfoFailed" as any)}: ${error.message || "网络错误"}`,
-    );
+    if (!options.silent) {
+      showNotice.error(
+        `${i18n.t("settings.components.verge.advanced.notifications.fetchUserInfoFailed" as any)}: ${error.message || "网络错误"}`,
+      );
+    }
   }
 };
 
