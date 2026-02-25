@@ -18,7 +18,7 @@ export const useProfiles = () => {
   } = useSWR("getProfiles", getProfiles, {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
-    dedupingInterval: 500, // 减少去重时间，提高响应性
+    dedupingInterval: 300, // 减少去重时间，提高响应性
     errorRetryCount: 3,
     errorRetryInterval: 1000,
     refreshInterval: 0, // 完全由手动控制

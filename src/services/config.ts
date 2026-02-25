@@ -4,7 +4,7 @@ const SWR_NOT_SMART = {
   revalidateIfStale: false,
   suspense: false,
   errorRetryCount: 2,
-  dedupingInterval: 1500,
+  dedupingInterval: 300,
   errorRetryInterval: 3000,
 } as const;
 
@@ -13,7 +13,7 @@ export const SWR_DEFAULTS = {
   revalidateOnReconnect: false,
   suspense: false,
   errorRetryCount: 2,
-  dedupingInterval: 5000,
+  dedupingInterval: 2000,
 } as const;
 
 export const SWR_SLOW_POLL = {

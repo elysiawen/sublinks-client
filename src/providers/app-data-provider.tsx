@@ -16,6 +16,7 @@ import {
   getSystemProxy,
 } from "@/services/cmds";
 import { SWR_DEFAULTS, SWR_MIHOMO } from "@/services/config";
+import { debugLog } from "@/utils/debug";
 
 import { AppDataContext, AppDataContextType } from "./app-data-context";
 
@@ -58,6 +59,31 @@ export const AppDataProvider = ({
     getRules,
     SWR_MIHOMO,
   );
+
+  const { data: sysproxy, mutate: refreshSysproxy } = useSWR(
+    "getSystemProxy",
+    getSystemProxy,
+    SWR_DEFAULTS,
+  );
+
+  // 提供统一的刷新方法
+  const refreshAll = useCallback(async () => {
+    await Promise.all([
+      refreshProxy(),
+      refreshClashConfig(),
+      refreshRules(),
+      refreshSysproxy(),
+      refreshProxyProviders(),
+      refreshRuleProviders(),
+    ]);
+  }, [
+    refreshProxy,
+    refreshClashConfig,
+    refreshRules,
+    refreshSysproxy,
+    refreshProxyProviders,
+    refreshRuleProviders,
+  ]);
 
   useEffect(() => {
     let lastProfileId: string | null = null;
@@ -122,14 +148,12 @@ export const AppDataProvider = ({
       lastProfileId = newProfileId;
       lastUpdateTime = now;
 
-      scheduleTimeout(() => {
-        refreshRules().catch((error) =>
-          console.warn("[DataProvider] Rules refresh failed:", error),
-        );
-        refreshRuleProviders().catch((error) =>
-          console.warn("[DataProvider] Rule providers refresh failed:", error),
-        );
-      }, 200);
+      debugLog("[DataProvider] Profile changed to:", newProfileId);
+
+      // 订阅切换时，必须刷新所有数据，特别是代理和配置
+      scheduleTimeout(async () => {
+        await refreshAll();
+      }, 100);
     };
 
     const handleRefreshClash = () => {
@@ -224,13 +248,13 @@ export const AppDataProvider = ({
         );
       }
     };
-  }, [refreshProxy, refreshClashConfig, refreshRules, refreshRuleProviders]);
-
-  const { data: sysproxy, mutate: refreshSysproxy } = useSWR(
-    "getSystemProxy",
-    getSystemProxy,
-    SWR_DEFAULTS,
-  );
+  }, [
+    refreshProxy,
+    refreshClashConfig,
+    refreshRules,
+    refreshRuleProviders,
+    refreshAll,
+  ]);
 
   const { data: runningMode } = useSWR(
     "getRunningMode",
@@ -243,25 +267,6 @@ export const AppDataProvider = ({
     refreshInterval: 3000,
     errorRetryCount: 1,
   });
-
-  // 提供统一的刷新方法
-  const refreshAll = useCallback(async () => {
-    await Promise.all([
-      refreshProxy(),
-      refreshClashConfig(),
-      refreshRules(),
-      refreshSysproxy(),
-      refreshProxyProviders(),
-      refreshRuleProviders(),
-    ]);
-  }, [
-    refreshProxy,
-    refreshClashConfig,
-    refreshRules,
-    refreshSysproxy,
-    refreshProxyProviders,
-    refreshRuleProviders,
-  ]);
 
   // 聚合所有数据
   const value = useMemo(() => {

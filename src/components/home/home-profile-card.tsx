@@ -315,7 +315,12 @@ export const HomeProfileCard = ({
       try {
         await patchProfiles({ current: uid });
         onProfileUpdated?.();
-        refreshAll();
+
+        // 给内核一点时间稳定其内部状态
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        // 等待数据刷新完成再关闭加载状态
+        await refreshAll();
       } catch (err) {
         showNotice.error(err, 3000);
       } finally {
