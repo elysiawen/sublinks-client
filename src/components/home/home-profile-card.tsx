@@ -29,11 +29,11 @@ import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 
-import { useProfiles } from "@/hooks/use-profiles";
-import { useAppData } from "@/providers/app-data-context";
-import { openWebUrl, updateProfile } from "@/services/cmds";
-import { showNotice } from "@/services/notice-service";
-import parseTraffic from "@/utils/parse-traffic";
+import { useProfiles } from '@/hooks/use-profiles'
+import { useAppData } from '@/providers/app-data-context'
+import { openWebUrl, updateProfile } from '@/services/cmds'
+import { showNotice } from '@/services/notice-service'
+import parseTraffic from '@/utils/parse-traffic'
 
 import { EnhancedCard } from './enhanced-card'
 
@@ -43,20 +43,15 @@ const round = keyframes`
   to { transform: rotate(360deg); }
 `
 
-// 辅助函数解析URL和过期时间
-const parseUrl = (url?: string) => {
-  if (!url) return "-";
-  if (url.startsWith("http")) return new URL(url).host;
-  return "local";
-};
+// 辅助函数解析过期时间
 const parseExpire = (expire?: number) => {
   if (!expire) return '-'
   return dayjs(expire * 1000).format('YYYY-MM-DD')
 }
 
 interface HomeProfileCardProps {
-  current: IProfileItem | null | undefined;
-  onProfileUpdated?: () => void;
+  current: IProfileItem | null | undefined
+  onProfileUpdated?: () => void
 }
 
 // 提取独立组件减少主组件复杂度
@@ -68,12 +63,12 @@ const ProfileDetails = ({
   updating,
   switching,
 }: {
-  current: IProfileItem;
-  allProfiles: IProfileItem[];
-  onUpdateProfile: () => void;
-  onProfileChange: (uid: string) => void;
-  updating: boolean;
-  switching: boolean;
+  current: IProfileItem
+  allProfiles: IProfileItem[]
+  onUpdateProfile: () => void
+  onProfileChange: (uid: string) => void
+  updating: boolean
+  switching: boolean
 }) => {
   const { t } = useTranslation()
   const theme = useTheme()
@@ -90,20 +85,20 @@ const ProfileDetails = ({
   }, [current.extra, usedTraffic])
 
   const handleSelectChange = (event: SelectChangeEvent) => {
-    onProfileChange(event.target.value as string);
-  };
+    onProfileChange(event.target.value as string)
+  }
 
   return (
     <Box>
       <Stack spacing={1.5}>
         <FormControl fullWidth variant="outlined" size="small">
           <InputLabel id="home-profile-select-label">
-            {t("profiles.page.title")}
+            {t('profiles.page.title')}
           </InputLabel>
           <Select
             labelId="home-profile-select-label"
             value={current.uid}
-            label={t("profiles.page.title")}
+            label={t('profiles.page.title')}
             onChange={handleSelectChange}
             disabled={switching || updating}
             MenuProps={{
@@ -114,10 +109,10 @@ const ProfileDetails = ({
               },
             }}
             sx={{
-              "& .MuiSelect-select": {
+              '& .MuiSelect-select': {
                 py: 1,
-                display: "flex",
-                alignItems: "center",
+                display: 'flex',
+                alignItems: 'center',
               },
             }}
             endAdornment={
@@ -125,9 +120,9 @@ const ProfileDetails = ({
                 <CircularProgress
                   size={18}
                   sx={{
-                    position: "absolute",
+                    position: 'absolute',
                     right: 32,
-                    top: "calc(50% - 9px)",
+                    top: 'calc(50% - 9px)',
                   }}
                 />
               ) : null
@@ -140,89 +135,23 @@ const ProfileDetails = ({
                 sx={{
                   py: 1,
                   px: 2,
-                  minHeight: "auto",
-                  fontSize: "0.875rem",
-                  "&.Mui-selected": {
-                    fontWeight: "bold",
+                  minHeight: 'auto',
+                  fontSize: '0.875rem',
+                  '&.Mui-selected': {
+                    fontWeight: 'bold',
                   },
                 }}
               >
                 <Typography variant="body2" noWrap>
                   {profile.name ||
-                    (profile.type === "remote"
-                      ? "Remote Profile"
-                      : "Local Profile")}
+                    (profile.type === 'remote'
+                      ? 'Remote Profile'
+                      : 'Local Profile')}
                 </Typography>
               </MenuItem>
             ))}
           </Select>
         </FormControl>
-
-        {current.url && (
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <StorageOutlined fontSize="small" color="action" />
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              noWrap
-              sx={{ display: "flex", alignItems: "center" }}
-            >
-              <span style={{ flexShrink: 0 }}>{t("shared.labels.from")}: </span>
-              {current.home ? (
-                <Link
-                  component="button"
-                  fontWeight="medium"
-                  onClick={() => current.home && openWebUrl(current.home)}
-                  sx={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    minWidth: 0,
-                    maxWidth: "calc(100% - 40px)",
-                    ml: 0.5,
-                  }}
-                  title={parseUrl(current.url)}
-                >
-                  <Typography
-                    component="span"
-                    sx={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      minWidth: 0,
-                      flex: 1,
-                    }}
-                  >
-                    {parseUrl(current.url)}
-                  </Typography>
-                  <LaunchOutlined
-                    fontSize="inherit"
-                    sx={{
-                      ml: 0.5,
-                      fontSize: "0.8rem",
-                      opacity: 0.7,
-                      flexShrink: 0,
-                    }}
-                  />
-                </Link>
-              ) : (
-                <Typography
-                  component="span"
-                  fontWeight="medium"
-                  sx={{
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    minWidth: 0,
-                    flex: 1,
-                    ml: 0.5,
-                  }}
-                >
-                  {parseUrl(current.url)}
-                </Typography>
-              )}
-            </Typography>
-          </Stack>
-        )}
 
         {current.updated && (
           <Stack direction="row" alignItems="center" spacing={1}>
@@ -334,40 +263,39 @@ export const HomeProfileCard = ({
   current: currentProp,
   onProfileUpdated,
 }: HomeProfileCardProps) => {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { refreshAll, isProfileSwitching, setIsProfileSwitching } =
-    useAppData();
-  const { profiles, patchProfiles, mutateProfiles } = useProfiles();
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const { refreshAll, isProfileSwitching, setIsProfileSwitching } = useAppData()
+  const { profiles, patchProfiles, mutateProfiles } = useProfiles()
 
   // 优先使用来自 hook 的 current，如果没有则使用 props 里的
   const current = useMemo(() => {
     if (profiles?.items && profiles.current) {
-      return profiles.items.find((p) => p && p.uid === profiles.current);
+      return profiles.items.find((p) => p && p.uid === profiles.current)
     }
-    return currentProp;
-  }, [profiles, currentProp]);
+    return currentProp
+  }, [profiles, currentProp])
 
   const allProfiles = useMemo(() => {
-    const items = profiles?.items || [];
-    const allowedTypes = ["local", "remote"];
+    const items = profiles?.items || []
+    const allowedTypes = ['local', 'remote']
     return items.filter(
       (p): p is IProfileItem =>
-        !!p && !!p.uid && allowedTypes.includes(p.type || ""),
-    );
-  }, [profiles]);
+        !!p && !!p.uid && allowedTypes.includes(p.type || ''),
+    )
+  }, [profiles])
 
   // 更新当前订阅
   const [updating, setUpdating] = useState(false)
 
   const onUpdateProfile = useLockFn(async () => {
-    if (!current?.uid || isProfileSwitching) return;
+    if (!current?.uid || isProfileSwitching) return
 
     setUpdating(true)
     try {
-      await updateProfile(current.uid, current.option);
-      onProfileUpdated?.();
-      mutateProfiles();
+      await updateProfile(current.uid, current.option)
+      onProfileUpdated?.()
+      mutateProfiles()
 
       // 刷新首页数据
       refreshAll()
@@ -381,21 +309,21 @@ export const HomeProfileCard = ({
   // 切换订阅
   const onProfileChange = useCallback(
     async (uid: string) => {
-      if (uid === current?.uid || updating) return;
-      setIsProfileSwitching(true);
+      if (uid === current?.uid || updating) return
+      setIsProfileSwitching(true)
       try {
-        await patchProfiles({ current: uid });
-        onProfileUpdated?.();
+        await patchProfiles({ current: uid })
+        onProfileUpdated?.()
 
         // 给内核一点时间稳定其内部状态
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500))
 
         // 等待数据刷新完成再关闭加载状态
-        await refreshAll();
+        await refreshAll()
       } catch (err) {
-        showNotice.error(err, 3000);
+        showNotice.error(err, 3000)
       } finally {
-        setIsProfileSwitching(false);
+        setIsProfileSwitching(false)
       }
     },
     [
@@ -406,7 +334,7 @@ export const HomeProfileCard = ({
       updating,
       setIsProfileSwitching,
     ],
-  );
+  )
 
   // 导航到订阅页面
   const goToProfiles = useCallback(() => {

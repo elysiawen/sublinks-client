@@ -8,7 +8,7 @@ import {
   RefreshRounded,
   NewReleasesRounded,
   HelpOutlineRounded,
-} from "@mui/icons-material";
+} from '@mui/icons-material'
 import {
   Box,
   Button,
@@ -25,60 +25,33 @@ import {
   Typography,
   Slide,
   alpha,
-  Skeleton,
-} from "@mui/material";
-import { useLockFn } from "ahooks";
-import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+} from '@mui/material'
+import { useLockFn } from 'ahooks'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
-import { BasePage } from "@/components/base";
-import { ClashModeCard } from "@/components/home/clash-mode-card";
-import { CurrentProxyCard } from "@/components/home/current-proxy-card";
-import { EnhancedCard } from "@/components/home/enhanced-card";
-import { EnhancedTrafficStats } from "@/components/home/enhanced-traffic-stats";
-import { HomeProfileCard } from "@/components/home/home-profile-card";
-import { ProxyTunCard } from "@/components/home/proxy-tun-card";
-import { UpdateDialog } from "@/components/setting/mods/update-dialog";
-import { SUBLINKS_CONFIG } from "@/configs/sublinks-config";
-import { useProfiles } from "@/hooks/use-profiles";
-import { useUpdate } from "@/hooks/use-update";
-import { useVerge } from "@/hooks/use-verge";
-import { entry_lightweight_mode, openWebUrl } from "@/services/cmds";
-
-const LazyTestCard = lazy(() =>
-  import("@/components/home/test-card").then((module) => ({
-    default: module.TestCard,
-  })),
-);
-const LazyIpInfoCard = lazy(() =>
-  import("@/components/home/ip-info-card").then((module) => ({
-    default: module.IpInfoCard,
-  })),
-);
-const LazyClashInfoCard = lazy(() =>
-  import("@/components/home/clash-info-card").then((module) => ({
-    default: module.ClashInfoCard,
-  })),
-);
-const LazySystemInfoCard = lazy(() =>
-  import("@/components/home/system-info-card").then((module) => ({
-    default: module.SystemInfoCard,
-  })),
-);
+import { BasePage } from '@/components/base'
+import { ClashModeCard } from '@/components/home/clash-mode-card'
+import { CurrentProxyCard } from '@/components/home/current-proxy-card'
+import { EnhancedCard } from '@/components/home/enhanced-card'
+import { EnhancedTrafficStats } from '@/components/home/enhanced-traffic-stats'
+import { HomeProfileCard } from '@/components/home/home-profile-card'
+import { ProxyTunCard } from '@/components/home/proxy-tun-card'
+import { UpdateDialog } from '@/components/setting/mods/update-dialog'
+import { SUBLINKS_CONFIG } from '@/configs/sublinks-config'
+import { useProfiles } from '@/hooks/use-profiles'
+import { useUpdate } from '@/hooks/use-update'
+import { useVerge } from '@/hooks/use-verge'
+import { entry_lightweight_mode, openWebUrl } from '@/services/cmds'
 
 // 定义首页卡片设置接口
 interface HomeCardsSettings {
-  profile: boolean;
-  proxy: boolean;
-  network: boolean;
-  mode: boolean;
-  traffic: boolean;
-  info: boolean;
-  clashinfo: boolean;
-  systeminfo: boolean;
-  test: boolean;
-  ip: boolean;
-  [key: string]: boolean;
+  profile: boolean
+  proxy: boolean
+  network: boolean
+  mode: boolean
+  traffic: boolean
+  [key: string]: boolean
 }
 
 // 首页设置对话框组件接口
@@ -169,42 +142,6 @@ const HomeSettingsDialog = ({
             }
             label={t('home.page.settings.cards.traffic')}
           />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={cards.test || false}
-                onChange={() => handleToggle("test")}
-              />
-            }
-            label={t("home.page.settings.cards.tests")}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={cards.ip || false}
-                onChange={() => handleToggle("ip")}
-              />
-            }
-            label={t("home.page.settings.cards.ip")}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={cards.clashinfo || false}
-                onChange={() => handleToggle("clashinfo")}
-              />
-            }
-            label={t("home.page.settings.cards.clashInfo")}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={cards.systeminfo || false}
-                onChange={() => handleToggle("systeminfo")}
-              />
-            }
-            label={t("home.page.settings.cards.systemInfo")}
-          />
         </FormGroup>
       </DialogContent>
       <DialogActions>
@@ -217,99 +154,98 @@ const HomeSettingsDialog = ({
   )
 }
 
-
 const WelcomeBanner = () => {
-  const { t } = useTranslation();
-  const userStr = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER);
+  const { t } = useTranslation()
   const user = useMemo(() => {
     try {
-      return userStr ? JSON.parse(userStr) : null;
+      const userStr = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER)
+      return userStr ? JSON.parse(userStr) : null
     } catch {
-      return null;
+      return null
     }
-  }, [userStr]);
+  }, [])
 
-  const [hitokoto, setHitokoto] = useState("");
+  const [hitokoto, setHitokoto] = useState('')
 
   // Cache background image URL in sessionStorage to reduce API calls
   const [bgUrl, setBgUrl] = useState(() => {
-    const cached = sessionStorage.getItem("home_bg_url");
-    if (cached) return cached;
-    const newUrl = `${SUBLINKS_CONFIG.BACKGROUND_IMAGE_API}?seed=${Math.random()}`;
-    sessionStorage.setItem("home_bg_url", newUrl);
-    return newUrl;
-  });
+    const cached = sessionStorage.getItem('home_bg_url')
+    if (cached) return cached
+    const newUrl = `${SUBLINKS_CONFIG.BACKGROUND_IMAGE_API}?seed=${Math.random()}`
+    sessionStorage.setItem('home_bg_url', newUrl)
+    return newUrl
+  })
 
   const handleRefreshBackground = () => {
-    const newUrl = `${SUBLINKS_CONFIG.BACKGROUND_IMAGE_API}?seed=${Math.random()}`;
-    sessionStorage.setItem("home_bg_url", newUrl);
-    setBgUrl(newUrl);
-  };
+    const newUrl = `${SUBLINKS_CONFIG.BACKGROUND_IMAGE_API}?seed=${Math.random()}`
+    sessionStorage.setItem('home_bg_url', newUrl)
+    setBgUrl(newUrl)
+  }
 
   useEffect(() => {
     const fetchGreeting = () => {
       // eslint-disable-next-line
-      setHitokoto(t("home.components.welcomeBanner.hitokoto.loading"));
+      setHitokoto(t('home.components.welcomeBanner.hitokoto.loading'))
       fetch(SUBLINKS_CONFIG.HITOKOTO_API)
         .then((res) => res.json())
         .then((data) => {
-          setHitokoto(data.hitokoto);
+          setHitokoto(data.hitokoto)
         })
         .catch((err) => {
-          console.error("Failed to fetch hitokoto", err);
-          setHitokoto(t("home.components.welcomeBanner.hitokoto.fallback"));
-        });
-    };
-    fetchGreeting();
-  }, [t]);
+          console.error('Failed to fetch hitokoto', err)
+          setHitokoto(t('home.components.welcomeBanner.hitokoto.fallback'))
+        })
+    }
+    fetchGreeting()
+  }, [t])
 
   const getTimeGreeting = () => {
-    const hour = new Date().getHours();
+    const hour = new Date().getHours()
     if (hour >= 0 && hour < 5)
-      return t("home.components.welcomeBanner.greetings.earlyMorning");
+      return t('home.components.welcomeBanner.greetings.earlyMorning')
     if (hour >= 5 && hour < 9)
-      return t("home.components.welcomeBanner.greetings.morning");
+      return t('home.components.welcomeBanner.greetings.morning')
     if (hour >= 9 && hour < 11)
-      return t("home.components.welcomeBanner.greetings.forenoon");
+      return t('home.components.welcomeBanner.greetings.forenoon')
     if (hour >= 11 && hour < 13)
-      return t("home.components.welcomeBanner.greetings.noon");
+      return t('home.components.welcomeBanner.greetings.noon')
     if (hour >= 13 && hour < 18)
-      return t("home.components.welcomeBanner.greetings.afternoon");
+      return t('home.components.welcomeBanner.greetings.afternoon')
     if (hour >= 18 && hour < 20)
-      return t("home.components.welcomeBanner.greetings.evening");
+      return t('home.components.welcomeBanner.greetings.evening')
     if (hour >= 20 && hour < 23)
-      return t("home.components.welcomeBanner.greetings.night");
-    return t("home.components.welcomeBanner.greetings.lateNight");
-  };
+      return t('home.components.welcomeBanner.greetings.night')
+    return t('home.components.welcomeBanner.greetings.lateNight')
+  }
 
-  const username = user?.nickname || user?.username || "Guest";
-  const greeting = getTimeGreeting();
+  const username = user?.nickname || user?.username || 'Guest'
+  const greeting = getTimeGreeting()
 
   return (
     <Box
       sx={{
         mb: 2,
-        borderRadius: "16px",
-        overflow: "hidden",
-        position: "relative",
-        height: "160px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
+        borderRadius: '16px',
+        overflow: 'hidden',
+        position: 'relative',
+        height: '160px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
         px: 4,
-        color: "#fff",
+        color: '#fff',
         backgroundImage: `url(${bgUrl})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
-        "&::before": {
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+        '&::before': {
           content: '""',
-          position: "absolute",
+          position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.4)",
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
           zIndex: 1,
         },
       }}
@@ -320,8 +256,8 @@ const WelcomeBanner = () => {
           sx={{
             fontWeight: 800,
             mb: 1,
-            textShadow: "0 2px 4px rgba(0,0,0,0.5)",
-            fontSize: { xs: "1.5rem", md: "2rem" },
+            textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+            fontSize: { xs: '1.5rem', md: '2rem' },
           }}
         >
           {greeting}，{username}!
@@ -331,8 +267,8 @@ const WelcomeBanner = () => {
           sx={{
             fontWeight: 500,
             opacity: 0.9,
-            textShadow: "0 1px 2px rgba(0,0,0,0.5)",
-            fontStyle: "italic",
+            textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+            fontStyle: 'italic',
           }}
         >
           {hitokoto}
@@ -340,24 +276,24 @@ const WelcomeBanner = () => {
       </Box>
       {/* Refresh button in bottom-right corner */}
       <Tooltip
-        title={t("home.components.welcomeBanner.tooltips.refreshBackground")}
+        title={t('home.components.welcomeBanner.tooltips.refreshBackground')}
         placement="left"
       >
         <IconButton
           onClick={handleRefreshBackground}
           sx={{
-            position: "absolute",
+            position: 'absolute',
             bottom: 8,
             right: 8,
             zIndex: 2,
-            color: "white",
-            bgcolor: "rgba(255, 255, 255, 0.15)",
-            backdropFilter: "blur(10px)",
-            ":hover": {
-              bgcolor: "rgba(255, 255, 255, 0.25)",
-              transform: "rotate(180deg)",
+            color: 'white',
+            bgcolor: 'rgba(255, 255, 255, 0.15)',
+            backdropFilter: 'blur(10px)',
+            ':hover': {
+              bgcolor: 'rgba(255, 255, 255, 0.25)',
+              transform: 'rotate(180deg)',
             },
-            transition: "all 0.3s ease",
+            transition: 'all 0.3s ease',
           }}
           size="small"
         >
@@ -365,13 +301,13 @@ const WelcomeBanner = () => {
         </IconButton>
       </Tooltip>
     </Box>
-  );
-};
+  )
+}
 
 const HomePage = () => {
-  const { t } = useTranslation();
-  const { verge } = useVerge();
-  const { current, mutateProfiles } = useProfiles();
+  const { t } = useTranslation()
+  const { verge } = useVerge()
+  const { current, mutateProfiles } = useProfiles()
 
   // 设置弹窗的状态
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -389,11 +325,6 @@ const HomePage = () => {
       network: true,
       mode: true,
       traffic: true,
-      info: false,
-      clashinfo: false,
-      systeminfo: false,
-      test: false,
-      ip: false,
     }),
     [],
   )
@@ -424,8 +355,8 @@ const HomePage = () => {
 
   // 文档链接函数
   const toGithubDoc = useLockFn(() => {
-    return openWebUrl("https://clash-verge-rev.github.io/index.html");
-  });
+    return openWebUrl('https://clash-verge-rev.github.io/index.html')
+  })
   // 新增：打开设置弹窗
   const openSettings = useCallback(() => {
     setSettingsOpen(true)
@@ -491,55 +422,30 @@ const HomePage = () => {
         </EnhancedCard>,
         12,
       ),
-
-      renderCard(
-        "test",
-        <Suspense fallback={<Skeleton variant="rectangular" height={200} />}>
-          <LazyTestCard />
-        </Suspense>,
-      ),
-      renderCard(
-        "ip",
-        <Suspense fallback={<Skeleton variant="rectangular" height={200} />}>
-          <LazyIpInfoCard />
-        </Suspense>,
-      ),
-      renderCard(
-        "clashinfo",
-        <Suspense fallback={<Skeleton variant="rectangular" height={200} />}>
-          <LazyClashInfoCard />
-        </Suspense>,
-      ),
-      renderCard(
-        "systeminfo",
-        <Suspense fallback={<Skeleton variant="rectangular" height={200} />}>
-          <LazySystemInfoCard />
-        </Suspense>,
-      ),
     ],
     [t, renderCard],
   )
 
   // Home Update Notification Logic
-  const { updateInfo } = useUpdate();
-  const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
+  const { updateInfo } = useUpdate()
+  const [updateDialogOpen, setUpdateDialogOpen] = useState(false)
   const [skippedVersion, setSkippedVersion] = useState(() =>
-    localStorage.getItem("home_skipped_version"),
-  );
+    localStorage.getItem('home_skipped_version'),
+  )
 
   const showUpdateNotification = useMemo(() => {
-    if (!updateInfo?.available) return false;
+    if (!updateInfo?.available) return false
     // Fix: updateInfo.version is an object, updateInfo.version.version is the string
-    if (updateInfo.version.version === skippedVersion) return false;
-    return true;
-  }, [updateInfo, skippedVersion]);
+    if (updateInfo.version.version === skippedVersion) return false
+    return true
+  }, [updateInfo, skippedVersion])
 
   const handleSkipVersion = useCallback(() => {
     if (updateInfo?.version) {
-      localStorage.setItem("home_skipped_version", updateInfo.version.version);
-      setSkippedVersion(updateInfo.version.version);
+      localStorage.setItem('home_skipped_version', updateInfo.version.version)
+      setSkippedVersion(updateInfo.version.version)
     }
-  }, [updateInfo]);
+  }, [updateInfo])
   return (
     <BasePage
       title={t('home.page.title')}
@@ -548,10 +454,10 @@ const HomePage = () => {
         <>
           <Box
             sx={{
-              position: "absolute",
-              left: "50%",
-              top: "50%",
-              transform: "translate(-50%, -50%)",
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
               zIndex: 10,
             }}
           >
@@ -563,29 +469,29 @@ const HomePage = () => {
             >
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 2,
                   bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
-                  color: "primary.main",
-                  border: "1px solid",
+                  color: 'primary.main',
+                  border: '1px solid',
                   borderColor: (theme) =>
                     alpha(theme.palette.primary.main, 0.3),
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  borderRadius: "20px",
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  borderRadius: '20px',
                   pl: 2,
                   pr: 0.6,
                   py: 0.65,
-                  backdropFilter: "blur(8px)",
+                  backdropFilter: 'blur(8px)',
                 }}
               >
                 <NewReleasesRounded sx={{ fontSize: 18, ml: 0.5 }} />
                 <Typography
                   variant="body2"
                   fontWeight="600"
-                  sx={{ whiteSpace: "nowrap", fontSize: 13 }}
+                  sx={{ whiteSpace: 'nowrap', fontSize: 13 }}
                 >
-                  {t("home.page.tooltips.updateAvailable")}
+                  {t('home.page.tooltips.updateAvailable')}
                 </Typography>
                 <Button
                   size="small"
@@ -595,64 +501,64 @@ const HomePage = () => {
                     minWidth: 0,
                     px: 1.5,
                     py: 0.25,
-                    borderRadius: "16px",
+                    borderRadius: '16px',
                     fontSize: 11,
                     height: 24,
                     boxShadow: 0,
-                    fontWeight: "bold",
-                    textTransform: "none",
-                    "&:hover": {
+                    fontWeight: 'bold',
+                    textTransform: 'none',
+                    '&:hover': {
                       boxShadow: (theme) =>
                         `0 2px 8px ${alpha(theme.palette.primary.main, 0.4)}`,
                     },
                   }}
                 >
-                  {t("home.page.tooltips.updateNow")}
+                  {t('home.page.tooltips.updateNow')}
                 </Button>
-                <Tooltip title={t("home.page.tooltips.skipVersion")}>
+                <Tooltip title={t('home.page.tooltips.skipVersion')}>
                   <IconButton
-                     size="small"
-                     onClick={handleSkipVersion}
-                     color="inherit"
-                     sx={{
-                       p: 0.5,
-                       "&:hover": {
-                         bgcolor: (theme) =>
-                           alpha(theme.palette.primary.main, 0.1),
-                       },
-                     }}
-                   >
-                     <CloseRounded sx={{ fontSize: 16 }} />
-                   </IconButton>
-                 </Tooltip>
-               </Box>
-             </Slide>
-           </Box>
- 
-           <Box sx={{ display: "flex", alignItems: "center" }}>
-             <Tooltip title={t("home.page.tooltips.lightweightMode")} arrow>
-               <IconButton
-                 onClick={async () => await entry_lightweight_mode()}
-                 size="small"
-                 color="inherit"
-               >
-                 <HistoryEduOutlined />
-               </IconButton>
-             </Tooltip>
+                    size="small"
+                    onClick={handleSkipVersion}
+                    color="inherit"
+                    sx={{
+                      p: 0.5,
+                      '&:hover': {
+                        bgcolor: (theme) =>
+                          alpha(theme.palette.primary.main, 0.1),
+                      },
+                    }}
+                  >
+                    <CloseRounded sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Slide>
+          </Box>
 
-             <Tooltip title={t("home.page.tooltips.manual")} arrow>
-               <IconButton onClick={toGithubDoc} size="small" color="inherit">
-                 <HelpOutlineRounded />
-               </IconButton>
-             </Tooltip>
- 
-             <Tooltip title={t("home.page.tooltips.settings")} arrow>
-               <IconButton onClick={openSettings} size="small" color="inherit">
-                 <SettingsOutlined />
-               </IconButton>
-             </Tooltip>
-           </Box>
-         </>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Tooltip title={t('home.page.tooltips.lightweightMode')} arrow>
+              <IconButton
+                onClick={async () => await entry_lightweight_mode()}
+                size="small"
+                color="inherit"
+              >
+                <HistoryEduOutlined />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title={t('home.page.tooltips.manual')} arrow>
+              <IconButton onClick={toGithubDoc} size="small" color="inherit">
+                <HelpOutlineRounded />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title={t('home.page.tooltips.settings')} arrow>
+              <IconButton onClick={openSettings} size="small" color="inherit">
+                <SettingsOutlined />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </>
       }
     >
       <WelcomeBanner />

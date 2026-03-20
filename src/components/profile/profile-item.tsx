@@ -229,7 +229,6 @@ export const ProfileItem = (props: Props) => {
   const hasHome = !!itemData.home // only subscription url has home page
 
   const { upload = 0, download = 0, total = 0 } = extra ?? {}
-  const from = parseUrl(itemData.url)
   const description = itemData.desc
   const expire = parseExpire(extra?.expire)
   const progress = Math.min(
@@ -757,7 +756,7 @@ export const ProfileItem = (props: Props) => {
         <Box sx={boxStyle}>
           {
             <>
-              {description ? (
+              {description && (
                 <Typography
                   noWrap
                   title={description}
@@ -765,15 +764,6 @@ export const ProfileItem = (props: Props) => {
                 >
                   {description}
                 </Typography>
-              ) : (
-                hasUrl && (
-                  <Typography
-                    noWrap
-                    title={`${t('shared.labels.from')} ${from}`}
-                  >
-                    {from}
-                  </Typography>
-                )
               )}
               {hasUrl && (
                 <Box
@@ -960,13 +950,6 @@ export const ProfileItem = (props: Props) => {
       />
     </Box>
   )
-}
-
-function parseUrl(url?: string) {
-  if (!url) return ''
-  const regex = /https?:\/\/(.+?)\//
-  const result = url.match(regex)
-  return result ? result[1] : 'local file'
 }
 
 function parseExpire(expire?: number) {
