@@ -390,11 +390,11 @@ export async function openDevTools() {
 }
 
 export async function openMiniWindow() {
-  return invoke("open_mini_window");
+  return invoke('open_mini_window')
 }
 
 export async function closeMiniWindow() {
-  return invoke("close_mini_window");
+  return invoke('close_mini_window')
 }
 
 export async function exitApp() {
@@ -540,12 +540,7 @@ export const repairService = async () => {
 
 // 系统服务是否可用
 export const isServiceAvailable = async () => {
-  try {
-    return await invoke<boolean>('is_service_available')
-  } catch (error) {
-    console.error('Service check failed:', error)
-    return false
-  }
+  return await invoke<boolean>('is_service_available').catch(() => false)
 }
 export const entry_lightweight_mode = async () => {
   return invoke<void>('entry_lightweight_mode')

@@ -1,4 +1,4 @@
-use super::{CmdResult, StringifyErr as _};
+use super::CmdResult;
 use crate::core::service::{self, SERVICE_MANAGER, ServiceStatus};
 use smartstring::SmartString;
 
@@ -32,6 +32,5 @@ pub async fn repair_service() -> CmdResult {
 
 #[tauri::command]
 pub async fn is_service_available() -> CmdResult<bool> {
-    service::is_service_available().await.stringify_err()?;
-    Ok(true)
+    Ok(service::is_service_available().await.is_ok())
 }
