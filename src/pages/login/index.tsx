@@ -32,6 +32,10 @@ const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  // 2FA states
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [twoFactorCode, setTwoFactorCode] = useState("");
+
   useEffect(() => {
     const reason = localStorage.getItem(
       SUBLINKS_CONFIG.STORAGE_KEYS.LOGOUT_REASON,
@@ -62,13 +66,18 @@ const LoginPage = () => {
         console.warn("[Login] Failed to get hostname, using UA:", e);
       }
 
+      const bodyPayload: any = { username, password, deviceInfo };
+      if (requires2FA) {
+        bodyPayload.code = twoFactorCode;
+      }
+
       const response = await fetch(`${apiUrl}/api/client/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "User-Agent": USER_AGENT,
         },
-        body: JSON.stringify({ username, password, deviceInfo }),
+        body: JSON.stringify(bodyPayload),
       });
 
       const text = await response.text();
@@ -84,6 +93,14 @@ const LoginPage = () => {
 
       if (!response.ok) {
         throw new Error(data.message || `登录失败 (${response.status})`);
+      }
+
+      if (data.requires2FA) {
+        setRequires2FA(true);
+        if (data.message) {
+          showNotice("info", data.message);
+        }
+        return;
       }
 
       // Extract token robustly
@@ -197,30 +214,58 @@ const LoginPage = () => {
           onSubmit={handleLogin}
           sx={{ width: "100%", mt: 1 }}
         >
-          <TextField
-            fullWidth
-            label="用户名"
-            margin="normal"
-            required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <TextField
-            fullWidth
-            label="密码"
-            type="password"
-            margin="normal"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          {!requires2FA ? (
+            <>
+              <TextField
+                fullWidth
+                label="用户名"
+                margin="normal"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+              <TextField
+                fullWidth
+                label="密码"
+                type="password"
+                margin="normal"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </>
+          ) : (
+            <>
+              <TextField
+                fullWidth
+                label="6 位验证码 (TOTP)"
+                margin="normal"
+                required
+                value={twoFactorCode}
+                onChange={(e) => setTwoFactorCode(e.target.value)}
+              />
+              <Button
+                fullWidth
+                variant="outlined"
+                color="inherit"
+                disabled={loading}
+                onClick={() => {
+                  setRequires2FA(false);
+                  setTwoFactorCode("");
+                }}
+                sx={{ mt: 1 }}
+              >
+                返回修改密码
+              </Button>
+            </>
+          )}
           <Button
             fullWidth
             type="submit"
             variant="contained"
             size="large"
             disabled={loading}
-            sx={{ mt: 3, mb: 2 }}
+            sx={{ mt: requires2FA ? 1 : 3, mb: 2 }}
           >
             {loading ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -229,6 +274,8 @@ const LoginPage = () => {
                   {syncStatus || "正在登录..."}
                 </Typography>
               </Box>
+            ) : requires2FA ? (
+              "验证"
             ) : (
               "登录"
             )}
