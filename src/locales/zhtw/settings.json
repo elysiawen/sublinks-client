@@ -1,6 +1,11 @@
 {
   "page": {
-    "title": "設定"
+    "title": "設定",
+    "actions": {
+      "manual": "Manual",
+      "telegram": "Telegram",
+      "github": "Github"
+    }
   },
   "sections": {
     "system": {

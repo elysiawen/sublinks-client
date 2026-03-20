@@ -1,6 +1,11 @@
 {
   "page": {
-    "title": "تنظیمات"
+    "title": "تنظیمات",
+    "actions": {
+      "manual": "Manual",
+      "telegram": "Telegram",
+      "github": "Github"
+    }
   },
   "sections": {
     "system": {

@@ -1120,6 +1120,11 @@ export interface TranslationResources {
         }
       }
       page: {
+        actions: {
+          github: string
+          manual: string
+          telegram: string
+        }
         title: string
       }
       sections: {

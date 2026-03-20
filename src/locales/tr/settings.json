@@ -1,6 +1,11 @@
 {
   "page": {
-    "title": "Ayarlar"
+    "title": "Ayarlar",
+    "actions": {
+      "manual": "Manual",
+      "telegram": "Telegram",
+      "github": "Github"
+    }
   },
   "sections": {
     "system": {

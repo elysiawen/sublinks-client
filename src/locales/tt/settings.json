@@ -1,6 +1,11 @@
 {
   "page": {
-    "title": "Көйләүләр"
+    "title": "Көйләүләр",
+    "actions": {
+      "manual": "Manual",
+      "telegram": "Telegram",
+      "github": "Github"
+    }
   },
   "sections": {
     "system": {

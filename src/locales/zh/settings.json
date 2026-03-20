@@ -1,6 +1,11 @@
 {
   "page": {
-    "title": "设置"
+    "title": "设置",
+    "actions": {
+      "manual": "文档",
+      "telegram": "频道",
+      "github": "仓库"
+    }
   },
   "sections": {
     "system": {
