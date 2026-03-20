@@ -14,6 +14,9 @@
         "settings": "Pengaturan",
         "about": "Tentang"
       },
+      "aboutPage": {
+        "attribution": "Based on clash-verge-rev"
+      },
       "menu": {
         "reorderMode": "Menu reorder mode",
         "restoreDefaultOrder": "Restore default order",
@@ -24,8 +27,21 @@
       },
       "userInfo": {
         "loggedIn": "Sudah masuk",
-        "logout": "Keluar"
+        "logout": "Keluar",
+        "logoutConfirmationTitle": "Confirm Logout",
+        "logoutConfirmationMessage": "Are you sure you want to logout?",
+        "loggingOut": "Logging out...",
+        "amountLogout": "Logout",
+        "cancel": "Cancel"
       }
     }
+  },
+  "notifications": {
+    "autoSyncSuccess": "Subscriptions synced successfully",
+    "autoSyncFailed": "Failed to sync subscriptions",
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logged out",
+    "logoutFailed": "Logout failed",
+    "sessionExpired": "Session expired, please login again"
   }
 }

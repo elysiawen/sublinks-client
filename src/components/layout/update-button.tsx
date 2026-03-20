@@ -1,21 +1,21 @@
-import { Button } from "@mui/material";
-import { useState } from "react";
+import { Button } from '@mui/material'
+import { useState } from 'react'
 
-import { useUpdate } from "@/hooks/use-update";
+import { useUpdate } from '@/hooks/use-update'
 
-import { UpdateDialog } from "../setting/mods/update-dialog";
+import { UpdateDialog } from '../setting/mods/update-dialog'
 
 interface Props {
-  className?: string;
+  className?: string
 }
 
 export const UpdateButton = (props: Props) => {
-  const { className } = props;
-  const [open, setOpen] = useState(false);
+  const { className } = props
+  const [open, setOpen] = useState(false)
 
-  const { updateInfo } = useUpdate();
+  const { updateInfo } = useUpdate()
 
-  if (!updateInfo?.available) return null;
+  if (!updateInfo?.available) return null
 
   return (
     <>
@@ -35,5 +35,5 @@ export const UpdateButton = (props: Props) => {
         New
       </Button>
     </>
-  );
-};
+  )
+}

@@ -14,6 +14,9 @@
         "settings": "설정",
         "about": "정보"
       },
+      "aboutPage": {
+        "attribution": "Based on clash-verge-rev"
+      },
       "menu": {
         "reorderMode": "메뉴 재정렬 모드",
         "restoreDefaultOrder": "Restore default order",

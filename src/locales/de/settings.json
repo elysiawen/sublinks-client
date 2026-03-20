@@ -23,11 +23,24 @@
         }
       }
     },
+    "sublinks": {
+      "title": "SubLinks Settings",
+      "fields": {
+        "autoSync": "Auto Sync on Startup"
+      },
+      "descriptions": {
+        "autoSync": "Automatically sync subscriptions when app starts"
+      }
+    },
     "proxyControl": {
       "tooltips": {
         "systemProxy": "Ändern Sie die Proxy-Einstellungen des Betriebssystems. Wenn die Aktivierung fehlschlägt, können Sie die Proxy-Einstellungen des Betriebssystems manuell ändern.",
         "tunMode": "Der TUN-Modus (Virtual Network Interface) übernimmt den gesamten Systemverkehr. Wenn dieser Modus aktiviert ist, muss der Systemproxy nicht geöffnet werden.",
         "tunUnavailable": "TUN-Modus erfordert Service-Modus oder Administrator-Modus"
+      },
+      "actions": {
+        "installService": "Install Service",
+        "uninstallService": "Uninstall Service"
       },
       "fields": {
         "systemProxy": "Systemproxy",
@@ -64,6 +77,9 @@
       },
       "placeholders": {
         "origin": "Bitte eine gültige URL eingeben"
+      },
+      "actions": {
+        "add": "Add"
       },
       "messages": {
         "alwaysIncluded": "Immer enthaltene Ursprünge: {{urls}}"
@@ -136,9 +152,16 @@
     }
   },
   "components": {
+    "sidebar": {
+      "title": "Sidebar Settings",
+      "essential": "Essential (Cannot be disabled)"
+    },
     "verge": {
       "basic": {
         "title": "Verge-Grundeinstellungen",
+        "actions": {
+          "browse": "Browse"
+        },
         "trayOptions": {
           "showMainWindow": "Hauptfenster anzeigen",
           "showTrayMenu": "Tray-Menü anzeigen",
@@ -154,7 +177,8 @@
           "themeSetting": "Thema-Einstellungen",
           "layoutSetting": "Layout-Einstellungen",
           "misc": "Sonstige Einstellungen",
-          "hotkeySetting": "Tastenkombinationseinstellungen"
+          "hotkeySetting": "Tastenkombinationseinstellungen",
+          "miniWindow": "Mini Window"
         }
       },
       "advanced": {
@@ -163,6 +187,9 @@
           "backupInfo": "Unterstützt die Sicherung von Konfigurationsdateien über WebDAV",
           "openConfDir": "Wenn die Software fehlerhaft funktioniert, !sichern Sie! alle Dateien in diesem Verzeichnis, löschen Sie sie und starten Sie die Software neu.",
           "liteMode": "GUI-Oberfläche schließen, nur den Kern laufen lassen"
+        },
+        "actions": {
+          "copyVersion": "Copy Version"
         },
         "notifications": {
           "latestVersion": "Sie verwenden bereits die neueste Version",
@@ -208,6 +235,9 @@
           "fontFamily": "Schriftfamilie",
           "cssInjection": "CSS-Einbindung"
         },
+        "actions": {
+          "editCss": "Edit CSS"
+        },
         "dialogs": {
           "editCssTitle": "Edit CSS"
         }
@@ -231,7 +261,8 @@
           "systemProxyTrayIcon": "Systemproxy-Tray-Symbol",
           "tunTrayIcon": "TUN-Modus-Tray-Symbol",
           "enableTrayIcon": "Tray-Symbol aktivieren",
-          "enableTraySpeed": "Tray-Geschwindigkeit aktivieren"
+          "enableTraySpeed": "Tray-Geschwindigkeit aktivieren",
+          "pauseRenderTrafficStatsOnBlur": "Rendering der Verkehrsstatistiken bei Fokusverlust pausieren"
         },
         "tooltips": {
           "hoverNavigator": "Automatically scroll to the corresponding proxy group when hovering over alphabet letters",
@@ -268,6 +299,9 @@
         "redir": "Redir-Transparenter Proxy-Port",
         "tproxy": "TPROXY-Transparenter Proxy-Port"
       },
+      "actions": {
+        "random": "Random Port"
+      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "Port settings saved",
@@ -282,6 +316,9 @@
     },
     "liteMode": {
       "title": "Einstellungen für den Leichtgewichtigen Modus",
+      "actions": {
+        "enterNow": "Enter LightWeight Mode Now"
+      },
       "toggles": {
         "autoEnter": "Automatisch in den Leichtgewichtigen Modus wechseln"
       },
@@ -300,6 +337,17 @@
       "tabs": {
         "local": "Local backup",
         "webdav": "WebDAV backup"
+      },
+      "actions": {
+        "selectTarget": "Select backup target",
+        "backup": "Backup",
+        "export": "Export",
+        "exportBackup": "Export Backup",
+        "importBackup": "Import Backup",
+        "deleteBackup": "Delete Backup",
+        "restore": "Restore",
+        "restoreBackup": "Restore Backup",
+        "viewHistory": "View history"
       },
       "fields": {
         "webdavUrl": "WebDAV-Serveradresse http(s)://",
@@ -333,7 +381,7 @@
         "scheduleHelper": "Create local backups in the background at the configured interval.",
         "intervalLabel": "Backup frequency",
         "changeLabel": "Backup on critical changes",
-        "changeHelper": "Automatically back up when the global extend config/script or subscriptions are added, removed, or edited.",
+        "changeHelper": "Automatically backup when Global Extend Config/Script changes.",
         "options": {
           "hours": "Every {{n}} hours",
           "days": "Every {{n}} days"
@@ -397,6 +445,10 @@
     },
     "update": {
       "title": "New Version v{{version}}",
+      "actions": {
+        "goToRelease": "Go to Release Page",
+        "update": "Update"
+      },
       "messages": {
         "portableError": "Die portable Version unterstützt keine In-App-Aktualisierung. Bitte laden Sie die Dateien manuell herunter und ersetzen Sie sie.",
         "breakChangeError": "Dies ist eine wichtige Aktualisierung. Die In-App-Aktualisierung wird nicht unterstützt. Bitte deinstallieren Sie die Software und laden Sie die neue Version manuell herunter und installieren Sie sie."
@@ -451,7 +503,9 @@
         "autoRedirect": "Automatically configures nftables/iptables TCP redirects"
       },
       "messages": {
-        "applied": "Einstellungen angewendet"
+        "applied": "Einstellungen angewendet",
+        "invalidRouteExcludeAddress": "Bitte geben Sie einen gültigen CIDR-Block ein",
+        "routeExcludeAddressHint": "Es werden nur IPv4-/IPv6-CIDR-Blöcke unterstützt, z. B. 192.168.0.0/16 oder fd00::/8"
       }
     },
     "dns": {
@@ -550,6 +604,9 @@
       }
     },
     "webUI": {
+      "actions": {
+        "openUrl": "Open URL"
+      },
       "title": "Web-Oberfläche",
       "messages": {
         "supportedPlaceholders": "Unterstützt %host, %port, %secret",

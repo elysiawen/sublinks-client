@@ -3,7 +3,10 @@
     "tooltips": {
       "lightweightMode": "경량 모드",
       "manual": "사용 설명서",
-      "settings": "홈 설정"
+      "settings": "홈 설정",
+      "updateAvailable": "New version available",
+      "updateNow": "Update",
+      "skipVersion": "Do not show this version again"
     },
     "cards": {
       "trafficStats": "트래픽 통계",

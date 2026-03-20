@@ -23,11 +23,24 @@
         }
       }
     },
+    "sublinks": {
+      "title": "SubLinks Settings",
+      "fields": {
+        "autoSync": "Auto Sync on Startup"
+      },
+      "descriptions": {
+        "autoSync": "Automatically sync subscriptions when app starts"
+      }
+    },
     "proxyControl": {
       "tooltips": {
         "systemProxy": "オペレーティングシステムのプロキシ設定を変更します。有効にできない場合は、手動でオペレーティングシステムのプロキシ設定を変更してください。",
         "tunMode": "TUN（仮想ネットワークカード）モードはシステムのすべてのトラフィックを制御します。有効にすると、システムプロキシを開く必要はありません。",
         "tunUnavailable": "TUNモードはサービスモードまたは管理者モードが必要です"
+      },
+      "actions": {
+        "installService": "Install Service",
+        "uninstallService": "Uninstall Service"
       },
       "fields": {
         "systemProxy": "システムプロキシ",
@@ -64,6 +77,9 @@
       },
       "placeholders": {
         "origin": "有効なURLを入力してください"
+      },
+      "actions": {
+        "add": "Add"
       },
       "messages": {
         "alwaysIncluded": "常に含まれるオリジン: {{urls}}"
@@ -136,9 +152,16 @@
     }
   },
   "components": {
+    "sidebar": {
+      "title": "Sidebar Settings",
+      "essential": "Essential (Cannot be disabled)"
+    },
     "verge": {
       "basic": {
         "title": "Verge基本設定",
+        "actions": {
+          "browse": "Browse"
+        },
         "trayOptions": {
           "showMainWindow": "メインウィンドウを表示",
           "showTrayMenu": "トレイメニューを表示",
@@ -154,7 +177,8 @@
           "themeSetting": "テーマ設定",
           "layoutSetting": "レイアウト設定",
           "misc": "その他の設定",
-          "hotkeySetting": "ホットキー設定"
+          "hotkeySetting": "ホットキー設定",
+          "miniWindow": "Mini Window"
         }
       },
       "advanced": {
@@ -163,6 +187,9 @@
           "backupInfo": "WebDAVを使用した設定ファイルのバックアップをサポートします。",
           "openConfDir": "アプリケーションが正常に動作しない場合は、このフォルダ内のすべてのファイルを!バックアップ!して削除し、アプリケーションを再起動してください。",
           "liteMode": "GUIを閉じて、コアのみを実行します。"
+        },
+        "actions": {
+          "copyVersion": "Copy Version"
         },
         "notifications": {
           "latestVersion": "現在は最新バージョンです。",
@@ -208,6 +235,9 @@
           "fontFamily": "フォントファミリー",
           "cssInjection": "CSSインジェクション"
         },
+        "actions": {
+          "editCss": "Edit CSS"
+        },
         "dialogs": {
           "editCssTitle": "Edit CSS"
         }
@@ -231,7 +261,8 @@
           "systemProxyTrayIcon": "システムプロキシトレイアイコン",
           "tunTrayIcon": "TUNモードトレイアイコン",
           "enableTrayIcon": "トレイアイコンを有効にする",
-          "enableTraySpeed": "トレイの速度表示を有効にする"
+          "enableTraySpeed": "トレイの速度表示を有効にする",
+          "pauseRenderTrafficStatsOnBlur": "フォーカスを失ったときにトラフィック統計の描画を一時停止"
         },
         "tooltips": {
           "hoverNavigator": "Automatically scroll to the corresponding proxy group when hovering over alphabet letters",
@@ -268,6 +299,9 @@
         "redir": "Redir透明プロキシポート",
         "tproxy": "TPROXY透明プロキシポート"
       },
+      "actions": {
+        "random": "Random Port"
+      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "Port settings saved",
@@ -282,6 +316,9 @@
     },
     "liteMode": {
       "title": "軽量モード設定",
+      "actions": {
+        "enterNow": "Enter LightWeight Mode Now"
+      },
       "toggles": {
         "autoEnter": "自動的に軽量モードに入る"
       },
@@ -300,6 +337,17 @@
       "tabs": {
         "local": "Local backup",
         "webdav": "WebDAV backup"
+      },
+      "actions": {
+        "selectTarget": "Select backup target",
+        "backup": "Backup",
+        "export": "Export",
+        "exportBackup": "Export Backup",
+        "importBackup": "Import Backup",
+        "deleteBackup": "Delete Backup",
+        "restore": "Restore",
+        "restoreBackup": "Restore Backup",
+        "viewHistory": "View history"
       },
       "fields": {
         "webdavUrl": "WebDAVサーバーのURL http(s)://",
@@ -333,7 +381,7 @@
         "scheduleHelper": "Create local backups in the background at the configured interval.",
         "intervalLabel": "Backup frequency",
         "changeLabel": "Backup on critical changes",
-        "changeHelper": "Automatically back up when the global extend config/script or subscriptions are added, removed, or edited.",
+        "changeHelper": "Automatically backup when Global Extend Config/Script changes.",
         "options": {
           "hours": "Every {{n}} hours",
           "days": "Every {{n}} days"
@@ -397,6 +445,10 @@
     },
     "update": {
       "title": "New Version v{{version}}",
+      "actions": {
+        "goToRelease": "Go to Release Page",
+        "update": "Update"
+      },
       "messages": {
         "portableError": "ポータブル版ではアプリケーション内での更新はサポートされていません。手動でダウンロードして置き換えてください。",
         "breakChangeError": "このバージョンは重大な更新であり、アプリケーション内での更新はサポートされていません。アンインストールしてから手動でダウンロードしてインストールしてください。"
@@ -451,7 +503,9 @@
         "autoRedirect": "Automatically configures nftables/iptables TCP redirects"
       },
       "messages": {
-        "applied": "設定が適用されました。"
+        "applied": "設定が適用されました",
+        "invalidRouteExcludeAddress": "有効な CIDR ブロックを入力してください",
+        "routeExcludeAddressHint": "IPv4/IPv6 の CIDR のみ対応しています。例: 192.168.0.0/16、fd00::/8"
       }
     },
     "dns": {
@@ -550,6 +604,9 @@
       }
     },
     "webUI": {
+      "actions": {
+        "openUrl": "Open URL"
+      },
       "title": "Webインターフェース",
       "messages": {
         "supportedPlaceholders": "%host, %port, %secretをサポートします。",

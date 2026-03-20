@@ -23,11 +23,24 @@
         }
       }
     },
+    "sublinks": {
+      "title": "SubLinks Settings",
+      "fields": {
+        "autoSync": "Auto Sync on Startup"
+      },
+      "descriptions": {
+        "autoSync": "Automatically sync subscriptions when app starts"
+      }
+    },
     "proxyControl": {
       "tooltips": {
         "systemProxy": "운영 체제의 프록시 설정을 수정합니다. 활성화에 실패하면 운영 체제의 프록시를 수동으로 설정하세요",
         "tunMode": "TUN(가상 NIC) 모드: 시스템 전체 트래픽을 캡처합니다. 활성화 시 시스템 프록시를 사용할 필요가 없습니다.",
         "tunUnavailable": "TUN은 서비스 모드 또는 관리자 모드가 필요합니다"
+      },
+      "actions": {
+        "installService": "Install Service",
+        "uninstallService": "Uninstall Service"
       },
       "fields": {
         "systemProxy": "시스템 프록시",
@@ -64,6 +77,9 @@
       },
       "placeholders": {
         "origin": "유효한 URL을 입력하세요"
+      },
+      "actions": {
+        "add": "Add"
       },
       "messages": {
         "alwaysIncluded": "항상 포함되는 오리진: {{urls}}"
@@ -136,9 +152,16 @@
     }
   },
   "components": {
+    "sidebar": {
+      "title": "Sidebar Settings",
+      "essential": "Essential (Cannot be disabled)"
+    },
     "verge": {
       "basic": {
         "title": "Verge 기본 설정",
+        "actions": {
+          "browse": "Browse"
+        },
         "trayOptions": {
           "showMainWindow": "메인 창 표시",
           "showTrayMenu": "트레이 메뉴 표시",
@@ -154,7 +177,8 @@
           "themeSetting": "테마 설정",
           "layoutSetting": "레이아웃 설정",
           "misc": "기타",
-          "hotkeySetting": "단축키 설정"
+          "hotkeySetting": "단축키 설정",
+          "miniWindow": "Mini Window"
         }
       },
       "advanced": {
@@ -163,6 +187,9 @@
           "backupInfo": "설정 파일의 로컬 또는 WebDAV 백업을 지원합니다",
           "openConfDir": "소프트웨어가 비정상 동작할 경우, 이 폴더의 파일을 백업 후 모두 삭제하고 재시작하세요",
           "liteMode": "GUI를 닫고 커널만 실행 상태로 유지합니다"
+        },
+        "actions": {
+          "copyVersion": "Copy Version"
         },
         "notifications": {
           "latestVersion": "현재 최신 버전입니다",
@@ -208,6 +235,9 @@
           "fontFamily": "글꼴",
           "cssInjection": "CSS 삽입"
         },
+        "actions": {
+          "editCss": "Edit CSS"
+        },
         "dialogs": {
           "editCssTitle": "CSS 편집"
         }
@@ -231,7 +261,8 @@
           "systemProxyTrayIcon": "시스템 프록시 트레이 아이콘",
           "tunTrayIcon": "TUN 트레이 아이콘",
           "enableTrayIcon": "트레이 아이콘 사용",
-          "enableTraySpeed": "트레이 속도 표시 사용"
+          "enableTraySpeed": "트레이 속도 표시 사용",
+          "pauseRenderTrafficStatsOnBlur": "포커스를 잃으면 트래픽 통계 렌더링 일시 중지"
         },
         "tooltips": {
           "hoverNavigator": "알파벳에 마우스를 올리면 해당 프록시 그룹으로 자동 스크롤합니다",
@@ -268,6 +299,9 @@
         "redir": "Redir 포트",
         "tproxy": "TProxy 포트"
       },
+      "actions": {
+        "random": "Random Port"
+      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "포트 설정이 저장되었습니다",
@@ -282,6 +316,9 @@
     },
     "liteMode": {
       "title": "경량 모드 설정",
+      "actions": {
+        "enterNow": "Enter LightWeight Mode Now"
+      },
       "toggles": {
         "autoEnter": "경량 모드 자동 진입"
       },
@@ -300,6 +337,17 @@
       "tabs": {
         "local": "로컬 백업",
         "webdav": "WebDAV 백업"
+      },
+      "actions": {
+        "selectTarget": "Select backup target",
+        "backup": "Backup",
+        "export": "Export",
+        "exportBackup": "Export Backup",
+        "importBackup": "Import Backup",
+        "deleteBackup": "Delete Backup",
+        "restore": "Restore",
+        "restoreBackup": "Restore Backup",
+        "viewHistory": "View history"
       },
       "fields": {
         "webdavUrl": "WebDAV 서버 URL",
@@ -333,7 +381,7 @@
         "scheduleHelper": "Create local backups in the background at the configured interval.",
         "intervalLabel": "Backup frequency",
         "changeLabel": "Backup on critical changes",
-        "changeHelper": "Automatically back up when the global extend config/script or subscriptions are added, removed, or edited.",
+        "changeHelper": "Automatically backup when Global Extend Config/Script changes.",
         "options": {
           "hours": "Every {{n}} hours",
           "days": "Every {{n}} days"
@@ -397,6 +445,10 @@
     },
     "update": {
       "title": "새 버전 v{{version}}",
+      "actions": {
+        "goToRelease": "Go to Release Page",
+        "update": "Update"
+      },
       "messages": {
         "portableError": "포터블 버전은 앱 내 업데이트를 지원하지 않습니다. 수동으로 다운로드하여 교체하세요",
         "breakChangeError": "이 버전은 메이저 업데이트로 앱 내 업데이트를 지원하지 않습니다. 프로그램을 제거한 뒤 새 버전을 수동으로 설치하세요"
@@ -451,7 +503,9 @@
         "autoRedirect": "Automatically configures nftables/iptables TCP redirects"
       },
       "messages": {
-        "applied": "설정이 적용되었습니다"
+        "applied": "설정이 적용되었습니다",
+        "invalidRouteExcludeAddress": "유효한 CIDR 대역을 입력하세요",
+        "routeExcludeAddressHint": "IPv4/IPv6 CIDR만 지원합니다. 예: 192.168.0.0/16 또는 fd00::/8"
       }
     },
     "dns": {
@@ -550,6 +604,9 @@
       }
     },
     "webUI": {
+      "actions": {
+        "openUrl": "Open URL"
+      },
       "title": "Web UI",
       "messages": {
         "supportedPlaceholders": "지원되는 자리표시자: %host, %port, %secret",

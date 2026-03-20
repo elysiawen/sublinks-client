@@ -14,6 +14,9 @@
         "settings": "設 定",
         "about": "關 於"
       },
+      "aboutPage": {
+        "attribution": "Based on clash-verge-rev"
+      },
       "menu": {
         "reorderMode": "選單排序模式",
         "restoreDefaultOrder": "恢復預設排序",

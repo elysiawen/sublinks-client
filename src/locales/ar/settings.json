@@ -23,11 +23,24 @@
         }
       }
     },
+    "sublinks": {
+      "title": "SubLinks Settings",
+      "fields": {
+        "autoSync": "Auto Sync on Startup"
+      },
+      "descriptions": {
+        "autoSync": "Automatically sync subscriptions when app starts"
+      }
+    },
     "proxyControl": {
       "tooltips": {
         "systemProxy": "عند التمكين، سيتم تعديل إعدادات الوكيل في نظام التشغيل. إذا فشل التمكين، فقم بتعديل إعدادات الوكيل في النظام يدويًا.",
         "tunMode": "وضع TUN (بطاقة شبكة افتراضية): يلتقط كل حركة المرور في النظام. عند تمكينه، لا حاجة لتفعيل وكيل النظام.",
         "tunUnavailable": "TUN requires Service Mode or Admin Mode"
+      },
+      "actions": {
+        "installService": "Install Service",
+        "uninstallService": "Uninstall Service"
       },
       "fields": {
         "systemProxy": "وكيل النظام",
@@ -64,6 +77,9 @@
       },
       "placeholders": {
         "origin": "Please enter a valid url"
+      },
+      "actions": {
+        "add": "Add"
       },
       "messages": {
         "alwaysIncluded": "Always included origins: {{urls}}"
@@ -136,9 +152,16 @@
     }
   },
   "components": {
+    "sidebar": {
+      "title": "Sidebar Settings",
+      "essential": "Essential (Cannot be disabled)"
+    },
     "verge": {
       "basic": {
         "title": "الإعدادات الأساسية  Verge",
+        "actions": {
+          "browse": "Browse"
+        },
         "trayOptions": {
           "showMainWindow": "إظهار النافذة الرئيسية",
           "showTrayMenu": "Show Tray Menu",
@@ -154,7 +177,8 @@
           "themeSetting": "إعدادات السمة",
           "layoutSetting": "إعدادات التخطيط",
           "misc": "متفرقات",
-          "hotkeySetting": "إعدادات الاختصارات"
+          "hotkeySetting": "إعدادات الاختصارات",
+          "miniWindow": "Mini Window"
         }
       },
       "advanced": {
@@ -163,6 +187,9 @@
           "backupInfo": "Support local or WebDAV backup of configuration files",
           "openConfDir": "إذا عمل البرنامج بشكل غير طبيعي، قم بالنسخ الاحتياطي ثم حذف جميع الملفات في هذا المجلد ثم أعد تشغيل البرنامج",
           "liteMode": "إيقاف الواجهة الرسومية والإبقاء على تشغيل النواة"
+        },
+        "actions": {
+          "copyVersion": "Copy Version"
         },
         "notifications": {
           "latestVersion": "أنت على أحدث إصدار حاليًا",
@@ -208,6 +235,9 @@
           "fontFamily": "عائلة الخط",
           "cssInjection": "حقن CSS"
         },
+        "actions": {
+          "editCss": "Edit CSS"
+        },
         "dialogs": {
           "editCssTitle": "Edit CSS"
         }
@@ -231,7 +261,8 @@
           "systemProxyTrayIcon": "أيقونة شريط المهام لوكيل النظام",
           "tunTrayIcon": "أيقونة شريط المهام لـ TUN",
           "enableTrayIcon": "Enable Tray Icon",
-          "enableTraySpeed": "تفعيل سرعة التراي"
+          "enableTraySpeed": "تفعيل سرعة التراي",
+          "pauseRenderTrafficStatsOnBlur": "إيقاف عرض إحصاءات حركة المرور مؤقتًا عند فقدان التركيز"
         },
         "tooltips": {
           "hoverNavigator": "Automatically scroll to the corresponding proxy group when hovering over alphabet letters",
@@ -268,6 +299,9 @@
         "redir": "منفذ إعادة التوجيه",
         "tproxy": "منفذ Tproxy"
       },
+      "actions": {
+        "random": "Random Port"
+      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "Port settings saved",
@@ -282,6 +316,9 @@
     },
     "liteMode": {
       "title": "LightWeight Mode Settings",
+      "actions": {
+        "enterNow": "Enter LightWeight Mode Now"
+      },
       "toggles": {
         "autoEnter": "Auto Enter LightWeight Mode"
       },
@@ -300,6 +337,17 @@
       "tabs": {
         "local": "Local backup",
         "webdav": "WebDAV backup"
+      },
+      "actions": {
+        "selectTarget": "Select backup target",
+        "backup": "Backup",
+        "export": "Export",
+        "exportBackup": "Export Backup",
+        "importBackup": "Import Backup",
+        "deleteBackup": "Delete Backup",
+        "restore": "Restore",
+        "restoreBackup": "Restore Backup",
+        "viewHistory": "View history"
       },
       "fields": {
         "webdavUrl": "عنوان خادم WebDAV",
@@ -333,7 +381,7 @@
         "scheduleHelper": "Create local backups in the background at the configured interval.",
         "intervalLabel": "Backup frequency",
         "changeLabel": "Backup on critical changes",
-        "changeHelper": "Automatically back up when the global extend config/script or subscriptions are added, removed, or edited.",
+        "changeHelper": "Automatically backup when Global Extend Config/Script changes.",
         "options": {
           "hours": "Every {{n}} hours",
           "days": "Every {{n}} days"
@@ -397,6 +445,10 @@
     },
     "update": {
       "title": "New Version v{{version}}",
+      "actions": {
+        "goToRelease": "Go to Release Page",
+        "update": "Update"
+      },
       "messages": {
         "portableError": "الإصدار المحمول لا يدعم التحديث داخل التطبيق. يرجى التنزيل والاستبدال يدويًا",
         "breakChangeError": "هذا الإصدار هو تحديث رئيسي ولا يدعم التحديث داخل التطبيق. يرجى إلغاء التثبيت وتنزيل الإصدار الجديد وتثبيته يدويًا"
@@ -451,7 +503,9 @@
         "autoRedirect": "Automatically configures nftables/iptables TCP redirects"
       },
       "messages": {
-        "applied": "تم تطبيق الإعدادات"
+        "applied": "تم تطبيق الإعدادات",
+        "invalidRouteExcludeAddress": "يرجى إدخال نطاق CIDR صالح",
+        "routeExcludeAddressHint": "يتم دعم CIDR لـ IPv4/IPv6 فقط، مثل 192.168.0.0/16 أو fd00::/8"
       }
     },
     "dns": {
@@ -550,6 +604,9 @@
       }
     },
     "webUI": {
+      "actions": {
+        "openUrl": "Open URL"
+      },
       "title": "واجهة الويب",
       "messages": {
         "supportedPlaceholders": "يدعم %host و%port و%secret",

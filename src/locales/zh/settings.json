@@ -261,7 +261,8 @@
           "systemProxyTrayIcon": "系统代理托盘图标",
           "tunTrayIcon": "TUN 模式托盘图标",
           "enableTrayIcon": "启用托盘图标",
-          "enableTraySpeed": "启用托盘速率"
+          "enableTraySpeed": "启用托盘速率",
+          "pauseRenderTrafficStatsOnBlur": "失去焦点时暂停渲染流量统计"
         },
         "tooltips": {
           "hoverNavigator": "鼠标悬停在字母上时自动滚动到对应代理组",
@@ -380,7 +381,7 @@
         "scheduleHelper": "按设定频率在后台创建本地备份文件。",
         "intervalLabel": "备份频率",
         "changeLabel": "关键变更时自动备份",
-        "changeHelper": "全局扩展配置/脚本或订阅增删改后会自动备份。",
+        "changeHelper": "全局扩展覆写配置/脚本更改后自动备份。",
         "options": {
           "hours": "每 {{n}} 小时",
           "days": "每 {{n}} 天"
@@ -502,7 +503,9 @@
         "autoRedirect": "自动配置 nftables/iptables 的 TCP 重定向"
       },
       "messages": {
-        "applied": "设置已应用"
+        "applied": "设置已应用",
+        "invalidRouteExcludeAddress": "请输入有效的 CIDR 网段",
+        "routeExcludeAddressHint": "仅支持 IPv4/IPv6 CIDR，例如 192.168.0.0/16 或 fd00::/8"
       }
     },
     "dns": {

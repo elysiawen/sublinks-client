@@ -3,7 +3,10 @@
     "tooltips": {
       "lightweightMode": "LightWeight Mode",
       "manual": "Документация",
-      "settings": "Настройки главной страницы"
+      "settings": "Настройки главной страницы",
+      "updateAvailable": "New version available",
+      "updateNow": "Update",
+      "skipVersion": "Do not show this version again"
     },
     "cards": {
       "trafficStats": "Статистика по трафику",

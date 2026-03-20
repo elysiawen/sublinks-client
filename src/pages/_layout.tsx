@@ -5,7 +5,7 @@ import {
   closestCenter,
   useSensor,
   useSensors,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core'
 import {
   SortableContext,
   sortableKeyboardCoordinates,
@@ -42,11 +42,10 @@ import { LayoutItem } from "@/components/layout/layout-item";
 import { LayoutTraffic } from "@/components/layout/layout-traffic";
 import { NoticeManager } from "@/components/layout/notice-manager";
 import { WindowControls } from "@/components/layout/window-controller";
-import { SUBLINKS_CONFIG } from "@/configs/sublinks-config"; // [NEW] Import config
+import { SUBLINKS_CONFIG } from "@/configs/sublinks-config";
 import { useI18n } from "@/hooks/use-i18n";
 import { useVerge } from "@/hooks/use-verge";
 import { useWindowDecorations } from "@/hooks/use-window";
-// [NEW] Updated imports for cleanup
 import { useAppData } from "@/providers/app-data-context";
 import { showNotice } from "@/services/notice-service";
 import { useThemeMode } from "@/services/states";
@@ -54,7 +53,7 @@ import {
   syncSubLinksSubscriptions,
   logoutSubLinks,
   fetchSubLinksUserInfo,
-} from "@/services/sublinks-service"; // [NEW] Updated imports
+} from "@/services/sublinks-service";
 import getSystem from "@/utils/get-system";
 
 import {
@@ -66,20 +65,20 @@ import {
 } from "./_layout/hooks";
 import { handleNoticeMessage } from "./_layout/utils";
 import { navItems } from "./_routers";
-import LoginPage from "./login"; // [NEW] Import Login Page
+import LoginPage from "./login";
 
-import "dayjs/locale/ru";
-import "dayjs/locale/zh-cn";
+import 'dayjs/locale/ru'
+import 'dayjs/locale/zh-cn'
 
-export const portableFlag = false;
+export const portableFlag = false
 
-type NavItem = (typeof navItems)[number];
+type NavItem = (typeof navItems)[number]
 
-type MenuContextPosition = { top: number; left: number };
+type MenuContextPosition = { top: number; left: number }
 
 interface SortableNavMenuItemProps {
-  item: NavItem;
-  label: string;
+  item: NavItem
+  label: string
 }
 
 const SortableNavMenuItem = ({ item, label }: SortableNavMenuItemProps) => {
@@ -92,15 +91,15 @@ const SortableNavMenuItem = ({ item, label }: SortableNavMenuItemProps) => {
     isDragging,
   } = useSortable({
     id: item.path,
-  });
+  })
 
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-  };
+  }
 
   if (isDragging) {
-    style.zIndex = 100;
+    style.zIndex = 100
   }
 
   return (
@@ -117,28 +116,28 @@ const SortableNavMenuItem = ({ item, label }: SortableNavMenuItemProps) => {
     >
       {label}
     </LayoutItem>
-  );
-};
+  )
+}
 
-dayjs.extend(relativeTime);
+dayjs.extend(relativeTime)
 
-const OS = getSystem();
+const OS = getSystem()
 
 const Layout = () => {
-  const mode = useThemeMode();
-  const isDark = mode !== "light";
-  const { t } = useTranslation();
-  const { theme } = useCustomTheme();
-  const { verge, mutateVerge, patchVerge } = useVerge();
-  const { language } = verge ?? {};
-  const navCollapsed = verge?.collapse_navbar ?? false;
-  const { switchLanguage } = useI18n();
-  const navigate = useNavigate();
-  const themeReady = useMemo(() => Boolean(theme), [theme]);
+  const mode = useThemeMode()
+  const isDark = mode !== 'light'
+  const { t } = useTranslation()
+  const { theme } = useCustomTheme()
+  const { verge, mutateVerge, patchVerge } = useVerge()
+  const { language } = verge ?? {}
+  const navCollapsed = verge?.collapse_navbar ?? false
+  const { switchLanguage } = useI18n()
+  const navigate = useNavigate()
+  const themeReady = useMemo(() => Boolean(theme), [theme])
 
-  const [menuUnlocked, setMenuUnlocked] = useState(false);
+  const [menuUnlocked, setMenuUnlocked] = useState(false)
   const [menuContextPosition, setMenuContextPosition] =
-    useState<MenuContextPosition | null>(null);
+    useState<MenuContextPosition | null>(null)
 
   // [NEW] Logout Dialog State
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
@@ -156,7 +155,7 @@ const Layout = () => {
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
-  );
+  )
 
   const handleMenuOrderOptimisticUpdate = useCallback(
     (order: string[]) => {
@@ -164,15 +163,15 @@ const Layout = () => {
         (prev: IVergeConfig | undefined) =>
           prev ? { ...prev, menu_order: order } : prev,
         false,
-      );
+      )
     },
     [mutateVerge],
-  );
+  )
 
   const handleMenuOrderPersist = useCallback(
     (order: string[]) => patchVerge({ menu_order: order }),
     [patchVerge],
-  );
+  )
 
   const {
     menuOrder,
@@ -186,40 +185,40 @@ const Layout = () => {
     storedOrder: verge?.menu_order,
     onOptimisticUpdate: handleMenuOrderOptimisticUpdate,
     onPersist: handleMenuOrderPersist,
-  });
+  })
 
   const handleMenuContextMenu = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
-      event.preventDefault();
-      event.stopPropagation();
-      setMenuContextPosition({ top: event.clientY, left: event.clientX });
+      event.preventDefault()
+      event.stopPropagation()
+      setMenuContextPosition({ top: event.clientY, left: event.clientX })
     },
     [],
-  );
+  )
 
   const handleMenuContextClose = useCallback(() => {
-    setMenuContextPosition(null);
-  }, []);
+    setMenuContextPosition(null)
+  }, [])
 
   const handleResetMenuOrder = useCallback(() => {
-    setMenuContextPosition(null);
-    void resetMenuOrder();
-  }, [resetMenuOrder]);
+    setMenuContextPosition(null)
+    void resetMenuOrder()
+  }, [resetMenuOrder])
 
   const handleUnlockMenu = useCallback(() => {
-    setMenuUnlocked(true);
-    setMenuContextPosition(null);
-  }, []);
+    setMenuUnlocked(true)
+    setMenuContextPosition(null)
+  }, [])
 
   const handleLockMenu = useCallback(() => {
-    setMenuUnlocked(false);
-    setMenuContextPosition(null);
-  }, []);
+    setMenuUnlocked(false)
+    setMenuContextPosition(null)
+  }, [])
 
   const handleToggleNavCollapsed = useCallback(() => {
-    setMenuContextPosition(null);
-    void patchVerge({ collapse_navbar: !navCollapsed });
-  }, [navCollapsed, patchVerge]);
+    setMenuContextPosition(null)
+    void patchVerge({ collapse_navbar: !navCollapsed })
+  }, [navCollapsed, patchVerge])
 
   const customTitlebar = useMemo(
     () =>
@@ -240,31 +239,31 @@ const Layout = () => {
         </div>
       ) : null,
     [decorated],
-  );
+  )
 
-  useLoadingOverlay(themeReady);
-  useAppInitialization();
+  useLoadingOverlay(themeReady)
+  useAppInitialization()
 
   const handleNotice = useCallback(
     (payload: [string, string]) => {
-      const [status, msg] = payload;
+      const [status, msg] = payload
       try {
         handleNoticeMessage(status, msg, t, navigate);
-      } catch (_error) {
-        console.error("[通知处理] 失败:", _error);
+      } catch (error) {
+        console.error("[通知处理] 失败:", error);
       }
     },
     [t, navigate],
-  );
+  )
 
-  useLayoutEvents(handleNotice);
+  useLayoutEvents(handleNotice)
 
   useEffect(() => {
     if (language) {
-      dayjs.locale(language === "zh" ? "zh-cn" : language);
-      switchLanguage(language);
+      dayjs.locale(language === 'zh' ? 'zh-cn' : language)
+      switchLanguage(language)
     }
-  }, [language, switchLanguage]);
+  }, [language, switchLanguage])
 
   const [sidebarVisibility, setSidebarVisibility] = useState<
     Record<string, boolean>
@@ -406,17 +405,17 @@ const Layout = () => {
     return (
       <div
         style={{
-          width: "100vw",
-          height: "100vh",
-          background: mode === "light" ? "#fff" : "#181a1b",
-          transition: "background 0.2s",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: mode === "light" ? "#333" : "#fff",
+          width: '100vw',
+          height: '100vh',
+          background: mode === 'light' ? '#fff' : '#181a1b',
+          transition: 'background 0.2s',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: mode === 'light' ? '#333' : '#fff',
         }}
       ></div>
-    );
+    )
   }
 
   if (!token) {
@@ -467,20 +466,16 @@ const Layout = () => {
         errorRetryInterval: 5000,
         onError: (error, key) => {
           // FIXME the condition should not be handle gllobally
-          if (key !== "getAutotemProxy") {
-            console.error(`SWR Error for ${key}:`, error);
-            return;
+          if (key !== 'getAutotemProxy') {
+            console.error(`SWR Error for ${key}:`, error)
+            return
           }
 
           // FIXME we need a better way to handle the retry when first booting app
-          const silentKeys = [
-            "getVersion",
-            "getClashConfig",
-            "getAutotemProxy",
-          ];
-          if (silentKeys.includes(key)) return;
+          const silentKeys = ['getVersion', 'getClashConfig', 'getAutotemProxy']
+          if (silentKeys.includes(key)) return
 
-          console.error(`[SWR Error] Key: ${key}, Error:`, error);
+          console.error(`[SWR Error] Key: ${key}, Error:`, error)
         },
         dedupingInterval: 2000,
       }}
@@ -490,8 +485,8 @@ const Layout = () => {
         <NoticeManager position={verge?.notice_position} />
         <div
           style={{
-            animation: "fadeIn 0.5s",
-            WebkitAnimation: "fadeIn 0.5s",
+            animation: 'fadeIn 0.5s',
+            WebkitAnimation: 'fadeIn 0.5s',
           }}
         />
         <style>
@@ -506,29 +501,29 @@ const Layout = () => {
         <Paper
           square
           elevation={0}
-          className={`${OS} layout${navCollapsed ? " layout--nav-collapsed" : ""}`}
+          className={`${OS} layout${navCollapsed ? ' layout--nav-collapsed' : ''}`}
           style={{
-            borderTopLeftRadius: "0px",
-            borderTopRightRadius: "0px",
+            borderTopLeftRadius: '0px',
+            borderTopRightRadius: '0px',
           }}
           onContextMenu={(e) => {
             if (
-              OS === "windows" &&
-              !["input", "textarea"].includes(
+              OS === 'windows' &&
+              !['input', 'textarea'].includes(
                 e.currentTarget.tagName.toLowerCase(),
               ) &&
               !e.currentTarget.isContentEditable
             ) {
-              e.preventDefault();
+              e.preventDefault()
             }
           }}
           sx={[
             ({ palette }) => ({ bgcolor: palette.background.paper }),
-            OS === "linux"
+            OS === 'linux'
               ? {
-                  borderRadius: "8px",
-                  width: "100vw",
-                  height: "100vh",
+                  borderRadius: '8px',
+                  width: '100vw',
+                  height: '100vh',
                 }
               : {},
           ]}
@@ -579,21 +574,21 @@ const Layout = () => {
                   sx={(theme) => ({
                     px: 1.5,
                     py: 0.75,
-                    mx: "auto",
+                    mx: 'auto',
                     mb: 1,
                     maxWidth: 250,
                     borderRadius: 1.5,
                     fontSize: 12,
                     fontWeight: 600,
-                    textAlign: "center",
+                    textAlign: 'center',
                     color: theme.palette.warning.contrastText,
                     bgcolor:
-                      theme.palette.mode === "light"
+                      theme.palette.mode === 'light'
                         ? theme.palette.warning.main
                         : theme.palette.warning.dark,
                   })}
                 >
-                  {t("layout.components.navigation.menu.reorderMode")}
+                  {t('layout.components.navigation.menu.reorderMode')}
                 </Box>
               )}
 
@@ -611,7 +606,7 @@ const Layout = () => {
                       {visibleMenuOrder.map((path) => {
                         const item = navItemMap.get(path);
                         if (!item) {
-                          return null;
+                          return null
                         }
                         return (
                           <SortableNavMenuItem
@@ -619,7 +614,7 @@ const Layout = () => {
                             item={item}
                             label={t(item.label)}
                           />
-                        );
+                        )
                       })}
                     </List>
                   </SortableContext>
@@ -632,7 +627,7 @@ const Layout = () => {
                   {visibleMenuOrder.map((path) => {
                     const item = navItemMap.get(path);
                     if (!item) {
-                      return null;
+                      return null
                     }
                     return (
                       <LayoutItem
@@ -642,7 +637,7 @@ const Layout = () => {
                       >
                         {t(item.label)}
                       </LayoutItem>
-                    );
+                    )
                   })}
                 </List>
               )}
@@ -668,23 +663,23 @@ const Layout = () => {
               >
                 <MenuItem onClick={handleToggleNavCollapsed} dense>
                   {navCollapsed
-                    ? t("layout.components.navigation.menu.expandNavBar")
-                    : t("layout.components.navigation.menu.collapseNavBar")}
+                    ? t('layout.components.navigation.menu.expandNavBar')
+                    : t('layout.components.navigation.menu.collapseNavBar')}
                 </MenuItem>
                 <MenuItem
                   onClick={menuUnlocked ? handleLockMenu : handleUnlockMenu}
                   dense
                 >
                   {menuUnlocked
-                    ? t("layout.components.navigation.menu.lock")
-                    : t("layout.components.navigation.menu.unlock")}
+                    ? t('layout.components.navigation.menu.lock')
+                    : t('layout.components.navigation.menu.unlock')}
                 </MenuItem>
                 <MenuItem
                   onClick={handleResetMenuOrder}
                   dense
                   disabled={isDefaultOrder}
                 >
-                  {t("layout.components.navigation.menu.restoreDefaultOrder")}
+                  {t('layout.components.navigation.menu.restoreDefaultOrder')}
                 </MenuItem>
               </Menu>
 
@@ -825,7 +820,7 @@ const Layout = () => {
         </Dialog>
       </ThemeProvider>
     </SWRConfig>
-  );
-};
+  )
+}
 
-export default Layout;
+export default Layout

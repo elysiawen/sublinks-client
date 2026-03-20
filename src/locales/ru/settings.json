@@ -23,11 +23,24 @@
         }
       }
     },
+    "sublinks": {
+      "title": "SubLinks Settings",
+      "fields": {
+        "autoSync": "Auto Sync on Startup"
+      },
+      "descriptions": {
+        "autoSync": "Automatically sync subscriptions when app starts"
+      }
+    },
     "proxyControl": {
       "tooltips": {
         "systemProxy": "Разрешить изменение настроек прокси-сервера операционной системы. Если разрешение не удастся, измените настройки прокси-сервера операционной системы вручную",
         "tunMode": "Режим Tun: захватывает весь системный трафик, при включении нет необходимости включать системный прокси-сервер.",
         "tunUnavailable": "TUN requires Service Mode or Admin Mode"
+      },
+      "actions": {
+        "installService": "Install Service",
+        "uninstallService": "Uninstall Service"
       },
       "fields": {
         "systemProxy": "Системный прокси",
@@ -64,6 +77,9 @@
       },
       "placeholders": {
         "origin": "Введите корректный URL"
+      },
+      "actions": {
+        "add": "Add"
       },
       "messages": {
         "alwaysIncluded": "Всегда включаемые источники: {{urls}}"
@@ -136,9 +152,16 @@
     }
   },
   "components": {
+    "sidebar": {
+      "title": "Sidebar Settings",
+      "essential": "Essential (Cannot be disabled)"
+    },
     "verge": {
       "basic": {
         "title": "Основные настройки Verge",
+        "actions": {
+          "browse": "Browse"
+        },
         "trayOptions": {
           "showMainWindow": "Показать главное окно",
           "showTrayMenu": "Показать меню в трее",
@@ -154,7 +177,8 @@
           "themeSetting": "Настройки темы",
           "layoutSetting": "Настройки раскладки",
           "misc": "Расширенные настройки",
-          "hotkeySetting": "Настройки сочетаний клавиш"
+          "hotkeySetting": "Настройки сочетаний клавиш",
+          "miniWindow": "Mini Window"
         }
       },
       "advanced": {
@@ -163,6 +187,9 @@
           "backupInfo": "Поддерживает файлы конфигурации резервного копирования WebDAV",
           "openConfDir": "Если программное обеспечение работает неправильно, сделайте резервную копию и удалите все файлы в этой папке, а затем перезапустите ПО",
           "liteMode": "Режим, в котором работает только ядро Clash, а графический интрефейс закрыт"
+        },
+        "actions": {
+          "copyVersion": "Copy Version"
         },
         "notifications": {
           "latestVersion": "Обновление не требуется",
@@ -208,6 +235,9 @@
           "fontFamily": "Семейство шрифтов",
           "cssInjection": "Внедрение CSS"
         },
+        "actions": {
+          "editCss": "Edit CSS"
+        },
         "dialogs": {
           "editCssTitle": "Edit CSS"
         }
@@ -231,7 +261,8 @@
           "systemProxyTrayIcon": "Значок системного прокси в трее",
           "tunTrayIcon": "Значок TUN в трее",
           "enableTrayIcon": "Показывать значок в трее",
-          "enableTraySpeed": "Показывать скорость в трее"
+          "enableTraySpeed": "Показывать скорость в трее",
+          "pauseRenderTrafficStatsOnBlur": "При потере фокуса приостанавливать отрисовку статистики трафика"
         },
         "tooltips": {
           "hoverNavigator": "Automatically scroll to the corresponding proxy group when hovering over alphabet letters",
@@ -268,6 +299,9 @@
         "redir": "Порт прозрачного прокси Redir",
         "tproxy": "Порт прозрачного прокси Tproxy"
       },
+      "actions": {
+        "random": "Random Port"
+      },
       "messages": {
         "portInUse": "Port {{port}} is already in use",
         "saved": "Port settings saved",
@@ -282,6 +316,9 @@
     },
     "liteMode": {
       "title": "Настройки LightWeight Mode",
+      "actions": {
+        "enterNow": "Enter LightWeight Mode Now"
+      },
       "toggles": {
         "autoEnter": "Автоматический вход в LightWeight Mode"
       },
@@ -300,6 +337,17 @@
       "tabs": {
         "local": "Local backup",
         "webdav": "WebDAV backup"
+      },
+      "actions": {
+        "selectTarget": "Select backup target",
+        "backup": "Backup",
+        "export": "Export",
+        "exportBackup": "Export Backup",
+        "importBackup": "Import Backup",
+        "deleteBackup": "Delete Backup",
+        "restore": "Restore",
+        "restoreBackup": "Restore Backup",
+        "viewHistory": "View history"
       },
       "fields": {
         "webdavUrl": "URL-адрес сервера WebDAV http(s)://",
@@ -333,7 +381,7 @@
         "scheduleHelper": "Create local backups in the background at the configured interval.",
         "intervalLabel": "Backup frequency",
         "changeLabel": "Backup on critical changes",
-        "changeHelper": "Automatically back up when the global extend config/script or subscriptions are added, removed, or edited.",
+        "changeHelper": "Automatically backup when Global Extend Config/Script changes.",
         "options": {
           "hours": "Every {{n}} hours",
           "days": "Every {{n}} days"
@@ -397,6 +445,10 @@
     },
     "update": {
       "title": "New Version v{{version}}",
+      "actions": {
+        "goToRelease": "Go to Release Page",
+        "update": "Update"
+      },
       "messages": {
         "portableError": "Портативная версия не поддерживает обновление внутри приложения, пожалуйста, скачайте и замените файлы вручную",
         "breakChangeError": "Это крупное обновление, которое не поддерживает обновление внутри приложения. Пожалуйста, удалите его и загрузите установочный файл вручную."
@@ -451,7 +503,9 @@
         "autoRedirect": "Automatically configures nftables/iptables TCP redirects"
       },
       "messages": {
-        "applied": "Настройки применены"
+        "applied": "Настройки применены",
+        "invalidRouteExcludeAddress": "Введите корректный блок CIDR",
+        "routeExcludeAddressHint": "Поддерживаются только блоки CIDR IPv4/IPv6, например 192.168.0.0/16 или fd00::/8"
       }
     },
     "dns": {
@@ -550,6 +604,9 @@
       }
     },
     "webUI": {
+      "actions": {
+        "openUrl": "Open URL"
+      },
       "title": "Веб-интерфейс",
       "messages": {
         "supportedPlaceholders": "Поддерживаются %host, %port, %secret",

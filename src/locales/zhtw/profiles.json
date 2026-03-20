@@ -4,7 +4,8 @@
       "updateAll": "更新所有訂閱",
       "viewRuntimeConfig": "查看執行時訂閱",
       "reactivate": "重新啟用訂閱",
-      "import": "匯入"
+      "import": "匯入",
+      "syncSubscriptions": "Sync Subscriptions"
     },
     "batch": {
       "actions": {
@@ -72,8 +73,8 @@
     },
     "more": {
       "global": {
-        "merge": "Global Merge",
-        "script": "Global Script"
+        "merge": "Global Extend Config",
+        "script": "Global Extend Script"
       },
       "chips": {
         "merge": "Merge",

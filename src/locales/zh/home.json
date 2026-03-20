@@ -19,7 +19,11 @@
         "currentProxy": "当前代理卡",
         "network": "网络设置卡",
         "proxyMode": "代理模式卡",
-        "traffic": "流量统计卡"
+        "traffic": "流量统计卡",
+        "tests": "Website Tests Card",
+        "ip": "IP Information Card",
+        "clashInfo": "Clash Info Cards",
+        "systemInfo": "System Info Cards"
       },
       "title": "首页设置"
     },

@@ -18,3 +18,4 @@ CLAUDE.md
 
 mock-update-api.mjs
 .vfox.toml
+.vfox/

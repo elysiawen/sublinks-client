@@ -4,7 +4,8 @@
       "updateAll": "Actualizar todas las suscripciones",
       "viewRuntimeConfig": "Ver configuración en tiempo de ejecución",
       "reactivate": "Reactivar suscripciones",
-      "import": "Importar"
+      "import": "Importar",
+      "syncSubscriptions": "Sync Subscriptions"
     },
     "batch": {
       "actions": {
@@ -72,8 +73,8 @@
     },
     "more": {
       "global": {
-        "merge": "Global Merge",
-        "script": "Global Script"
+        "merge": "Global Extend Config",
+        "script": "Global Extend Script"
       },
       "chips": {
         "merge": "Merge",

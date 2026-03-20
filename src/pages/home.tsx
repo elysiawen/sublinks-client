@@ -7,6 +7,7 @@ import {
   SpeedOutlined,
   RefreshRounded,
   NewReleasesRounded,
+  HelpOutlineRounded,
 } from "@mui/icons-material";
 import {
   Box,
@@ -24,8 +25,10 @@ import {
   Typography,
   Slide,
   alpha,
+  Skeleton,
 } from "@mui/material";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLockFn } from "ahooks";
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { BasePage } from "@/components/base";
@@ -40,10 +43,28 @@ import { SUBLINKS_CONFIG } from "@/configs/sublinks-config";
 import { useProfiles } from "@/hooks/use-profiles";
 import { useUpdate } from "@/hooks/use-update";
 import { useVerge } from "@/hooks/use-verge";
-import { entry_lightweight_mode } from "@/services/cmds";
-// Removed local welcomeBg import to use API
+import { entry_lightweight_mode, openWebUrl } from "@/services/cmds";
 
-// Moved cards to About and Test pages
+const LazyTestCard = lazy(() =>
+  import("@/components/home/test-card").then((module) => ({
+    default: module.TestCard,
+  })),
+);
+const LazyIpInfoCard = lazy(() =>
+  import("@/components/home/ip-info-card").then((module) => ({
+    default: module.IpInfoCard,
+  })),
+);
+const LazyClashInfoCard = lazy(() =>
+  import("@/components/home/clash-info-card").then((module) => ({
+    default: module.ClashInfoCard,
+  })),
+);
+const LazySystemInfoCard = lazy(() =>
+  import("@/components/home/system-info-card").then((module) => ({
+    default: module.SystemInfoCard,
+  })),
+);
 
 // 定义首页卡片设置接口
 interface HomeCardsSettings {
@@ -52,22 +73,27 @@ interface HomeCardsSettings {
   network: boolean;
   mode: boolean;
   traffic: boolean;
+  info: boolean;
+  clashinfo: boolean;
+  systeminfo: boolean;
+  test: boolean;
+  ip: boolean;
   [key: string]: boolean;
 }
 
 // 首页设置对话框组件接口
 interface HomeSettingsDialogProps {
-  open: boolean;
-  onClose: () => void;
-  homeCards: HomeCardsSettings;
-  onSave: (cards: HomeCardsSettings) => void;
+  open: boolean
+  onClose: () => void
+  homeCards: HomeCardsSettings
+  onSave: (cards: HomeCardsSettings) => void
 }
 
 const serializeCardFlags = (cards: HomeCardsSettings) =>
   Object.keys(cards)
     .sort()
     .map((key) => `${key}:${cards[key] ? 1 : 0}`)
-    .join("|");
+    .join('|')
 
 // 首页设置对话框组件
 const HomeSettingsDialog = ({
@@ -76,84 +102,121 @@ const HomeSettingsDialog = ({
   homeCards,
   onSave,
 }: HomeSettingsDialogProps) => {
-  const { t } = useTranslation();
-  const [cards, setCards] = useState<HomeCardsSettings>(homeCards);
-  const { patchVerge } = useVerge();
+  const { t } = useTranslation()
+  const [cards, setCards] = useState<HomeCardsSettings>(homeCards)
+  const { patchVerge } = useVerge()
 
   const handleToggle = (key: string) => {
     setCards((prev: HomeCardsSettings) => ({
       ...prev,
       [key]: !prev[key],
-    }));
-  };
+    }))
+  }
 
   const handleSave = async () => {
-    await patchVerge({ home_cards: cards });
-    onSave(cards);
-    onClose();
-  };
+    await patchVerge({ home_cards: cards })
+    onSave(cards)
+    onClose()
+  }
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle>{t("home.page.settings.title")}</DialogTitle>
+      <DialogTitle>{t('home.page.settings.title')}</DialogTitle>
       <DialogContent>
         <FormGroup>
           <FormControlLabel
             control={
               <Checkbox
                 checked={cards.profile || false}
-                onChange={() => handleToggle("profile")}
+                onChange={() => handleToggle('profile')}
               />
             }
-            label={t("home.page.settings.cards.profile")}
+            label={t('home.page.settings.cards.profile')}
           />
           <FormControlLabel
             control={
               <Checkbox
                 checked={cards.proxy || false}
-                onChange={() => handleToggle("proxy")}
+                onChange={() => handleToggle('proxy')}
               />
             }
-            label={t("home.page.settings.cards.currentProxy")}
+            label={t('home.page.settings.cards.currentProxy')}
           />
           <FormControlLabel
             control={
               <Checkbox
                 checked={cards.network || false}
-                onChange={() => handleToggle("network")}
+                onChange={() => handleToggle('network')}
               />
             }
-            label={t("home.page.settings.cards.network")}
+            label={t('home.page.settings.cards.network')}
           />
           <FormControlLabel
             control={
               <Checkbox
                 checked={cards.mode || false}
-                onChange={() => handleToggle("mode")}
+                onChange={() => handleToggle('mode')}
               />
             }
-            label={t("home.page.settings.cards.proxyMode")}
+            label={t('home.page.settings.cards.proxyMode')}
           />
           <FormControlLabel
             control={
               <Checkbox
                 checked={cards.traffic || false}
-                onChange={() => handleToggle("traffic")}
+                onChange={() => handleToggle('traffic')}
               />
             }
-            label={t("home.page.settings.cards.traffic")}
+            label={t('home.page.settings.cards.traffic')}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={cards.test || false}
+                onChange={() => handleToggle("test")}
+              />
+            }
+            label={t("home.page.settings.cards.tests")}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={cards.ip || false}
+                onChange={() => handleToggle("ip")}
+              />
+            }
+            label={t("home.page.settings.cards.ip")}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={cards.clashinfo || false}
+                onChange={() => handleToggle("clashinfo")}
+              />
+            }
+            label={t("home.page.settings.cards.clashInfo")}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={cards.systeminfo || false}
+                onChange={() => handleToggle("systeminfo")}
+              />
+            }
+            label={t("home.page.settings.cards.systemInfo")}
           />
         </FormGroup>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>{t("shared.actions.cancel")}</Button>
+        <Button onClick={onClose}>{t('shared.actions.cancel')}</Button>
         <Button onClick={handleSave} color="primary">
-          {t("shared.actions.save")}
+          {t('shared.actions.save')}
         </Button>
       </DialogActions>
     </Dialog>
-  );
-};
+  )
+}
+
 
 const WelcomeBanner = () => {
   const { t } = useTranslation();
@@ -306,16 +369,17 @@ const WelcomeBanner = () => {
 };
 
 const HomePage = () => {
-  const { t } = useTranslation() as any;
+  const { t } = useTranslation();
   const { verge } = useVerge();
   const { current, mutateProfiles } = useProfiles();
 
   // 设置弹窗的状态
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const [localHomeCards, setLocalHomeCards] = useState<{
-    value: HomeCardsSettings;
-    baseSignature: string;
-  } | null>(null);
+    value: HomeCardsSettings
+    baseSignature: string
+  } | null>(null)
+  const [dialogKey, setDialogKey] = useState(0)
 
   // 卡片显示状态
   const defaultCards = useMemo<HomeCardsSettings>(
@@ -325,92 +389,101 @@ const HomePage = () => {
       network: true,
       mode: true,
       traffic: true,
+      info: false,
+      clashinfo: false,
+      systeminfo: false,
+      test: false,
+      ip: false,
     }),
     [],
-  );
+  )
 
   const vergeHomeCards = useMemo<HomeCardsSettings | null>(
     () => (verge?.home_cards as HomeCardsSettings | undefined) ?? null,
     [verge],
-  );
+  )
 
   const remoteHomeCards = useMemo<HomeCardsSettings>(
     () => vergeHomeCards ?? defaultCards,
     [defaultCards, vergeHomeCards],
-  );
+  )
 
   const remoteSignature = useMemo(
     () => serializeCardFlags(remoteHomeCards),
     [remoteHomeCards],
-  );
+  )
 
   const pendingLocalCards = useMemo<HomeCardsSettings | null>(() => {
-    if (!localHomeCards) return null;
+    if (!localHomeCards) return null
     return localHomeCards.baseSignature === remoteSignature
       ? localHomeCards.value
-      : null;
-  }, [localHomeCards, remoteSignature]);
+      : null
+  }, [localHomeCards, remoteSignature])
 
-  const effectiveHomeCards = pendingLocalCards ?? remoteHomeCards;
+  const effectiveHomeCards = pendingLocalCards ?? remoteHomeCards
 
+  // 文档链接函数
+  const toGithubDoc = useLockFn(() => {
+    return openWebUrl("https://clash-verge-rev.github.io/index.html");
+  });
   // 新增：打开设置弹窗
   const openSettings = useCallback(() => {
-    setSettingsOpen(true);
-  }, []);
+    setSettingsOpen(true)
+  }, [])
 
   const renderCard = useCallback(
     (cardKey: string, component: React.ReactNode, size: number = 6) => {
-      if (!effectiveHomeCards[cardKey]) return null;
+      if (!effectiveHomeCards[cardKey]) return null
 
       return (
         <Grid size={size} key={cardKey}>
           {component}
         </Grid>
-      );
+      )
     },
     [effectiveHomeCards],
-  );
+  )
 
   const criticalCards = useMemo(
     () => [
       renderCard(
-        "profile",
+        'profile',
         <HomeProfileCard current={current} onProfileUpdated={mutateProfiles} />,
       ),
-      renderCard("proxy", <CurrentProxyCard />),
-      renderCard("network", <NetworkSettingsCard />),
-      renderCard("mode", <ClashModeEnhancedCard />),
+      renderCard('proxy', <CurrentProxyCard />),
+      renderCard('network', <NetworkSettingsCard />),
+      renderCard('mode', <ClashModeEnhancedCard />),
     ],
     [current, mutateProfiles, renderCard],
-  );
+  )
 
   // 新增：保存设置时用requestIdleCallback/setTimeout
   const handleSaveSettings = (newCards: HomeCardsSettings) => {
     if (window.requestIdleCallback) {
-      window.requestIdleCallback(() =>
+      window.requestIdleCallback(() => {
         setLocalHomeCards({
           value: newCards,
           baseSignature: remoteSignature,
-        }),
-      );
+        })
+        setDialogKey((prev) => prev + 1)
+      })
     } else {
-      setTimeout(
-        () =>
-          setLocalHomeCards({
-            value: newCards,
-            baseSignature: remoteSignature,
-          }),
-        0,
-      );
+      setTimeout(() => {
+        setLocalHomeCards({
+          value: newCards,
+          baseSignature: remoteSignature,
+        })
+        setDialogKey((prev) => prev + 1)
+      }, 0)
     }
-  };
+  }
 
   const nonCriticalCards = useMemo(
     () => [
       renderCard(
-        "traffic",
+        'traffic',
         <EnhancedCard
-          title={t("home.page.cards.trafficStats")}
+          title={t('home.page.cards.trafficStats')}
           icon={<SpeedOutlined />}
           iconColor="secondary"
         >
@@ -418,15 +491,36 @@ const HomePage = () => {
         </EnhancedCard>,
         12,
       ),
+
+      renderCard(
+        "test",
+        <Suspense fallback={<Skeleton variant="rectangular" height={200} />}>
+          <LazyTestCard />
+        </Suspense>,
+      ),
+      renderCard(
+        "ip",
+        <Suspense fallback={<Skeleton variant="rectangular" height={200} />}>
+          <LazyIpInfoCard />
+        </Suspense>,
+      ),
+      renderCard(
+        "clashinfo",
+        <Suspense fallback={<Skeleton variant="rectangular" height={200} />}>
+          <LazyClashInfoCard />
+        </Suspense>,
+      ),
+      renderCard(
+        "systeminfo",
+        <Suspense fallback={<Skeleton variant="rectangular" height={200} />}>
+          <LazySystemInfoCard />
+        </Suspense>,
+      ),
     ],
     [t, renderCard],
-  );
-  const dialogKey = useMemo(
-    () => `${serializeCardFlags(effectiveHomeCards)}:${settingsOpen ? 1 : 0}`,
-    [effectiveHomeCards, settingsOpen],
-  );
-  // Home Update Notification Logic
+  )
 
+  // Home Update Notification Logic
   const { updateInfo } = useUpdate();
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
   const [skippedVersion, setSkippedVersion] = useState(() =>
@@ -446,10 +540,9 @@ const HomePage = () => {
       setSkippedVersion(updateInfo.version.version);
     }
   }, [updateInfo]);
-
   return (
     <BasePage
-      title={t("home.page.title")}
+      title={t('home.page.title')}
       contentStyle={{ padding: 2 }}
       header={
         <>
@@ -518,42 +611,48 @@ const HomePage = () => {
                 </Button>
                 <Tooltip title={t("home.page.tooltips.skipVersion")}>
                   <IconButton
-                    size="small"
-                    onClick={handleSkipVersion}
-                    color="inherit"
-                    sx={{
-                      p: 0.5,
-                      "&:hover": {
-                        bgcolor: (theme) =>
-                          alpha(theme.palette.primary.main, 0.1),
-                      },
-                    }}
-                  >
-                    <CloseRounded sx={{ fontSize: 16 }} />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            </Slide>
-          </Box>
+                     size="small"
+                     onClick={handleSkipVersion}
+                     color="inherit"
+                     sx={{
+                       p: 0.5,
+                       "&:hover": {
+                         bgcolor: (theme) =>
+                           alpha(theme.palette.primary.main, 0.1),
+                       },
+                     }}
+                   >
+                     <CloseRounded sx={{ fontSize: 16 }} />
+                   </IconButton>
+                 </Tooltip>
+               </Box>
+             </Slide>
+           </Box>
+ 
+           <Box sx={{ display: "flex", alignItems: "center" }}>
+             <Tooltip title={t("home.page.tooltips.lightweightMode")} arrow>
+               <IconButton
+                 onClick={async () => await entry_lightweight_mode()}
+                 size="small"
+                 color="inherit"
+               >
+                 <HistoryEduOutlined />
+               </IconButton>
+             </Tooltip>
 
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Tooltip title={t("home.page.tooltips.lightweightMode")} arrow>
-              <IconButton
-                onClick={async () => await entry_lightweight_mode()}
-                size="small"
-                color="inherit"
-              >
-                <HistoryEduOutlined />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip title={t("home.page.tooltips.settings")} arrow>
-              <IconButton onClick={openSettings} size="small" color="inherit">
-                <SettingsOutlined />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </>
+             <Tooltip title={t("home.page.tooltips.manual")} arrow>
+               <IconButton onClick={toGithubDoc} size="small" color="inherit">
+                 <HelpOutlineRounded />
+               </IconButton>
+             </Tooltip>
+ 
+             <Tooltip title={t("home.page.tooltips.settings")} arrow>
+               <IconButton onClick={openSettings} size="small" color="inherit">
+                 <SettingsOutlined />
+               </IconButton>
+             </Tooltip>
+           </Box>
+         </>
       }
     >
       <WelcomeBanner />
@@ -579,37 +678,37 @@ const HomePage = () => {
         onClose={() => setUpdateDialogOpen(false)}
       />
     </BasePage>
-  );
-};
+  )
+}
 
 // 增强版网络设置卡片组件
 const NetworkSettingsCard = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
   return (
     <EnhancedCard
-      title={t("home.page.cards.networkSettings")}
+      title={t('home.page.cards.networkSettings')}
       icon={<DnsOutlined />}
       iconColor="primary"
       action={null}
     >
       <ProxyTunCard />
     </EnhancedCard>
-  );
-};
+  )
+}
 
 // 增强版 Clash 模式卡片组件
 const ClashModeEnhancedCard = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
   return (
     <EnhancedCard
-      title={t("home.page.cards.proxyMode")}
+      title={t('home.page.cards.proxyMode')}
       icon={<RouterOutlined />}
       iconColor="info"
       action={null}
     >
       <ClashModeCard />
     </EnhancedCard>
-  );
-};
+  )
+}
 
-export default HomePage;
+export default HomePage

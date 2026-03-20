@@ -4,7 +4,8 @@
       "updateAll": "تحديث جميع الملفات الشخصية",
       "viewRuntimeConfig": "عرض تكوين وقت التشغيل",
       "reactivate": "إعادة تنشيط الملفات الشخصية",
-      "import": "استيراد"
+      "import": "استيراد",
+      "syncSubscriptions": "Sync Subscriptions"
     },
     "batch": {
       "actions": {
@@ -72,8 +73,8 @@
     },
     "more": {
       "global": {
-        "merge": "Global Merge",
-        "script": "Global Script"
+        "merge": "Global Extend Config",
+        "script": "Global Extend Script"
       },
       "chips": {
         "merge": "Merge",

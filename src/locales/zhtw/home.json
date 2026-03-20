@@ -3,7 +3,10 @@
     "tooltips": {
       "lightweightMode": "輕量模式",
       "manual": "使用手冊",
-      "settings": "首頁設定"
+      "settings": "首頁設定",
+      "updateAvailable": "New version available",
+      "updateNow": "Update",
+      "skipVersion": "Do not show this version again"
     },
     "cards": {
       "trafficStats": "流量統計",

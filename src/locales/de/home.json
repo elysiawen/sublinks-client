@@ -3,7 +3,10 @@
     "tooltips": {
       "lightweightMode": "Leichtgewichtiger Modus",
       "manual": "Bedienungsanleitung",
-      "settings": "Startseite-Einstellungen"
+      "settings": "Startseite-Einstellungen",
+      "updateAvailable": "New version available",
+      "updateNow": "Update",
+      "skipVersion": "Do not show this version again"
     },
     "cards": {
       "trafficStats": "Verkehrsstatistik",

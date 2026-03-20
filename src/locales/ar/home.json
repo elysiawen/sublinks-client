@@ -3,7 +3,10 @@
     "tooltips": {
       "lightweightMode": "وضع الأداء الخفيف",
       "manual": "دليل",
-      "settings": "Home Settings"
+      "settings": "Home Settings",
+      "updateAvailable": "New version available",
+      "updateNow": "Update",
+      "skipVersion": "Do not show this version again"
     },
     "cards": {
       "trafficStats": "Traffic Stats",

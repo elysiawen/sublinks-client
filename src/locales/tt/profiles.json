@@ -4,7 +4,8 @@
       "updateAll": "Барлык профильләрне яңарту",
       "viewRuntimeConfig": "Кулланылган конфигурацияне карау",
       "reactivate": "Профильләрне янәдән активлаштыру",
-      "import": "Импорт"
+      "import": "Импорт",
+      "syncSubscriptions": "Sync Subscriptions"
     },
     "batch": {
       "actions": {
@@ -72,8 +73,8 @@
     },
     "more": {
       "global": {
-        "merge": "Global Merge",
-        "script": "Global Script"
+        "merge": "Global Extend Config",
+        "script": "Global Extend Script"
       },
       "chips": {
         "merge": "Merge",

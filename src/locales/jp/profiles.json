@@ -4,7 +4,8 @@
       "updateAll": "すべてのプロファイルを更新",
       "viewRuntimeConfig": "実行時のプロファイルを表示",
       "reactivate": "プロファイルを再アクティブ化",
-      "import": "インポート"
+      "import": "インポート",
+      "syncSubscriptions": "Sync Subscriptions"
     },
     "batch": {
       "actions": {
@@ -72,8 +73,8 @@
     },
     "more": {
       "global": {
-        "merge": "Global Merge",
-        "script": "Global Script"
+        "merge": "Global Extend Config",
+        "script": "Global Extend Script"
       },
       "chips": {
         "merge": "Merge",

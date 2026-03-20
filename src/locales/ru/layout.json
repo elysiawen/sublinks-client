@@ -14,6 +14,9 @@
         "settings": "Настройки",
         "about": "О программе"
       },
+      "aboutPage": {
+        "attribution": "Based on clash-verge-rev"
+      },
       "menu": {
         "reorderMode": "Menu reorder mode",
         "restoreDefaultOrder": "Restore default order",

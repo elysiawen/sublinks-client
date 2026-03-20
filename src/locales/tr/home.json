@@ -3,7 +3,10 @@
     "tooltips": {
       "lightweightMode": "Hafif Mod",
       "manual": "Kılavuz",
-      "settings": "Ana Sayfa Ayarları"
+      "settings": "Ana Sayfa Ayarları",
+      "updateAvailable": "New version available",
+      "updateNow": "Update",
+      "skipVersion": "Do not show this version again"
     },
     "cards": {
       "trafficStats": "Trafik İstatistikleri",
