@@ -216,7 +216,7 @@
           "liteModeSettings": "Hafif Mod Ayarları",
           "exit": "Çıkış",
           "exportDiagnostics": "Tanılama Bilgilerini Dışa Aktar",
-          "vergeVersion": "Verge Sürümü"
+          "vergeVersion": "İstemci Sürümü"
         }
       },
       "updateDialog": {

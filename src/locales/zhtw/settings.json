@@ -216,7 +216,7 @@
           "liteModeSettings": "輕量模式設定",
           "exit": "離開",
           "exportDiagnostics": "匯出診斷資訊",
-          "vergeVersion": "Verge 版本"
+          "vergeVersion": "客戶端版本"
         }
       },
       "updateDialog": {

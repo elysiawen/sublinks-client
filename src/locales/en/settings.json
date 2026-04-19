@@ -216,7 +216,7 @@
           "liteModeSettings": "LightWeight Mode Settings",
           "exit": "Exit",
           "exportDiagnostics": "Export Diagnostic Info",
-          "vergeVersion": "Verge Version"
+          "vergeVersion": "Client Version"
         }
       },
       "updateDialog": {

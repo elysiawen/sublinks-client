@@ -216,7 +216,7 @@
           "liteModeSettings": "Настройки LightWeight Mode",
           "exit": "Выход",
           "exportDiagnostics": "Экспорт диагностической информации",
-          "vergeVersion": "Версия Clash Verge Rev"
+          "vergeVersion": "Версия клиента"
         }
       },
       "updateDialog": {

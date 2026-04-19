@@ -60,7 +60,7 @@
         "autoLaunch": "Beim Start automatisch starten",
         "runningMode": "Betriebsmodus",
         "lastCheckUpdate": "Letzte Aktualitätsprüfung",
-        "vergeVersion": "Verge-Version"
+        "vergeVersion": "Client-Version"
       },
       "actions": {
         "settings": "Einstellungen"

@@ -263,6 +263,18 @@ pub struct IVerge {
 
     /// 启用迷你悬浮窗
     pub enable_mini_window: Option<bool>,
+
+    /// 迷你悬浮窗 X 坐标
+    pub mini_window_pos_x: Option<f64>,
+
+    /// 迷你悬浮窗 Y 坐标
+    pub mini_window_pos_y: Option<f64>,
+
+    /// 迷你悬浮窗置顶显示
+    pub mini_window_always_on_top: Option<bool>,
+
+    /// 迷你悬浮窗全屏时自动隐藏
+    pub mini_window_auto_hide: Option<bool>,
 }
 
 #[derive(Default, Debug, Clone, Deserialize, Serialize)]
@@ -455,6 +467,8 @@ impl IVerge {
             home_cards: None,
             enable_external_controller: Some(false),
             enable_mini_window: Some(false),
+            mini_window_always_on_top: Some(true),
+            mini_window_auto_hide: Some(false),
             ..Self::default()
         }
     }
@@ -561,6 +575,10 @@ impl IVerge {
         patch!(home_cards);
         patch!(enable_external_controller);
         patch!(enable_mini_window);
+        patch!(mini_window_pos_x);
+        patch!(mini_window_pos_y);
+        patch!(mini_window_always_on_top);
+        patch!(mini_window_auto_hide);
     }
 
     pub const fn get_singleton_port() -> u16 {

@@ -1,4 +1,5 @@
 use super::CmdResult;
+use crate::config::Config;
 use crate::core::{autostart, handle};
 use crate::utils::resolve::ui::{self, UiReadyStage};
 use crate::{cmd::StringifyErr as _, feat, utils::dirs};
@@ -129,33 +130,45 @@ pub fn update_ui_stage(stage: UiReadyStage) {
     ui::update_ui_ready_stage(stage);
 }
 
+const MINI_WINDOW_LABEL: &str = "mini";
+const MINI_WINDOW_WIDTH: f64 = 76.0;
+const MINI_WINDOW_HEIGHT: f64 = 56.0;
+
 /// 打开迷你悬浮窗
 #[tauri::command]
 pub async fn open_mini_window(app_handle: AppHandle) -> CmdResult<()> {
-    if let Some(window) = app_handle.get_webview_window("mini") {
-        window
-            .set_size(tauri::Size::Logical(tauri::LogicalSize::new(90.0, 56.0)))
-            .stringify_err()?;
+    if let Some(window) = app_handle.get_webview_window(MINI_WINDOW_LABEL) {
+        let logical_size = tauri::LogicalSize::new(MINI_WINDOW_WIDTH, MINI_WINDOW_HEIGHT);
+        window.set_size(tauri::Size::Logical(logical_size)).stringify_err()?;
         window.show().stringify_err()?;
         window.set_focus().stringify_err()?;
         return Ok(());
     }
 
-    let window = tauri::WebviewWindowBuilder::new(&app_handle, "mini", tauri::WebviewUrl::App("mini".into()))
-        .title("SubLinks Mini")
-        .inner_size(90.0, 56.0)
-        .decorations(false)
-        .transparent(true)
-        .always_on_top(true)
-        .skip_taskbar(true)
-        .resizable(false)
-        .visible(true)
-        .build()
-        .stringify_err()?;
+    let config = Config::verge().await;
+    let verge = config.latest_arc();
 
-    window
-        .set_size(tauri::Size::Logical(tauri::LogicalSize::new(90.0, 56.0)))
-        .stringify_err()?;
+    let mut builder = tauri::WebviewWindowBuilder::new(
+        &app_handle,
+        MINI_WINDOW_LABEL,
+        tauri::WebviewUrl::App(MINI_WINDOW_LABEL.into()),
+    )
+    .title("SubLinks Mini")
+    .inner_size(MINI_WINDOW_WIDTH, MINI_WINDOW_HEIGHT)
+    .decorations(false)
+    .transparent(true)
+    .always_on_top(verge.mini_window_always_on_top.unwrap_or(true))
+    .skip_taskbar(true)
+    .resizable(false)
+    .visible(true) // 直接设为可见，因为我们在创建时就设置了正确位置
+    .shadow(false);
+
+    // 如果配置中保存了位置，则在创建时直接定位
+    if let (Some(x), Some(y)) = (verge.mini_window_pos_x, verge.mini_window_pos_y) {
+        builder = builder.position(x, y);
+    }
+
+    builder.build().stringify_err()?;
 
     Ok(())
 }
@@ -163,7 +176,7 @@ pub async fn open_mini_window(app_handle: AppHandle) -> CmdResult<()> {
 /// 关闭迷你悬浮窗
 #[tauri::command]
 pub async fn close_mini_window(app_handle: AppHandle) -> CmdResult<()> {
-    if let Some(window) = app_handle.get_webview_window("mini") {
+    if let Some(window) = app_handle.get_webview_window(MINI_WINDOW_LABEL) {
         window.close().stringify_err()?;
     }
     Ok(())

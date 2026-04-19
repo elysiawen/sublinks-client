@@ -982,6 +982,10 @@ interface IVergeConfig {
   hover_jump_navigator_delay?: number
   enable_external_controller?: boolean
   enable_mini_window?: boolean
+  mini_window_pos_x?: number
+  mini_window_pos_y?: number
+  mini_window_always_on_top?: boolean
+  mini_window_auto_hide?: boolean
 }
 
 interface IWebDavFile {

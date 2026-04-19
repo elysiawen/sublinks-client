@@ -217,6 +217,9 @@ async fn process_terminated_flags(update_flags: UpdateFlags, patch: &IVerge) -> 
             .edit_draft(|d| d.enable_global_hotkey = patch.enable_global_hotkey);
         handle::Handle::refresh_verge();
     }
+    if patch.theme_mode.is_some() {
+        handle::Handle::refresh_verge();
+    }
     if update_flags.contains(UpdateFlags::LAUNCH) {
         autostart::update_launch().await?;
     }

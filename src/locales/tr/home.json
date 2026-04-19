@@ -60,7 +60,7 @@
         "autoLaunch": "Otomatik Başlatma",
         "runningMode": "Çalışma Modu",
         "lastCheckUpdate": "Son Güncelleme Kontrolü",
-        "vergeVersion": "Verge Sürümü"
+        "vergeVersion": "İstemci Sürümü"
       },
       "actions": {
         "settings": "Ayarlar"

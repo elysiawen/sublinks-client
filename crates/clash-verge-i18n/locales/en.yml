@@ -51,7 +51,7 @@ tray:
   coreLog: Core Log
   restartClash: Restart Clash Core
   restartApp: Restart Application
-  vergeVersion: Verge Version
+  vergeVersion: Sublinks Version
   more: More
   exit: Exit
   tooltip:
