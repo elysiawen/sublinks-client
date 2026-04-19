@@ -13,12 +13,6 @@
   专为 SubLinks 服务优化的定制版本，提供独立的运行环境与流畅的更新体验。
 </p>
 
-## Preview
-
-| Dark                             | Light                             |
-| -------------------------------- | --------------------------------- |
-| ![预览](./docs/preview_dark.png) | ![预览](./docs/preview_light.png) |
-
 ## Install
 
 请到发布页面下载对应的安装包：[Release page](https://github.com/clash-verge-rev/clash-verge-rev/releases)<br>
@@ -34,6 +28,7 @@ Supports Windows (x64/x86), Linux (x64/arm64) and macOS 11+ (intel/apple).
 | AutoBuild   | 滚动更新版，适合测试反馈，可能存在缺陷。 | [AutoBuild](https://github.com/clash-verge-rev/clash-verge-rev/releases/tag/autobuild) |
 
 #### 安装说明和常见问题，请到 [文档页](https://clash-verge-rev.github.io/) 查看
+
 ---
 
 ## 主要定制特性
