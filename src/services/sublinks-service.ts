@@ -193,16 +193,34 @@ export const syncSubLinksSubscriptions = async (options?: {
     const subData = await finalResponse.json();
     const serverSubs = subData.subscriptions || [];
 
-    // 1. Pruning skipped during sync to avoid multiple core restarts
-    // (each deleteProfile triggers update_config_forced which restarts the core)
-    // Orphaned profiles will be cleaned up during logout or manual cleanup
-    const deletedCount = 0;
+    // 1. Pruning: Remove profiles that no longer exist on the server
+    const serverUrlSet = new Set(serverSubs.map((s: any) => s.url));
+    const orphanedProfiles = (profilesConfig?.items || []).filter(
+      (p: any) => p.url && !serverUrlSet.has(p.url),
+    );
+    let deletedCount = 0;
+
+    if (orphanedProfiles.length > 0) {
+      // Deactivate current profile first to prevent core restarts on each delete
+      if (profilesConfig?.current) {
+        await patchProfilesConfig({ current: undefined }).catch(() => {});
+      }
+      for (const orphan of orphanedProfiles) {
+        try {
+          await deleteProfile(orphan.uid);
+          console.log(`[SubLinks Service] Deleted orphaned profile: ${orphan.name}`);
+          deletedCount++;
+        } catch (e) {
+          console.error(`[SubLinks Service] Failed to delete profile ${orphan.uid}`, e);
+        }
+      }
+    }
 
     // 2. Importing & Updating: Add new or update existing subscriptions
     const existingUrlMap = new Map<string, IProfileItem>(
       (profilesConfig?.items
         ?.map((p: any) => [p.url, p])
-        .filter(([url]: any) => !!url) as any) || [],
+        .filter(([url]: any) => !!url && serverUrlSet.has(url)) as any) || [],
     );
     let importedCount = 0;
     let renamedCount = 0;
