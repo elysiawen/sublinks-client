@@ -58,6 +58,16 @@
     "loginRequestFailed": "Request failed ({{status}}): {{text}}",
     "loginFailed": "Login failed ({{status}})",
     "loginNoToken": "Login succeeded but no access token received, please contact admin",
-    "loggingIn": "Logging in..."
+    "loggingIn": "Logging in...",
+    "serverInvalidResponse": "Server returned an invalid response",
+    "syncVerifying": "Verified, syncing subscriptions...",
+    "cannotConnectServer": "Cannot connect to server",
+    "loginTitle": "SubLinks Client",
+    "username": "Username",
+    "password": "Password",
+    "totpCode": "6-digit code (TOTP)",
+    "backToChangePassword": "Back to change password",
+    "verify": "Verify",
+    "login": "Login"
   }
 }

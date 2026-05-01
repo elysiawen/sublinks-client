@@ -58,6 +58,16 @@
     "loginRequestFailed": "请求失败 ({{status}}): {{text}}",
     "loginFailed": "登录失败 ({{status}})",
     "loginNoToken": "登录成功但未获取到访问令牌，请联系管理员",
-    "loggingIn": "正在登录..."
+    "loggingIn": "正在登录...",
+    "serverInvalidResponse": "服务器返回了无效的响应",
+    "syncVerifying": "验证成功，正在同步订阅...",
+    "cannotConnectServer": "无法连接到服务器",
+    "loginTitle": "SubLinks 客户端",
+    "username": "用户名",
+    "password": "密码",
+    "totpCode": "6 位验证码 (TOTP)",
+    "backToChangePassword": "返回修改密码",
+    "verify": "验证",
+    "login": "登录"
   }
 }

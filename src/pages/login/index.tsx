@@ -41,7 +41,7 @@ const LoginPage = () => {
       SUBLINKS_CONFIG.STORAGE_KEYS.LOGOUT_REASON,
     );
     if (reason) {
-      if (reason.includes("过期") || reason.includes("失效")) {
+      if (reason.includes("expired") || reason.includes("invalid") || reason.includes("过期") || reason.includes("失效")) {
         showNotice("error", reason);
       } else {
         showNotice("success", reason);
@@ -88,7 +88,7 @@ const LoginPage = () => {
         if (!response.ok) {
           throw new Error(t("layout.notifications.loginRequestFailed" as any, { status: response.status, text }));
         }
-        throw new Error("服务器返回了无效的响应");
+        throw new Error(t("layout.notifications.serverInvalidResponse" as any));
       }
 
       if (!response.ok) {
@@ -126,7 +126,7 @@ const LoginPage = () => {
         JSON.stringify(data.user),
       );
 
-      setSyncStatus("验证成功，正在同步订阅...");
+      setSyncStatus(t("layout.notifications.syncVerifying" as any));
 
       // Sync before reload to show progress
       await syncSubLinksSubscriptions({
@@ -140,7 +140,7 @@ const LoginPage = () => {
       // Trigger auth change event for seamless login
       window.dispatchEvent(new Event("sublinks-auth-change"));
     } catch (err: any) {
-      showNotice("error", err.message || "无法连接到服务器");
+      showNotice("error", err.message || t("layout.notifications.cannotConnectServer" as any));
     } finally {
       setLoading(false);
     }
@@ -206,7 +206,7 @@ const LoginPage = () => {
         />
 
         <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
-          SubLinks 客户端
+          {t("layout.notifications.loginTitle" as any)}
         </Typography>
 
         <Box
@@ -218,7 +218,7 @@ const LoginPage = () => {
             <>
               <TextField
                 fullWidth
-                label="用户名"
+                label={t("layout.notifications.username" as any)}
                 margin="normal"
                 required
                 value={username}
@@ -226,7 +226,7 @@ const LoginPage = () => {
               />
               <TextField
                 fullWidth
-                label="密码"
+                label={t("layout.notifications.password" as any)}
                 type="password"
                 margin="normal"
                 required
@@ -238,7 +238,7 @@ const LoginPage = () => {
             <>
               <TextField
                 fullWidth
-                label="6 位验证码 (TOTP)"
+                label={t("layout.notifications.totpCode" as any)}
                 margin="normal"
                 required
                 value={twoFactorCode}
@@ -255,7 +255,7 @@ const LoginPage = () => {
                 }}
                 sx={{ mt: 1 }}
               >
-                返回修改密码
+                {t("layout.notifications.backToChangePassword" as any)}
               </Button>
             </>
           )}
@@ -275,9 +275,9 @@ const LoginPage = () => {
                 </Typography>
               </Box>
             ) : requires2FA ? (
-              "验证"
+              t("layout.notifications.verify" as any)
             ) : (
-              "登录"
+              t("layout.notifications.login" as any)
             )}
           </Button>
         </Box>
