@@ -80,6 +80,8 @@ export interface RefreshersContextType {
   refreshProxyProviders: () => Promise<any>
   refreshRuleProviders: () => Promise<any>
   refreshAll: () => Promise<any>
+  isProfileSwitching: boolean
+  setIsProfileSwitching: (switching: boolean) => void
 }
 
 export const ProxiesContext = createContext<ProxiesContextType | null>(null)

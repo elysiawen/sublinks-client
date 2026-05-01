@@ -14,11 +14,11 @@ import {
   MenuItem,
   ListItemText,
 } from '@mui/material'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { LogicalSize } from '@tauri-apps/api/dpi'
 import { listen, emit } from '@tauri-apps/api/event'
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { useEffect, useRef, useState, useCallback } from 'react'
-import useSWR, { mutate } from 'swr'
 
 import { useConnectionData } from '@/hooks/use-connection-data'
 import { useTrafficData } from '@/hooks/use-traffic-data'
@@ -42,12 +42,16 @@ const MiniPage = () => {
   } | null>(null)
 
   const [isHovered, setIsHovered] = useState(false)
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Reuse the exact same custom theme hook from the main app
   const { theme: muiTheme } = useCustomTheme()
+  const queryClient = useQueryClient()
 
-  const { data: vergeConfig } = useSWR('getVergeConfig', getVergeConfig)
+  const { data: vergeConfig } = useQuery({
+    queryKey: ['getVergeConfig'],
+    queryFn: getVergeConfig,
+  })
 
   useEffect(() => {
     hideInitialOverlay()
@@ -55,7 +59,7 @@ const MiniPage = () => {
     const window = getCurrentWebviewWindow()
 
     // Save position when window is moved
-    let saveTimeout: NodeJS.Timeout
+    let saveTimeout: ReturnType<typeof setTimeout>
     const unlistenMove = window.onMoved(({ payload }) => {
       // Debounce saving to avoid too many writes
       clearTimeout(saveTimeout)
@@ -132,7 +136,7 @@ const MiniPage = () => {
   useEffect(() => {
     let unlisten: () => void
     listen('verge://refresh-verge-config', () => {
-      mutate('getVergeConfig')
+      queryClient.invalidateQueries({ queryKey: ['getVergeConfig'] })
     }).then((fn) => {
       unlisten = fn
     })
@@ -140,7 +144,7 @@ const MiniPage = () => {
     return () => {
       if (unlisten) unlisten()
     }
-  }, [])
+  }, [queryClient])
 
   // Prevent default context menu everywhere in the mini window
   useEffect(() => {
@@ -168,7 +172,7 @@ const MiniPage = () => {
     if (!vergeConfig) return
     const newVal = !(vergeConfig.mini_window_always_on_top ?? true)
     await patchVergeConfig({ mini_window_always_on_top: newVal })
-    mutate('getVergeConfig')
+    queryClient.invalidateQueries({ queryKey: ['getVergeConfig'] })
     await emit('verge://refresh-verge-config')
     const window = getCurrentWebviewWindow()
     window.setAlwaysOnTop(newVal).catch(console.error)
@@ -179,7 +183,7 @@ const MiniPage = () => {
     if (!vergeConfig) return
     const newVal = !(vergeConfig.mini_window_auto_hide ?? false)
     await patchVergeConfig({ mini_window_auto_hide: newVal })
-    mutate('getVergeConfig')
+    queryClient.invalidateQueries({ queryKey: ['getVergeConfig'] })
     await emit('verge://refresh-verge-config')
     closeMenu()
   }
@@ -271,6 +275,10 @@ const MiniPage = () => {
           },
           '*:focus': { outline: 'none !important' },
           '*': { userSelect: 'none' },
+          '@keyframes menuFade': {
+            from: { opacity: 0, transform: 'scale(0.9)' },
+            to: { opacity: 1, transform: 'scale(1)' },
+          },
         }}
       />
       <Paper
@@ -297,21 +305,22 @@ const MiniPage = () => {
         data-tauri-drag-region
       >
         <Box
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          gap={0.5}
-          alignItems="flex-start" // Keep left align for numbers to align decently
-          sx={{ pointerEvents: 'none' }}
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            gap: 0.5,
+            alignItems: 'flex-start',
+            pointerEvents: 'none',
+          }}
         >
-          <Box display="flex" alignItems="center" gap={0.5}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <ArrowUpwardRounded
               sx={{ fontSize: 14, color: 'secondary.main' }}
             />
             <Typography
               variant="caption"
-              fontWeight="bold"
-              sx={{ minWidth: 40, userSelect: 'none', lineHeight: 1 }}
+              sx={{ fontWeight: 'bold', minWidth: 40, userSelect: 'none', lineHeight: 1 }}
             >
               {up}{' '}
               <Typography
@@ -325,14 +334,13 @@ const MiniPage = () => {
             </Typography>
           </Box>
 
-          <Box display="flex" alignItems="center" gap={0.5}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <ArrowDownwardRounded
               sx={{ fontSize: 14, color: 'primary.main' }}
             />
             <Typography
               variant="caption"
-              fontWeight="bold"
-              sx={{ minWidth: 40, userSelect: 'none', lineHeight: 1 }}
+              sx={{ fontWeight: 'bold', minWidth: 40, userSelect: 'none', lineHeight: 1 }}
             >
               {down}{' '}
               <Typography
@@ -385,7 +393,7 @@ const MiniPage = () => {
             >
               实时上传
             </Typography>
-            <Box display="flex" flexDirection="column" gap={1} px={1}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, px: 1 }}>
               {paddedUploads.map((slot) => {
                 const conn = slot.data
                 if (!conn) {
@@ -413,15 +421,19 @@ const MiniPage = () => {
                 return (
                   <Box
                     key={conn.id}
-                    display="flex"
-                    flexDirection="column"
-                    justifyContent="center"
-                    sx={{ height: 38 }}
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      height: 38,
+                    }}
                   >
                     <Box
-                      display="flex"
-                      justifyContent="space-between"
-                      alignItems="center"
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}
                     >
                       <Typography
                         variant="body2"
@@ -445,10 +457,14 @@ const MiniPage = () => {
                       </Typography>
                     </Box>
                     <Box
-                      display="flex"
-                      gap={1}
-                      alignItems="center"
-                      sx={{ height: 18, mt: 0.25, overflow: 'hidden' }}
+                      sx={{
+                        display: 'flex',
+                        gap: 1,
+                        alignItems: 'center',
+                        height: 18,
+                        mt: 0.25,
+                        overflow: 'hidden',
+                      }}
                     >
                       {process && (
                         <Typography
@@ -509,7 +525,7 @@ const MiniPage = () => {
             >
               实时下载
             </Typography>
-            <Box display="flex" flexDirection="column" gap={1} px={1}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, px: 1 }}>
               {paddedDownloads.map((slot) => {
                 const conn = slot.data
                 if (!conn) {
@@ -537,15 +553,19 @@ const MiniPage = () => {
                 return (
                   <Box
                     key={conn.id}
-                    display="flex"
-                    flexDirection="column"
-                    justifyContent="center"
-                    sx={{ height: 38 }}
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      height: 38,
+                    }}
                   >
                     <Box
-                      display="flex"
-                      justifyContent="space-between"
-                      alignItems="center"
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}
                     >
                       <Typography
                         variant="body2"
@@ -569,10 +589,14 @@ const MiniPage = () => {
                       </Typography>
                     </Box>
                     <Box
-                      display="flex"
-                      gap={1}
-                      alignItems="center"
-                      sx={{ height: 18, mt: 0.25, overflow: 'hidden' }}
+                      sx={{
+                        display: 'flex',
+                        gap: 1,
+                        alignItems: 'center',
+                        height: 18,
+                        mt: 0.25,
+                        overflow: 'hidden',
+                      }}
                     >
                       {process && (
                         <Typography
@@ -633,10 +657,6 @@ const MiniPage = () => {
             bgcolor: 'background.paper',
             animation: 'menuFade 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
             transformOrigin: 'top left',
-            '@keyframes menuFade': {
-              from: { opacity: 0, transform: 'scale(0.9)' },
-              to: { opacity: 1, transform: 'scale(1)' },
-            },
           }}
         >
           <MenuList dense sx={{ py: 0.5 }}>

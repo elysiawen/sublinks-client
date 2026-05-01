@@ -17,6 +17,10 @@ import getSystem from "@/utils/get-system";
 const APP_VERSION = import.meta.env.APP_VERSION || "1.0.0";
 export const USER_AGENT = `SubLinks Client Desktop/${APP_VERSION} (${getSystem()})`;
 
+// Global flag to prevent concurrent syncs (login sync vs auto-sync)
+let syncInProgress = false;
+export const isSyncInProgress = () => syncInProgress;
+
 /**
  * Refresh access token using refresh token
  */
@@ -103,33 +107,40 @@ const checkAndRefreshAccessToken = async () => {
 export const syncSubLinksSubscriptions = async (options?: {
   onProgress?: (status: string) => void;
 }) => {
+  // Prevent concurrent syncs
+  if (syncInProgress) {
+    console.log("[SubLinks Service] Sync already in progress, skipping");
+    return false;
+  }
+
+  syncInProgress = true;
   const { onProgress } = options || {};
 
-  // Proactive Token Refresh
-  await checkAndRefreshAccessToken();
-
-  let token = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
-  const userStr = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER);
-
-  if (!token || !userStr || token === "undefined") {
-    console.error("[SubLinks Service] No valid token or user found for sync", {
-      hasToken: !!token,
-      tokenVal: token,
-    });
-    return;
-  }
-
-  // Sanitize token
-  token = token.trim();
-  if (token.startsWith('"') && token.endsWith('"')) {
-    token = token.slice(1, -1);
-  }
-
-  onProgress?.("正在获取订阅列表...");
-  const apiUrl = SUBLINKS_CONFIG.DEFAULT_API_URL;
-  const baseUrl = apiUrl.replace(/\/$/, "");
-
   try {
+    // Proactive Token Refresh
+    await checkAndRefreshAccessToken();
+
+    let token = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
+    const userStr = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER);
+
+    if (!token || !userStr || token === "undefined") {
+      console.error("[SubLinks Service] No valid token or user found for sync", {
+        hasToken: !!token,
+        tokenVal: token,
+      });
+      return false;
+    }
+
+    // Sanitize token
+    token = token.trim();
+    if (token.startsWith('"') && token.endsWith('"')) {
+      token = token.slice(1, -1);
+    }
+
+    onProgress?.("正在获取订阅列表...");
+    const apiUrl = SUBLINKS_CONFIG.DEFAULT_API_URL;
+    const baseUrl = apiUrl.replace(/\/$/, "");
+
     const [subResponse, profilesConfig] = await Promise.all([
       fetch(`${baseUrl}/api/client/subscriptions`, {
         headers: {
@@ -181,32 +192,11 @@ export const syncSubLinksSubscriptions = async (options?: {
 
     const subData = await finalResponse.json();
     const serverSubs = subData.subscriptions || [];
-    const serverUrls = new Set(
-      serverSubs.map((s: any) => s.url).filter(Boolean),
-    );
 
-    // 1. Pruning: Remove local profiles that are no longer on the server
-    let deletedCount = 0;
-    if (profilesConfig?.items) {
-      for (const profile of profilesConfig.items) {
-        // We only prune profiles that have a URL (indicating they are managed subscriptions)
-        // and whose URL is NOT in the server's list.
-        if (profile.url && !serverUrls.has(profile.url)) {
-          try {
-            await deleteProfile(profile.uid);
-            console.log(
-              `[SubLinks Service] Pruned deleted profile: ${profile.name} (${profile.uid})`,
-            );
-            deletedCount++;
-          } catch (delErr) {
-            console.error(
-              `[SubLinks Service] Failed to delete orphaned profile ${profile.name}`,
-              delErr,
-            );
-          }
-        }
-      }
-    }
+    // 1. Pruning skipped during sync to avoid multiple core restarts
+    // (each deleteProfile triggers update_config_forced which restarts the core)
+    // Orphaned profiles will be cleaned up during logout or manual cleanup
+    const deletedCount = 0;
 
     // 2. Importing & Updating: Add new or update existing subscriptions
     const existingUrlMap = new Map<string, IProfileItem>(
@@ -262,16 +252,38 @@ export const syncSubLinksSubscriptions = async (options?: {
       // Even if it's already "current", calling patchProfilesConfig will trigger
       // a core reload (update_config) which is necessary after initial import.
       onProgress?.("正在激活配置并启动内核...");
-      try {
-        // This triggers CoreManager::global().update_config() in the backend
-        await patchProfilesConfig({ current: targetUid });
-        console.log(`[SubLinks Service] Activated profile: ${targetUid}`);
-      } catch (pErr) {
-        console.error(
-          "[SubLinks Service] Failed to activate profile via patchProfilesConfig",
-          pErr,
-        );
+
+      // Small delay to let core stabilize after imports
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Retry logic for patchProfilesConfig (handles optimistic lock Busy status)
+      let activated = false;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          const result = await patchProfilesConfig({ current: targetUid }) as any;
+          // Check if result indicates Busy (optimistic lock held)
+          if (result && result.status === 'Busy') {
+            console.log(`[SubLinks Service] Profile switch busy, retrying (${attempt + 1}/3)...`);
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            continue;
+          }
+          console.log(`[SubLinks Service] Activated profile: ${targetUid}`);
+          activated = true;
+          break;
+        } catch (pErr) {
+          console.error(
+            "[SubLinks Service] Failed to activate profile via patchProfilesConfig",
+            pErr,
+          );
+          if (attempt < 2) {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
+        }
+      }
+
+      if (!activated) {
         // Fallback to enhanceProfiles if patch fails
+        console.log("[SubLinks Service] Falling back to enhanceProfiles");
         await enhanceProfiles();
       }
     }
@@ -295,6 +307,8 @@ export const syncSubLinksSubscriptions = async (options?: {
       `同步 SubLinks 订阅失败: ${err.message || "网络错误或服务器无响应"}`,
     );
     return false;
+  } finally {
+    syncInProgress = false;
   }
 };
 
@@ -476,24 +490,29 @@ export const logoutSubLinks = async (
   try {
     const profilesData = await getProfiles();
 
-    // Delete all profile files in parallel
+    // First, deactivate current profile to prevent core restarts during deletion
+    // (deleteProfile only triggers update_config_forced when deleting the CURRENT profile)
     if (profilesData?.items && profilesData.items.length > 0) {
-      await Promise.all(
-        profilesData.items.map((item) =>
-          deleteProfile(item.uid).catch((e) =>
-            console.error(
-              `[SubLinks Service] Failed to delete profile ${item.uid}`,
-              e,
-            ),
-          ),
-        ),
-      );
+      // Step 1: Clear current profile (triggers one core restart)
+      await patchProfilesConfig({ current: undefined }).catch(() => {});
+
+      // Step 2: Delete all profile files (no core restarts since no current profile)
+      for (const item of profilesData.items) {
+        try {
+          await deleteProfile(item.uid);
+        } catch (e) {
+          console.error(
+            `[SubLinks Service] Failed to delete profile ${item.uid}`,
+            e,
+          );
+        }
+      }
       console.log(
         `[SubLinks Service] Deleted ${profilesData.items.length} profile files`,
       );
     }
 
-    // Clear the profile list (now patch_config will actually clear items)
+    // Step 3: Clear the profile list
     await patchProfilesConfig({ items: [], current: undefined });
     console.log("[SubLinks Service] Cleared all profiles from config");
   } catch (err) {

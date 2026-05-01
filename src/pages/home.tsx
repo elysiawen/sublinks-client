@@ -488,8 +488,7 @@ const HomePage = () => {
                 <NewReleasesRounded sx={{ fontSize: 18, ml: 0.5 }} />
                 <Typography
                   variant="body2"
-                  fontWeight="600"
-                  sx={{ whiteSpace: 'nowrap', fontSize: 13 }}
+                  sx={{ fontWeight: 600, whiteSpace: 'nowrap', fontSize: 13 }}
                 >
                   {t('home.page.tooltips.updateAvailable')}
                 </Typography>

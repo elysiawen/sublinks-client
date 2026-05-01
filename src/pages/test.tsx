@@ -12,7 +12,7 @@ import {
   AccessTimeOutlined,
   CancelOutlined,
   CheckCircleOutlined,
-  HelpOutline,
+  HelpOutlined,
   PendingOutlined,
   RefreshRounded,
 } from '@mui/icons-material'
@@ -431,7 +431,7 @@ const TestPage = () => {
     if (status === 'Yes') return <CheckCircleOutlined />
     if (status === 'No') return <CancelOutlined />
     if (status === 'Soon') return <AccessTimeOutlined />
-    return <HelpOutline />
+    return <HelpOutlined />
   }
 
   const getStatusBorderColor = (status: string) => {

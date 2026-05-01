@@ -205,7 +205,7 @@ const LoginPage = () => {
           }}
         />
 
-        <Typography variant="h5" fontWeight="bold" gutterBottom>
+        <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
           SubLinks 客户端
         </Typography>
 
