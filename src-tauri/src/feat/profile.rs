@@ -1,7 +1,7 @@
 use crate::{
     cmd,
     config::{Config, PrfItem, PrfOption, profiles::profiles_draft_update_item_safe},
-    core::{CoreManager, handle, tray},
+    core::{CoreManager, handle, tray, validate::ValidationOutcome},
     utils::help::{mask_err, mask_url},
 };
 use anyhow::{Result, bail};
@@ -205,7 +205,7 @@ pub async fn update_profile(
 
     if should_refresh {
         logging!(info, Type::Config, "[订阅更新] 更新内核配置");
-        match CoreManager::global().update_config().await {
+        match CoreManager::global().update_config_forced().await {
             Ok(_) => {
                 logging!(info, Type::Config, "[订阅更新] 更新成功");
                 handle::Handle::refresh_clash();
@@ -222,6 +222,6 @@ pub async fn update_profile(
 }
 
 /// 增强配置
-pub async fn enhance_profiles() -> Result<(bool, String)> {
-    crate::core::CoreManager::global().update_config().await
+pub async fn enhance_profiles() -> Result<ValidationOutcome> {
+    crate::core::CoreManager::global().update_config_forced().await
 }
