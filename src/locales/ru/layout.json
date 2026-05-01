@@ -5,43 +5,43 @@
         "home": "Главная",
         "proxies": "Прокси",
         "profiles": "Профили",
-        "test": "Тест",
-        "test_web": "Тест веб-сайта",
-        "test_media": "Тест медиа",
+        "test": "Test",
+        "test_web": "Website Test",
+        "test_media": "Media Test",
         "connections": "Соединения",
         "rules": "Правила",
         "logs": "Логи",
         "settings": "Настройки",
-        "about": "О программе"
+        "about": "About"
       },
       "aboutPage": {
         "attribution": "Based on clash-verge-rev"
       },
       "menu": {
-        "reorderMode": "Menu reorder mode",
-        "restoreDefaultOrder": "Restore default order",
-        "unlock": "Unlock menu order",
-        "lock": "Lock menu order",
-        "collapseNavBar": "Collapse navigation bar",
-        "expandNavBar": "Expand navigation bar"
+        "reorderMode": "Режим изменения порядка меню",
+        "restoreDefaultOrder": "Восстановить порядок по умолчанию",
+        "unlock": "Разблокировать порядок меню",
+        "lock": "Заблокировать порядок меню",
+        "collapseNavBar": "Свернуть панель навигации",
+        "expandNavBar": "Развернуть панель навигации"
       },
       "userInfo": {
-        "loggedIn": "Вход выполнен",
-        "logout": "Выйти",
-        "logoutConfirmationTitle": "Подтверждение выхода",
-        "logoutConfirmationMessage": "Вы уверены, что хотите выйти из аккаунта?",
-        "loggingOut": "Выход...",
-        "amountLogout": "Выйти",
-        "cancel": "Отмена"
+        "loggedIn": "Logged in",
+        "logout": "Logout",
+        "logoutConfirmationTitle": "Confirm Logout",
+        "logoutConfirmationMessage": "Are you sure you want to logout?",
+        "loggingOut": "Logging out...",
+        "amountLogout": "Logout",
+        "cancel": "Cancel"
       }
     }
   },
   "notifications": {
-    "autoSyncSuccess": "Подписки успешно синхронизированы",
-    "autoSyncFailed": "Не удалось синхронизировать подписки",
-    "loginSuccess": "Вход выполнен успешно",
-    "logoutSuccess": "Выход выполнен",
-    "logoutFailed": "Ошибка выхода",
-    "sessionExpired": "Сессия истекла, пожалуйста, войдите снова"
+    "autoSyncSuccess": "Subscriptions synced successfully",
+    "autoSyncFailed": "Failed to sync subscriptions",
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logged out",
+    "logoutFailed": "Logout failed",
+    "sessionExpired": "Session expired, please login again"
   }
 }

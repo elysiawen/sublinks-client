@@ -21,7 +21,6 @@ import Layout from './_layout'
 import AboutPage from './about'
 import ConnectionsPage from './connections'
 import HomePage from './home'
-import LogsPage from './logs'
 import MiniPage from './mini'
 import ProfilesPage from './profiles'
 import ProxiesPage from './proxies'
@@ -70,7 +69,7 @@ export const navItems = [
     label: 'layout.components.navigation.tabs.logs',
     path: '/logs',
     icon: [<SubjectRoundedIcon key="mui" />, <LogsSvg key="svg" />],
-    Component: LogsPage,
+    Component: () => null /* KeepAlive: real LogsPage rendered in Layout */,
   },
   {
     label: 'layout.components.navigation.tabs.settings',

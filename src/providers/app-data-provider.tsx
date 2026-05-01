@@ -1,6 +1,6 @@
-import { listen } from "@tauri-apps/api/event";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import useSWR from "swr";
+import { useQuery } from '@tanstack/react-query'
+import { listen } from '@tauri-apps/api/event'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   getBaseConfig,
   getRuleProviders,
@@ -14,11 +14,40 @@ import {
   getAppUptime,
   getRunningMode,
   getSystemProxy,
-} from "@/services/cmds";
-import { SWR_DEFAULTS, SWR_MIHOMO } from "@/services/config";
-import { debugLog } from "@/utils/debug";
+} from '@/services/cmds'
+import { isSyncInProgress } from '@/services/sublinks-service'
+import { debugLog } from '@/utils/debug'
 
-import { AppDataContext, AppDataContextType } from './app-data-context'
+import {
+  ClashConfigContext,
+  CoreDataStatusContext,
+  ProxiesContext,
+  RefreshersContext,
+  RulesContext,
+  SystemContext,
+  UptimeContext,
+} from './app-data-context'
+
+const TQ_MIHOMO = {
+  refetchOnWindowFocus: false,
+  refetchOnReconnect: false,
+  staleTime: 1500,
+  retry: 3,
+  retryDelay: (attempt: number) => Math.min(200 * 2 ** attempt, 3000),
+} as const
+
+const TQ_DEFAULTS = {
+  refetchOnWindowFocus: false,
+  refetchOnReconnect: false,
+  staleTime: 5000,
+  retry: 2,
+} as const
+
+function useStableFn<T extends (...args: any[]) => any>(fn: T): T {
+  const ref = useRef(fn)
+  ref.current = fn
+  return useCallback((...args: Parameters<T>) => ref.current(...args), []) as T
+}
 
 // 全局数据提供者组件
 export const AppDataProvider = ({
@@ -28,43 +57,72 @@ export const AppDataProvider = ({
 }) => {
   const { verge } = useVerge()
 
-  const [isProfileSwitching, setIsProfileSwitching] = useState(false);
+  const [isProfileSwitching, setIsProfileSwitching] = useState(false)
 
-  const { data: proxiesData, mutate: refreshProxy } = useSWR(
-    'getProxies',
-    calcuProxies,
-    SWR_MIHOMO,
-  )
+  const {
+    data: proxiesData,
+    isPending: isProxiesPending,
+    refetch: _refetchProxy,
+  } = useQuery({
+    queryKey: ['getProxies'],
+    queryFn: calcuProxies,
+    ...TQ_MIHOMO,
+  })
 
-  const { data: clashConfig, mutate: refreshClashConfig } = useSWR(
-    'getClashConfig',
-    getBaseConfig,
-    SWR_MIHOMO,
-  )
+  const {
+    data: clashConfig,
+    isPending: isClashConfigPending,
+    refetch: _refetchClashConfig,
+  } = useQuery({
+    queryKey: ['getClashConfig'],
+    queryFn: getBaseConfig,
+    ...TQ_MIHOMO,
+  })
 
-  const { data: proxyProviders, mutate: refreshProxyProviders } = useSWR(
-    'getProxyProviders',
-    calcuProxyProviders,
-    SWR_MIHOMO,
-  )
+  const { data: proxyProviders, refetch: _refetchProxyProviders } = useQuery({
+    queryKey: ['getProxyProviders'],
+    queryFn: calcuProxyProviders,
+    ...TQ_MIHOMO,
+  })
 
-  const { data: ruleProviders, mutate: refreshRuleProviders } = useSWR(
-    'getRuleProviders',
-    getRuleProviders,
-    SWR_MIHOMO,
-  )
+  const { data: ruleProviders, refetch: _refetchRuleProviders } = useQuery({
+    queryKey: ['getRuleProviders'],
+    queryFn: getRuleProviders,
+    ...TQ_MIHOMO,
+  })
 
-  const { data: rulesData, mutate: refreshRules } = useSWR(
-    'getRules',
-    getRules,
-    SWR_MIHOMO,
-  )
+  const { data: rulesData, refetch: _refetchRules } = useQuery({
+    queryKey: ['getRules'],
+    queryFn: getRules,
+    ...TQ_MIHOMO,
+  })
 
-  const { data: sysproxy, mutate: refreshSysproxy } = useSWR(
-    "getSystemProxy",
-    getSystemProxy,
-    SWR_DEFAULTS,
-  );
+  const { data: sysproxy, refetch: _refetchSysproxy } = useQuery({
+    queryKey: ['getSystemProxy'],
+    queryFn: getSystemProxy,
+    ...TQ_DEFAULTS,
+  })
+
+  const { data: runningMode } = useQuery({
+    queryKey: ['getRunningMode'],
+    queryFn: getRunningMode,
+    ...TQ_DEFAULTS,
+  })
+
+  const { data: uptimeData } = useQuery({
+    queryKey: ['appUptime'],
+    queryFn: getAppUptime,
+    ...TQ_DEFAULTS,
+    refetchInterval: 3000,
+    retry: 1,
+  })
+
+  const refreshProxy = useStableFn(_refetchProxy)
+  const refreshClashConfig = useStableFn(_refetchClashConfig)
+  const refreshRules = useStableFn(_refetchRules)
+  const refreshSysproxy = useStableFn(_refetchSysproxy)
+  const refreshProxyProviders = useStableFn(_refetchProxyProviders)
+  const refreshRuleProviders = useStableFn(_refetchRuleProviders)
 
   // 提供统一的刷新方法
   const refreshAll = useCallback(async () => {
@@ -75,7 +133,7 @@ export const AppDataProvider = ({
       refreshSysproxy(),
       refreshProxyProviders(),
       refreshRuleProviders(),
-    ]);
+    ])
   }, [
     refreshProxy,
     refreshClashConfig,
@@ -83,106 +141,48 @@ export const AppDataProvider = ({
     refreshSysproxy,
     refreshProxyProviders,
     refreshRuleProviders,
-  ]);
+  ])
 
   useEffect(() => {
     let lastProfileId: string | null = null
     let lastUpdateTime = 0
     const refreshThrottle = 800
-
-    let isUnmounted = false
-    const scheduledTimeouts = new Set<number>()
     const cleanupFns: Array<() => void> = []
 
-    const registerCleanup = (fn: () => void) => {
-      if (isUnmounted) {
-        try {
-          fn()
-        } catch (error) {
-          console.error('[DataProvider] Immediate cleanup failed:', error)
-        }
-      } else {
-        cleanupFns.push(fn)
-      }
-    }
-
-    const addWindowListener = (eventName: string, handler: EventListener) => {
-      // eslint-disable-next-line @eslint-react/web-api/no-leaked-event-listener
-      window.addEventListener(eventName, handler)
-      return () => window.removeEventListener(eventName, handler)
-    }
-
-    const scheduleTimeout = (
-      callback: () => void | Promise<void>,
-      delay: number,
-    ) => {
-      if (isUnmounted) return -1
-
-      const timeoutId = window.setTimeout(() => {
-        scheduledTimeouts.delete(timeoutId)
-        if (!isUnmounted) {
-          void callback()
-        }
-      }, delay)
-
-      scheduledTimeouts.add(timeoutId)
-      return timeoutId
-    }
-
-    const clearAllTimeouts = () => {
-      scheduledTimeouts.forEach((timeoutId) => clearTimeout(timeoutId))
-      scheduledTimeouts.clear()
-    }
+    let refreshTimeout: ReturnType<typeof setTimeout> | null = null
 
     const handleProfileChanged = (event: { payload: string }) => {
+      // Skip refresh during sync to avoid overwhelming the UI
+      if (isSyncInProgress()) {
+        debugLog('[DataProvider] Profile changed during sync, skipping refresh')
+        return
+      }
+
       const newProfileId = event.payload
       const now = Date.now()
-
       if (
         lastProfileId === newProfileId &&
         now - lastUpdateTime < refreshThrottle
       ) {
         return
       }
-
       lastProfileId = newProfileId
       lastUpdateTime = now
 
-      debugLog("[DataProvider] Profile changed to:", newProfileId);
+      debugLog('[DataProvider] Profile changed to:', newProfileId)
 
       // 订阅切换时，必须刷新所有数据，特别是代理和配置
-      scheduleTimeout(async () => {
-        await refreshAll();
-      }, 100);
-    };
-
-    const handleRefreshClash = () => {
-      const now = Date.now()
-      if (now - lastUpdateTime <= refreshThrottle) return
-
-      lastUpdateTime = now
-      scheduleTimeout(async () => {
-        await Promise.all([
-          refreshProxy().catch((error) =>
-            console.error('[DataProvider] Proxy refresh failed:', error),
-          ),
-          refreshClashConfig().catch((error) =>
-            console.error('[DataProvider] Clash config refresh failed:', error),
-          ),
-        ])
-      }, 200)
+      if (refreshTimeout) clearTimeout(refreshTimeout)
+      refreshTimeout = setTimeout(async () => {
+        await refreshAll()
+      }, 100)
     }
 
     const handleRefreshProxy = () => {
       const now = Date.now()
       if (now - lastUpdateTime <= refreshThrottle) return
-
       lastUpdateTime = now
-      scheduleTimeout(() => {
-        refreshProxy().catch((error) =>
-          console.warn('[DataProvider] Proxy refresh failed:', error),
-        )
-      }, 200)
+      refreshProxy().catch(() => {})
     }
 
     const initializeListeners = async () => {
@@ -191,85 +191,62 @@ export const AppDataProvider = ({
           'profile-changed',
           handleProfileChanged,
         )
-        registerCleanup(unlistenProfile)
+        cleanupFns.push(unlistenProfile)
       } catch (error) {
         console.error('[AppDataProvider] 监听 Profile 事件失败:', error)
       }
 
       try {
-        const unlistenClash = await listen(
-          'verge://refresh-clash-config',
-          handleRefreshClash,
-        )
         const unlistenProxy = await listen(
           'verge://refresh-proxy-config',
           handleRefreshProxy,
         )
-
-        registerCleanup(() => {
-          unlistenClash()
-          unlistenProxy()
-        })
+        cleanupFns.push(unlistenProxy)
       } catch (error) {
         console.warn('[AppDataProvider] 设置 Tauri 事件监听器失败:', error)
-
-        const fallbackHandlers: Array<[string, EventListener]> = [
-          ['verge://refresh-clash-config', handleRefreshClash],
-          ['verge://refresh-proxy-config', handleRefreshProxy],
-        ]
-
-        fallbackHandlers.forEach(([eventName, handler]) => {
-          registerCleanup(addWindowListener(eventName, handler))
-        })
       }
     }
 
     void initializeListeners()
 
     return () => {
-      isUnmounted = true
-      clearAllTimeouts()
-
-      const errors: Error[] = []
-      cleanupFns.splice(0).forEach((fn) => {
+      if (refreshTimeout) clearTimeout(refreshTimeout)
+      cleanupFns.forEach((fn) => {
         try {
           fn()
         } catch (error) {
-          errors.push(error instanceof Error ? error : new Error(String(error)))
+          console.error('[DataProvider] Cleanup error:', error)
         }
       })
-
-      if (errors.length > 0) {
-        console.error(
-          `[DataProvider] ${errors.length} errors during cleanup:`,
-          errors,
-        )
-      }
     }
-  }, [
-    refreshProxy,
-    refreshClashConfig,
-    refreshRules,
-    refreshRuleProviders,
-    refreshAll,
-  ]);
+  }, [refreshProxy, refreshRules, refreshRuleProviders, refreshAll])
 
-  const { data: runningMode } = useSWR(
-    'getRunningMode',
-    getRunningMode,
-    SWR_DEFAULTS,
+  const proxiesValue = useMemo(
+    () => ({
+      proxies: proxiesData,
+      proxyProviders: proxyProviders || {},
+      isProxiesPending,
+    }),
+    [proxiesData, proxyProviders, isProxiesPending],
   )
 
-  const { data: uptimeData } = useSWR('appUptime', getAppUptime, {
-    ...SWR_DEFAULTS,
-    refreshInterval: 3000,
-    errorRetryCount: 1,
-  })
+  const rulesValue = useMemo(
+    () => ({
+      rules: rulesData?.rules ?? [],
+      ruleProviders: ruleProviders?.providers || {},
+    }),
+    [rulesData, ruleProviders],
+  )
 
+  const clashConfigValue = useMemo(
+    () => ({
+      clashConfig,
+      isClashConfigPending,
+    }),
+    [clashConfig, isClashConfigPending],
+  )
 
-  // 聚合所有数据
-  const value = useMemo(() => {
-    // 计算系统代理地址
+  const systemValue = useMemo(() => {
     const calculateSystemProxyAddress = () => {
       if (!verge || !clashConfig) return '-'
 
@@ -301,21 +278,21 @@ export const AppDataProvider = ({
     }
 
     return {
-      // 数据
-      proxies: proxiesData,
-      clashConfig,
-      rules: rulesData?.rules ?? [],
       sysproxy,
       runningMode,
-      uptime: uptimeData || 0,
-
-      // 提供者数据
-      proxyProviders: proxyProviders || {},
-      ruleProviders: ruleProviders?.providers || {},
-
       systemProxyAddress: calculateSystemProxyAddress(),
+    }
+  }, [sysproxy, runningMode, verge, clashConfig])
 
-      // 刷新方法
+  const uptimeValue = useMemo(() => ({ uptime: uptimeData || 0 }), [uptimeData])
+
+  const coreDataStatusValue = useMemo(
+    () => ({ isCoreDataPending: isProxiesPending || isClashConfigPending }),
+    [isProxiesPending, isClashConfigPending],
+  )
+
+  const refreshersValue = useMemo(
+    () => ({
       refreshProxy,
       refreshClashConfig,
       refreshRules,
@@ -325,26 +302,34 @@ export const AppDataProvider = ({
       refreshAll,
       isProfileSwitching,
       setIsProfileSwitching,
-    } as AppDataContextType;
-  }, [
-    proxiesData,
-    clashConfig,
-    rulesData,
-    sysproxy,
-    runningMode,
-    uptimeData,
-    proxyProviders,
-    ruleProviders,
-    verge,
-    refreshProxy,
-    refreshClashConfig,
-    refreshRules,
-    refreshSysproxy,
-    refreshProxyProviders,
-    refreshRuleProviders,
-    refreshAll,
-    isProfileSwitching,
-  ]);
+    }),
+    [
+      refreshProxy,
+      refreshClashConfig,
+      refreshRules,
+      refreshSysproxy,
+      refreshProxyProviders,
+      refreshRuleProviders,
+      refreshAll,
+      isProfileSwitching,
+    ],
+  )
 
-  return <AppDataContext value={value}>{children}</AppDataContext>
+  return (
+    <ProxiesContext value={proxiesValue}>
+      <RulesContext value={rulesValue}>
+        <ClashConfigContext value={clashConfigValue}>
+          <SystemContext value={systemValue}>
+            <UptimeContext value={uptimeValue}>
+              <CoreDataStatusContext value={coreDataStatusValue}>
+                <RefreshersContext value={refreshersValue}>
+                  {children}
+                </RefreshersContext>
+              </CoreDataStatusContext>
+            </UptimeContext>
+          </SystemContext>
+        </ClashConfigContext>
+      </RulesContext>
+    </ProxiesContext>
+  )
 }

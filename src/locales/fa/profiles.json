@@ -60,6 +60,7 @@
     "menu": {
       "home": "Home",
       "select": "انتخاب",
+      "shareQrCode": "Share QR Code",
       "editInfo": "ویرایش اطلاعات",
       "editFile": "ویرایش فایل",
       "editRules": "ویرایش قوانین",
@@ -178,6 +179,9 @@
     },
     "logViewer": {
       "title": "کنسول اسکریپت"
+    },
+    "qrViewer": {
+      "title": "Subscription QR Code"
     }
   }
 }

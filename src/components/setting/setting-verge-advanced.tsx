@@ -1,10 +1,10 @@
 import { ContentCopyRounded } from '@mui/icons-material'
-import { Box, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { DialogRef, Switch, TooltipIcon } from '@/components/base'
-import { useUpdate } from '@/hooks/use-update'
+import { updateLastCheckTime, useUpdate } from '@/hooks/use-update'
 import { useVerge } from '@/hooks/use-verge'
 import {
   exitApp,
@@ -56,9 +56,14 @@ const SettingVergeAdvanced = ({ onError: _ }: Props) => {
   const [updateInfo, setUpdateInfo] = useState<IUpdateInfo | null>(null)
 
   const onCheckUpdate = useCallback(async () => {
-    const info = await checkUpdate()
-    if (info) {
-      setUpdateInfo(info)
+    try {
+      const info = await checkUpdate()
+      updateLastCheckTime()
+      if (info) {
+        setUpdateInfo(info)
+      }
+    } catch (err: any) {
+      showNotice.error(err)
     }
   }, [])
 

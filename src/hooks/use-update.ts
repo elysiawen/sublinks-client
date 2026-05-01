@@ -1,11 +1,29 @@
-import useSWR, { SWRConfiguration } from 'swr'
+import { useQuery } from '@tanstack/react-query'
+
+import { queryClient } from '@/services/query-client'
 import { getUpdateInfo } from '@/services/update-service'
+
 import { useVerge } from './use-verge'
 
-export const useUpdate = (
-  enabled: boolean = true,
-  options?: SWRConfiguration,
-) => {
+const LAST_CHECK_KEY = 'last_check_update'
+
+export const readLastCheckTime = (): number | null => {
+  const stored = localStorage.getItem(LAST_CHECK_KEY)
+  if (!stored) return null
+  const ts = parseInt(stored, 10)
+  return isNaN(ts) ? null : ts
+}
+
+export const updateLastCheckTime = (timestamp?: number): number => {
+  const now = timestamp ?? Date.now()
+  localStorage.setItem(LAST_CHECK_KEY, now.toString())
+  queryClient.setQueryData([LAST_CHECK_KEY], now)
+  return now
+}
+
+// --- useUpdate hook ---
+
+export const useUpdate = (enabled: boolean = true) => {
   const { verge } = useVerge()
   const { auto_check_update } = verge || {}
 
@@ -15,21 +33,34 @@ export const useUpdate = (
 
   const {
     data: updateInfo,
-    mutate: checkUpdate,
-    isValidating,
-  } = useSWR(shouldCheck ? 'checkUpdate' : null, getUpdateInfo, {
-    errorRetryCount: 2,
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    focusThrottleInterval: 36e5, // 1 hour
-    refreshInterval: 24 * 60 * 60 * 1000, // 24 hours
-    dedupingInterval: 60 * 60 * 1000, // 1 hour
-    ...options,
+    refetch: checkUpdate,
+    isFetching: isValidating,
+  } = useQuery({
+    queryKey: ['checkUpdate'],
+    queryFn: async () => {
+      const result = await getUpdateInfo()
+      if (result) updateLastCheckTime()
+      return result
+    },
+    enabled: shouldCheck,
+    retry: 2,
+    staleTime: 60 * 60 * 1000,
+    refetchInterval: 24 * 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  })
+
+  // Shared last check timestamp
+  const { data: lastCheckUpdate } = useQuery({
+    queryKey: [LAST_CHECK_KEY],
+    queryFn: readLastCheckTime,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   })
 
   return {
     updateInfo,
     checkUpdate,
     loading: isValidating,
+    lastCheckUpdate: lastCheckUpdate ?? null,
   }
 }

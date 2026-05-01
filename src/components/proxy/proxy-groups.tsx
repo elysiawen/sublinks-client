@@ -9,17 +9,18 @@ import {
   Snackbar,
   Typography,
 } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { useLockFn } from 'ahooks'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso'
 import { delayGroup, healthcheckProxyProvider } from 'tauri-plugin-mihomo-api'
 
 import { BaseEmpty } from '@/components/base'
 import { useProxySelection } from '@/hooks/use-proxy-selection'
 import { useVerge } from '@/hooks/use-verge'
-import { useAppData } from '@/providers/app-data-context'
-import { updateProxyChainConfigInRuntime } from '@/services/cmds'
+import { useProxiesData } from '@/providers/app-data-context'
+import { calcuProxies, updateProxyChainConfigInRuntime } from '@/services/cmds'
 import delayManager from '@/services/delay'
 import { debugLog } from '@/utils/debug'
 
@@ -32,6 +33,12 @@ import {
 } from './proxy-group-navigator'
 import { ProxyRender } from './proxy-render'
 import { useRenderList } from './use-render-list'
+
+function useStableCallback<T extends (...args: any[]) => any>(fn: T): T {
+  const ref = useRef(fn)
+  ref.current = fn
+  return useCallback((...args: Parameters<T>) => ref.current(...args), []) as T
+}
 
 interface Props {
   mode: string
@@ -46,11 +53,21 @@ interface ProxyChainItem {
   delay?: number
 }
 
-const VirtuosoFooter = () => <div style={{ height: '8px' }} />
-
 export const ProxyGroups = (props: Props) => {
   const { t } = useTranslation()
   const { mode, isChainMode = false, chainConfigData } = props
+
+  // Drive 3s polling on the shared TQ cache; data is read via granular context below
+  useQuery({
+    queryKey: ['getProxies'],
+    queryFn: calcuProxies,
+    refetchInterval: 3000,
+    refetchIntervalInBackground: false,
+    staleTime: 1500,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  })
+
   const [proxyChain, setProxyChain] = useState<ProxyChainItem[]>(() => {
     try {
       const saved = localStorage.getItem('proxy-chain-items')
@@ -78,7 +95,7 @@ export const ProxyGroups = (props: Props) => {
   }>({ open: false, message: '' })
 
   const { verge } = useVerge()
-  const { proxies: proxiesData } = useAppData()
+  const { proxies: proxiesData } = useProxiesData()
   const groups = proxiesData?.groups
   const availableGroups = useMemo(() => {
     if (!groups) return []
@@ -129,10 +146,17 @@ export const ProxyGroups = (props: Props) => {
 
   const timeout = verge?.default_latency_timeout || 10000
 
-  const virtuosoRef = useRef<VirtuosoHandle>(null)
+  const parentRef = useRef<HTMLDivElement>(null)
   const scrollPositionRef = useRef<Record<string, number>>({})
   const [showScrollTop, setShowScrollTop] = useState(false)
-  const scrollerRef = useRef<Element | null>(null)
+
+  const virtualizer = useVirtualizer({
+    count: renderList.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 56,
+    overscan: 15,
+    getItemKey: (index) => renderList[index]?.key ?? index,
+  })
 
   // 从 localStorage 恢复滚动位置
   useEffect(() => {
@@ -149,10 +173,9 @@ export const ProxyGroups = (props: Props) => {
 
         if (savedPosition !== undefined) {
           restoreTimer = setTimeout(() => {
-            virtuosoRef.current?.scrollTo({
-              top: savedPosition,
-              behavior: 'auto',
-            })
+            if (parentRef.current) {
+              parentRef.current.scrollTop = savedPosition
+            }
           }, 100)
         }
       }
@@ -198,7 +221,7 @@ export const ProxyGroups = (props: Props) => {
 
   // 添加和清理滚动事件监听器
   useEffect(() => {
-    const node = scrollerRef.current
+    const node = parentRef.current
     if (!node) return
 
     const listener = handleScroll as EventListener
@@ -213,7 +236,7 @@ export const ProxyGroups = (props: Props) => {
 
   // 滚动到顶部
   const scrollToTop = useCallback(() => {
-    virtuosoRef.current?.scrollTo?.({
+    parentRef.current?.scrollTo?.({
       top: 0,
       behavior: 'smooth',
     })
@@ -297,60 +320,64 @@ export const ProxyGroups = (props: Props) => {
   )
 
   // 测全部延迟
-  const handleCheckAll = useLockFn(async (groupName: string) => {
-    debugLog(`[ProxyGroups] 开始测试所有延迟，组: ${groupName}`)
+  const handleCheckAll = useStableCallback(
+    useLockFn(async (groupName: string) => {
+      debugLog(`[ProxyGroups] 开始测试所有延迟，组: ${groupName}`)
 
-    const proxies = renderList
-      .filter(
-        (e) => e.group?.name === groupName && (e.type === 2 || e.type === 4),
+      const proxies = renderList
+        .filter(
+          (e) => e.group?.name === groupName && (e.type === 2 || e.type === 4),
+        )
+        .flatMap((e) => e.proxyCol || e.proxy!)
+        .filter(Boolean)
+
+      debugLog(`[ProxyGroups] 找到代理数量: ${proxies.length}`)
+
+      const providers = new Set(
+        proxies.map((p) => p!.provider!).filter(Boolean),
       )
-      .flatMap((e) => e.proxyCol || e.proxy!)
-      .filter(Boolean)
 
-    debugLog(`[ProxyGroups] 找到代理数量: ${proxies.length}`)
-
-    const providers = new Set(proxies.map((p) => p!.provider!).filter(Boolean))
-
-    if (providers.size) {
-      debugLog(`[ProxyGroups] 发现提供者，数量: ${providers.size}`)
-      Promise.allSettled(
-        [...providers].map((p) => healthcheckProxyProvider(p)),
-      ).then(() => {
-        debugLog(`[ProxyGroups] 提供者健康检查完成`)
-        onProxies()
-      })
-    }
-
-    const names = proxies.filter((p) => !p!.provider).map((p) => p!.name)
-    debugLog(`[ProxyGroups] 过滤后需要测试的代理数量: ${names.length}`)
-
-    const url = delayManager.getUrl(groupName)
-    debugLog(`[ProxyGroups] 测试URL: ${url}, 超时: ${timeout}ms`)
-
-    try {
-      await Promise.race([
-        delayManager.checkListDelay(names, groupName, timeout),
-        delayGroup(groupName, url, timeout).then((result) => {
-          debugLog(
-            `[ProxyGroups] getGroupProxyDelays返回结果数量:`,
-            Object.keys(result || {}).length,
-          )
-        }), // 查询group delays 将清除fixed(不关注调用结果)
-      ])
-      debugLog(`[ProxyGroups] 延迟测试完成，组: ${groupName}`)
-    } catch (error) {
-      console.error(`[ProxyGroups] 延迟测试出错，组: ${groupName}`, error)
-    } finally {
-      const headState = getGroupHeadState(groupName)
-      if (headState?.sortType === 1) {
-        onHeadState(groupName, { sortType: headState.sortType })
+      if (providers.size) {
+        debugLog(`[ProxyGroups] 发现提供者，数量: ${providers.size}`)
+        Promise.allSettled(
+          [...providers].map((p) => healthcheckProxyProvider(p)),
+        ).then(() => {
+          debugLog(`[ProxyGroups] 提供者健康检查完成`)
+          onProxies()
+        })
       }
-      onProxies()
-    }
-  })
+
+      const names = proxies.filter((p) => !p!.provider).map((p) => p!.name)
+      debugLog(`[ProxyGroups] 过滤后需要测试的代理数量: ${names.length}`)
+
+      const url = delayManager.getUrl(groupName)
+      debugLog(`[ProxyGroups] 测试URL: ${url}, 超时: ${timeout}ms`)
+
+      try {
+        await Promise.race([
+          delayManager.checkListDelay(names, groupName, timeout),
+          delayGroup(groupName, url, timeout).then((result) => {
+            debugLog(
+              `[ProxyGroups] getGroupProxyDelays返回结果数量:`,
+              Object.keys(result || {}).length,
+            )
+          }), // 查询group delays 将清除fixed(不关注调用结果)
+        ])
+        debugLog(`[ProxyGroups] 延迟测试完成，组: ${groupName}`)
+      } catch (error) {
+        console.error(`[ProxyGroups] 延迟测试出错，组: ${groupName}`, error)
+      } finally {
+        const headState = getGroupHeadState(groupName)
+        if (headState?.sortType === 1) {
+          onHeadState(groupName, { sortType: headState.sortType })
+        }
+        onProxies()
+      }
+    }),
+  )
 
   // 滚到对应的节点
-  const handleLocation = (group: IProxyGroupItem) => {
+  const handleLocation = useStableCallback((group: IProxyGroupItem) => {
     if (!group) return
     const { name, now } = group
 
@@ -362,13 +389,9 @@ export const ProxyGroups = (props: Props) => {
     )
 
     if (index >= 0) {
-      virtuosoRef.current?.scrollToIndex?.({
-        index,
-        align: 'center',
-        behavior: 'smooth',
-      })
+      virtualizer.scrollToIndex(index, { align: 'center', behavior: 'smooth' })
     }
-  }
+  })
 
   // 定位到指定的代理组
   const handleGroupLocationByName = useCallback(
@@ -378,14 +401,10 @@ export const ProxyGroups = (props: Props) => {
       )
 
       if (index >= 0) {
-        virtuosoRef.current?.scrollToIndex?.({
-          index,
-          align: 'start',
-          behavior: 'smooth',
-        })
+        virtualizer.scrollToIndex(index, { align: 'start', behavior: 'smooth' })
       }
     },
-    [renderList],
+    [renderList, virtualizer],
   )
 
   const proxyGroupNames = useMemo(() => {
@@ -475,39 +494,49 @@ export const ProxyGroups = (props: Props) => {
               </Box>
             )}
 
-            <Virtuoso
-              ref={virtuosoRef}
+            <div
+              ref={parentRef}
               style={{
                 height:
                   mode === 'rule' && proxyGroups.length > 0
                     ? 'calc(100% - 80px)' // 只有标题的高度
                     : 'calc(100% - 14px)',
+                overflow: 'auto',
               }}
-              totalCount={renderList.length}
-              increaseViewportBy={{ top: 200, bottom: 200 }}
-              overscan={150}
-              defaultItemHeight={56}
-              scrollerRef={(ref) => {
-                scrollerRef.current = ref as Element
-              }}
-              components={{
-                Footer: VirtuosoFooter,
-              }}
-              initialScrollTop={scrollPositionRef.current[mode]}
-              computeItemKey={(index) => renderList[index].key}
-              itemContent={(index) => (
-                <ProxyRender
-                  key={renderList[index].key}
-                  item={renderList[index]}
-                  indent={mode === 'rule' || mode === 'script'}
-                  onLocation={handleLocation}
-                  onCheckAll={handleCheckAll}
-                  onHeadState={onHeadState}
-                  onChangeProxy={handleChangeProxy}
-                  isChainMode={isChainMode}
-                />
-              )}
-            />
+            >
+              <div
+                style={{
+                  height: virtualizer.getTotalSize(),
+                  position: 'relative',
+                }}
+              >
+                {virtualizer.getVirtualItems().map((virtualItem) => (
+                  <div
+                    key={virtualItem.key}
+                    data-index={virtualItem.index}
+                    ref={virtualizer.measureElement}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      transform: `translateY(${virtualItem.start}px)`,
+                    }}
+                  >
+                    <ProxyRender
+                      item={renderList[virtualItem.index]}
+                      indent={mode === 'rule' || mode === 'script'}
+                      onLocation={handleLocation}
+                      onCheckAll={handleCheckAll}
+                      onHeadState={onHeadState}
+                      onChangeProxy={handleChangeProxy}
+                      isChainMode={isChainMode}
+                    />
+                  </div>
+                ))}
+                <div style={{ height: 8 }} />
+              </div>
+            </div>
             <ScrollTopButton show={showScrollTop} onClick={scrollToTop} />
           </Box>
 
@@ -603,34 +632,42 @@ export const ProxyGroups = (props: Props) => {
         />
       )}
 
-      <Virtuoso
-        ref={virtuosoRef}
-        style={{ height: 'calc(100% - 14px)' }}
-        totalCount={renderList.length}
-        increaseViewportBy={{ top: 200, bottom: 200 }}
-        overscan={150}
-        defaultItemHeight={56}
-        scrollerRef={(ref) => {
-          scrollerRef.current = ref as Element
-        }}
-        components={{
-          Footer: VirtuosoFooter,
-        }}
-        // 添加平滑滚动设置
-        initialScrollTop={scrollPositionRef.current[mode]}
-        computeItemKey={(index) => renderList[index].key}
-        itemContent={(index) => (
-          <ProxyRender
-            key={renderList[index].key}
-            item={renderList[index]}
-            indent={mode === 'rule' || mode === 'script'}
-            onLocation={handleLocation}
-            onCheckAll={handleCheckAll}
-            onHeadState={onHeadState}
-            onChangeProxy={handleChangeProxy}
-          />
-        )}
-      />
+      <div
+        ref={parentRef}
+        style={{ height: 'calc(100% - 14px)', overflow: 'auto' }}
+      >
+        <div
+          style={{
+            height: virtualizer.getTotalSize(),
+            position: 'relative',
+          }}
+        >
+          {virtualizer.getVirtualItems().map((virtualItem) => (
+            <div
+              key={virtualItem.key}
+              data-index={virtualItem.index}
+              ref={virtualizer.measureElement}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${virtualItem.start}px)`,
+              }}
+            >
+              <ProxyRender
+                item={renderList[virtualItem.index]}
+                indent={mode === 'rule' || mode === 'script'}
+                onLocation={handleLocation}
+                onCheckAll={handleCheckAll}
+                onHeadState={onHeadState}
+                onChangeProxy={handleChangeProxy}
+              />
+            </div>
+          ))}
+          <div style={{ height: 8 }} />
+        </div>
+      </div>
       <ScrollTopButton show={showScrollTop} onClick={scrollToTop} />
     </div>
   )

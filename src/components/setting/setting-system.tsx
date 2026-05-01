@@ -1,6 +1,5 @@
 import React, { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { mutate } from 'swr'
 
 import { DialogRef, Switch, TooltipIcon } from '@/components/base'
 import ProxyControlSwitches from '@/components/shared/proxy-control-switches'
@@ -64,7 +63,6 @@ const SettingSystem = ({ onError }: Props) => {
               // 先触发UI更新立即看到反馈
               onChangeData({ enable_auto_launch: e })
               await patchVerge({ enable_auto_launch: e })
-              await mutate('getAutoLaunchStatus')
               return Promise.resolve()
             } catch (error) {
               // 如果出错，恢复原始状态

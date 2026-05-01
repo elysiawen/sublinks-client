@@ -60,6 +60,7 @@
     "menu": {
       "home": "Ana Sayfa",
       "select": "Seç",
+      "shareQrCode": "Share QR Code",
       "editInfo": "Bilgileri Düzenle",
       "editFile": "Dosyayı Düzenle",
       "editRules": "Kuralları Düzenle",
@@ -178,6 +179,9 @@
     },
     "logViewer": {
       "title": "Betik Konsolu"
+    },
+    "qrViewer": {
+      "title": "Subscription QR Code"
     }
   }
 }

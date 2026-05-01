@@ -9,7 +9,7 @@ use crate::{
     config::{Config, PrfItem, profiles},
     core::{CoreManager, handle},
 };
-use clash_verge_logging::{Type, logging};
+use clash_verge_logging::{Type, logging, logging_error};
 
 pub(super) async fn resolve_scheme(param: &str) -> Result<()> {
     logging!(info, Type::Config, "received deep link: {param}");
@@ -94,7 +94,7 @@ async fn import_subscription(url: &str, name: Option<&String>) {
     }
 
     Config::profiles().await.apply();
-    let _ = Config::profiles().await.data_arc().save_file().await;
+    logging_error!(Type::Config, Config::profiles().await.data_arc().save_file().await);
     handle::Handle::notice_message(
         "import_sub_url::ok",
         "", // 空 msg 传入，我们不希望导致 后端-前端-后端 死循环，这里只做提醒。
@@ -138,14 +138,10 @@ async fn refresh_core_config() {
         Type::Config,
         "Deep link import set current profile; refreshing core config"
     );
-    match CoreManager::global().update_config().await {
-        Ok((true, _)) => handle::Handle::refresh_clash(),
-        Ok((false, msg)) => {
-            let message = if msg.is_empty() {
-                String::from("Failed to apply subscription configuration")
-            } else {
-                msg
-            };
+    match CoreManager::global().update_config_forced().await {
+        Ok(outcome) if outcome.is_valid() => handle::Handle::refresh_clash(),
+        Ok(outcome) => {
+            let message = outcome.to_string();
             logging!(warn, Type::Config, "Apply config failed: {}", message);
             handle::Handle::notice_message("config_validate::error", message);
         }

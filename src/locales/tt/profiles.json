@@ -60,6 +60,7 @@
     "menu": {
       "home": "Home",
       "select": "Сайлау",
+      "shareQrCode": "Share QR Code",
       "editInfo": "Мәгълүматны үзгәртү",
       "editFile": "Файлны үзгәртү",
       "editRules": "Кагыйдәләрне үзгәртү",
@@ -178,6 +179,9 @@
     },
     "logViewer": {
       "title": "Скрипт консоле"
+    },
+    "qrViewer": {
+      "title": "Subscription QR Code"
     }
   }
 }

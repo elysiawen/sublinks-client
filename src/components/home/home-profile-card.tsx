@@ -30,7 +30,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 
 import { useProfiles } from '@/hooks/use-profiles'
-import { useAppData } from '@/providers/app-data-context'
+import { useAppRefreshers } from '@/providers/app-data-context'
 import { openWebUrl, updateProfile } from '@/services/cmds'
 import { showNotice } from '@/services/notice-service'
 import parseTraffic from '@/utils/parse-traffic'
@@ -102,9 +102,11 @@ const ProfileDetails = ({
             onChange={handleSelectChange}
             disabled={switching || updating}
             MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 400,
+              slotProps: {
+                paper: {
+                  style: {
+                    maxHeight: 400,
+                  },
                 },
               },
             }}
@@ -154,7 +156,7 @@ const ProfileDetails = ({
         </FormControl>
 
         {current.updated && (
-          <Stack direction="row" alignItems="center" spacing={1}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <UpdateOutlined
               fontSize="small"
               color="action"
@@ -171,7 +173,7 @@ const ProfileDetails = ({
               onClick={onUpdateProfile}
             >
               {t('shared.labels.updateTime')}:{' '}
-              <Box component="span" fontWeight="medium">
+              <Box component="span" sx={{ fontWeight: 'medium' }}>
                 {dayjs(current.updated * 1000).format('YYYY-MM-DD HH:mm')}
               </Box>
             </Typography>
@@ -180,11 +182,11 @@ const ProfileDetails = ({
 
         {current.extra && (
           <>
-            <Stack direction="row" alignItems="center" spacing={1}>
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
               <SpeedOutlined fontSize="small" color="action" />
               <Typography variant="body2" color="text.secondary">
                 {t('shared.labels.usedTotal')}:{' '}
-                <Box component="span" fontWeight="medium">
+                <Box component="span" sx={{ fontWeight: 'medium' }}>
                   {parseTraffic(usedTraffic)} /{' '}
                   {parseTraffic(current.extra.total)}
                 </Box>
@@ -192,11 +194,11 @@ const ProfileDetails = ({
             </Stack>
 
             {current.extra.expire > 0 && (
-              <Stack direction="row" alignItems="center" spacing={1}>
+              <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
                 <EventOutlined fontSize="small" color="action" />
                 <Typography variant="body2" color="text.secondary">
                   {t('shared.labels.expireTime')}:{' '}
-                  <Box component="span" fontWeight="medium">
+                  <Box component="span" sx={{ fontWeight: 'medium' }}>
                     {parseExpire(current.extra.expire)}
                   </Box>
                 </Typography>
@@ -249,7 +251,7 @@ const EmptyProfile = ({ onClick }: { onClick: () => void }) => {
       <CloudUploadOutlined
         sx={{ fontSize: 60, color: 'primary.main', mb: 2 }}
       />
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" sx={{ mb: 1 }}>
         {t('profiles.page.actions.import')} {t('profiles.page.title')}
       </Typography>
       <Typography variant="body2" color="text.secondary">
@@ -265,7 +267,7 @@ export const HomeProfileCard = ({
 }: HomeProfileCardProps) => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { refreshAll, isProfileSwitching, setIsProfileSwitching } = useAppData()
+  const { refreshAll, isProfileSwitching, setIsProfileSwitching } = useAppRefreshers()
   const { profiles, patchProfiles, mutateProfiles } = useProfiles()
 
   // 优先使用来自 hook 的 current，如果没有则使用 props 里的
@@ -351,8 +353,6 @@ export const HomeProfileCard = ({
       <Link
         component="button"
         variant="h6"
-        fontWeight="medium"
-        fontSize={18}
         onClick={() => current.home && openWebUrl(current.home)}
         sx={{
           color: 'inherit',
@@ -361,6 +361,8 @@ export const HomeProfileCard = ({
           alignItems: 'center',
           minWidth: 0,
           maxWidth: '100%',
+          fontWeight: 'medium',
+          fontSize: 18,
           '& > span': {
             overflow: 'hidden',
             textOverflow: 'ellipsis',
