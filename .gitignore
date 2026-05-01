@@ -15,6 +15,7 @@ scripts/_env.sh
 target
 CLAUDE.md
 .env.*
+!.env.example
 
 mock-update-api.mjs
 .vfox.toml
