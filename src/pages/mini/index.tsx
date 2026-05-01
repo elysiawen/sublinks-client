@@ -393,7 +393,7 @@ const MiniPage = () => {
                 borderRadius: 1,
               }}
             >
-              {t('home.page.mini.realtimeUpload' as any)}
+              {t('home.components.mini.realtimeUpload' as any)}
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, px: 1 }}>
               {paddedUploads.map((slot) => {
@@ -525,7 +525,7 @@ const MiniPage = () => {
                 borderRadius: 1,
               }}
             >
-              {t('home.page.mini.realtimeDownload' as any)}
+              {t('home.components.mini.realtimeDownload' as any)}
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, px: 1 }}>
               {paddedDownloads.map((slot) => {
@@ -663,13 +663,13 @@ const MiniPage = () => {
         >
           <MenuList dense sx={{ py: 0.5 }}>
             <MenuItem onClick={toggleAlwaysOnTop} sx={{ minWidth: 140 }}>
-              <ListItemText primary={t('home.page.mini.alwaysOnTop' as any)} />
+              <ListItemText primary={t('home.components.mini.alwaysOnTop' as any)} />
               {isAlwaysOnTop && (
                 <CheckRounded fontSize="small" sx={{ ml: 2 }} />
               )}
             </MenuItem>
             <MenuItem onClick={toggleAutoHide} sx={{ minWidth: 140 }}>
-              <ListItemText primary={t('home.page.mini.autoHideFullscreen' as any)} />
+              <ListItemText primary={t('home.components.mini.autoHideFullscreen' as any)} />
               {isAutoHide && <CheckRounded fontSize="small" sx={{ ml: 2 }} />}
             </MenuItem>
             <Divider sx={{ my: 0.5 }} />
@@ -677,7 +677,7 @@ const MiniPage = () => {
               onClick={handleCloseMini}
               sx={{ minWidth: 140, color: 'error.main' }}
             >
-              <ListItemText primary={t('home.page.mini.closeMiniWindow' as any)} />
+              <ListItemText primary={t('home.components.mini.closeMiniWindow' as any)} />
             </MenuItem>
           </MenuList>
         </Paper>
