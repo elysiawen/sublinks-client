@@ -461,7 +461,7 @@ const Layout = () => {
   const handleLogoutConfirm = async () => {
     setLoggingOut(true)
     try {
-      const result = await logoutSubLinks('已成功退出登录')
+      const result = await logoutSubLinks(t('layout.notifications.logoutSuccess'))
       if (!result.success) {
         showNotice(
           'error',

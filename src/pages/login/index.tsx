@@ -86,13 +86,13 @@ const LoginPage = () => {
         data = text ? JSON.parse(text) : {};
       } catch {
         if (!response.ok) {
-          throw new Error(`请求失败 (${response.status}): ${text}`);
+          throw new Error(t("layout.notifications.loginRequestFailed" as any, { status: response.status, text }));
         }
         throw new Error("服务器返回了无效的响应");
       }
 
       if (!response.ok) {
-        throw new Error(data.message || `登录失败 (${response.status})`);
+        throw new Error(data.message || t("layout.notifications.loginFailed" as any, { status: response.status }));
       }
 
       if (data.requires2FA) {
@@ -109,7 +109,7 @@ const LoginPage = () => {
 
       if (!token) {
         console.error("[Login] No token found in response", data);
-        throw new Error("登录成功但未获取到访问令牌，请联系管理员");
+        throw new Error(t("layout.notifications.loginNoToken" as any));
       }
 
       // Save Token and Config
@@ -271,7 +271,7 @@ const LoginPage = () => {
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CircularProgress size={20} color="inherit" />
                 <Typography variant="button">
-                  {syncStatus || "正在登录..."}
+                  {syncStatus || t("layout.notifications.loggingIn" as any)}
                 </Typography>
               </Box>
             ) : requires2FA ? (

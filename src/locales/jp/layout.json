@@ -42,6 +42,22 @@
     "loginSuccess": "ログイン成功",
     "logoutSuccess": "ログアウトしました",
     "logoutFailed": "ログアウトに失敗しました",
-    "sessionExpired": "セッションが期限切れです。再度ログインしてください"
+    "sessionExpired": "セッションが期限切れです。再度ログインしてください",
+    "syncFetchingSubs": "Fetching subscription list...",
+    "syncProcessingSub": "Processing subscription [{{current}}/{{total}}]: {{name}}",
+    "syncActivating": "Activating profile and starting core...",
+    "syncComplete": "Sync complete",
+    "syncNoChanges": "Subscriptions are up to date",
+    "syncResult": "Synced from SubLinks: {{details}}",
+    "syncNewCount": "added {{count}}",
+    "syncUpdatedCount": "updated {{count}}",
+    "syncDeletedCount": "deleted {{count}}",
+    "syncFailed": "Failed to sync SubLinks subscriptions: {{error}}",
+    "syncNetworkError": "Network error or server unavailable",
+    "loggedOutLocal": "Logged out (local)",
+    "loginRequestFailed": "Request failed ({{status}}): {{text}}",
+    "loginFailed": "Login failed ({{status}})",
+    "loginNoToken": "Login succeeded but no access token received, please contact admin",
+    "loggingIn": "Logging in..."
   }
 }

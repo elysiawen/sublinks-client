@@ -235,10 +235,26 @@ export interface TranslationResources {
       notifications: {
         autoSyncFailed: string
         autoSyncSuccess: string
+        loggedOutLocal: string
+        loggingIn: string
+        loginFailed: string
+        loginNoToken: string
+        loginRequestFailed: string
         loginSuccess: string
         logoutFailed: string
         logoutSuccess: string
         sessionExpired: string
+        syncActivating: string
+        syncComplete: string
+        syncDeletedCount: string
+        syncFailed: string
+        syncFetchingSubs: string
+        syncNetworkError: string
+        syncNewCount: string
+        syncNoChanges: string
+        syncProcessingSub: string
+        syncResult: string
+        syncUpdatedCount: string
       }
     }
     logs: {

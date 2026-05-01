@@ -137,7 +137,7 @@ export const syncSubLinksSubscriptions = async (options?: {
       token = token.slice(1, -1);
     }
 
-    onProgress?.("正在获取订阅列表...");
+    onProgress?.(i18n.t("layout.notifications.syncFetchingSubs" as any));
     const apiUrl = SUBLINKS_CONFIG.DEFAULT_API_URL;
     const baseUrl = apiUrl.replace(/\/$/, "");
 
@@ -177,8 +177,8 @@ export const syncSubLinksSubscriptions = async (options?: {
         console.warn(
           "[SubLinks Service] Session expired after refresh attempt, logging out...",
         );
-        showNotice("error", "登录已过期，请重新登录");
-        await logoutSubLinks("登录已过期，请重新登录");
+        showNotice("error", i18n.t("layout.notifications.sessionExpired" as any));
+        await logoutSubLinks(i18n.t("layout.notifications.sessionExpired" as any));
         return false;
       }
     }
@@ -229,7 +229,7 @@ export const syncSubLinksSubscriptions = async (options?: {
     let currentIdx = 0;
     for (const sub of serverSubs) {
       currentIdx++;
-      onProgress?.(`正在处理订阅 [${currentIdx}/${total}]: ${sub.name}`);
+      onProgress?.(i18n.t("layout.notifications.syncProcessingSub" as any, { current: currentIdx, total, name: sub.name }));
       try {
         const existing = existingUrlMap.get(sub.url) as
           | IProfileItem
@@ -269,7 +269,7 @@ export const syncSubLinksSubscriptions = async (options?: {
       // Force activate the target profile.
       // Even if it's already "current", calling patchProfilesConfig will trigger
       // a core reload (update_config) which is necessary after initial import.
-      onProgress?.("正在激活配置并启动内核...");
+      onProgress?.(i18n.t("layout.notifications.syncActivating" as any));
 
       // Small delay to let core stabilize after imports
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -307,22 +307,21 @@ export const syncSubLinksSubscriptions = async (options?: {
     }
 
     if (importedCount > 0 || deletedCount > 0 || renamedCount > 0) {
-      const msg = `成功从 SubLinks 同步：`;
       const details = [];
-      if (importedCount > 0) details.push(`新增 ${importedCount} 个`);
-      if (renamedCount > 0) details.push(`更新 ${renamedCount} 个`);
-      if (deletedCount > 0) details.push(`删除 ${deletedCount} 个`);
-      showNotice.success(msg + details.join("、"));
+      if (importedCount > 0) details.push(i18n.t("layout.notifications.syncNewCount" as any, { count: importedCount }));
+      if (renamedCount > 0) details.push(i18n.t("layout.notifications.syncUpdatedCount" as any, { count: renamedCount }));
+      if (deletedCount > 0) details.push(i18n.t("layout.notifications.syncDeletedCount" as any, { count: deletedCount }));
+      showNotice.success(i18n.t("layout.notifications.syncResult" as any, { details: details.join("、") }));
     } else {
-      showNotice.info("SubLinks 订阅已是最新状态");
+      showNotice.info(i18n.t("layout.notifications.syncNoChanges" as any));
     }
 
-    onProgress?.("同步完成");
+    onProgress?.(i18n.t("layout.notifications.syncComplete" as any));
     return true;
   } catch (err: any) {
     console.error("[SubLinks Service] Failed to sync subscriptions", err);
     showNotice.error(
-      `同步 SubLinks 订阅失败: ${err.message || "网络错误或服务器无响应"}`,
+      i18n.t("layout.notifications.syncFailed" as any, { error: err.message || i18n.t("layout.notifications.syncNetworkError" as any) }),
     );
     return false;
   } finally {
@@ -422,7 +421,7 @@ export const fetchSubLinksUserInfo = async () => {
       }
       // If refresh failed or retry failed, force logout
       console.warn("[SubLinks Service] Refresh failed, logging out...");
-      await logoutSubLinks("登录已过期，请重新登录");
+      await logoutSubLinks(i18n.t("layout.notifications.sessionExpired" as any));
       return;
     }
 
@@ -482,7 +481,7 @@ export const logoutSubLinks = async (
       if (response.ok || data.success) {
         apiResult = {
           success: true,
-          message: data.message || "已登出",
+          message: data.message || i18n.t("layout.notifications.logoutSuccess" as any),
         };
       } else {
         apiResult = {
@@ -495,7 +494,7 @@ export const logoutSubLinks = async (
       apiResult = { success: false, message: e.message || "Network Error" };
     }
   } else {
-    apiResult = { success: true, message: "已登出 (本地)" };
+    apiResult = { success: true, message: i18n.t("layout.notifications.loggedOutLocal" as any) };
   }
 
   // Clear auth data immediately

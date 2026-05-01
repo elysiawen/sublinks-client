@@ -42,6 +42,22 @@
     "loginSuccess": "登录成功",
     "logoutSuccess": "已登出",
     "logoutFailed": "登出失败",
-    "sessionExpired": "登录已过期，请重新登录"
+    "sessionExpired": "登录已过期，请重新登录",
+    "syncFetchingSubs": "正在获取订阅列表...",
+    "syncProcessingSub": "正在处理订阅 [{{current}}/{{total}}]: {{name}}",
+    "syncActivating": "正在激活配置并启动内核...",
+    "syncComplete": "同步完成",
+    "syncNoChanges": "SubLinks 订阅已是最新状态",
+    "syncResult": "成功从 SubLinks 同步：{{details}}",
+    "syncNewCount": "新增 {{count}} 个",
+    "syncUpdatedCount": "更新 {{count}} 个",
+    "syncDeletedCount": "删除 {{count}} 个",
+    "syncFailed": "同步 SubLinks 订阅失败: {{error}}",
+    "syncNetworkError": "网络错误或服务器无响应",
+    "loggedOutLocal": "已登出 (本地)",
+    "loginRequestFailed": "请求失败 ({{status}}): {{text}}",
+    "loginFailed": "登录失败 ({{status}})",
+    "loginNoToken": "登录成功但未获取到访问令牌，请联系管理员",
+    "loggingIn": "正在登录..."
   }
 }
