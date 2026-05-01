@@ -14,7 +14,7 @@ export async function getProfiles() {
 }
 
 export async function enhanceProfiles() {
-  return invoke<void>("enhance_profiles");
+  return invoke<boolean>("enhance_profiles");
 }
 
 export async function patchProfilesConfig(profiles: IProfilesConfig) {
@@ -37,7 +37,7 @@ export async function readProfileFile(index: string) {
 }
 
 export async function saveProfileFile(index: string, fileData: string) {
-  return invoke<void>("save_profile_file", { index, fileData });
+  return invoke<boolean>("save_profile_file", { index, fileData });
 }
 
 export async function importProfile(
