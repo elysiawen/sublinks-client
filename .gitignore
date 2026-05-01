@@ -20,4 +20,7 @@ mock-update-api.mjs
 .vfox.toml
 .vfox/
 
+
+
+.claude
 .history

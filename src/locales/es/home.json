@@ -27,14 +27,7 @@
       },
       "title": "Configuración de la página de inicio"
     },
-    "title": "Hogar",
-    "mini": {
-      "realtimeUpload": "Real-time Upload",
-      "realtimeDownload": "Real-time Download",
-      "alwaysOnTop": "Always on Top",
-      "autoHideFullscreen": "Auto-hide in Fullscreen",
-      "closeMiniWindow": "Close Mini Window"
-    }
+    "title": "Hogar"
   },
   "components": {
     "proxyTun": {
@@ -159,6 +152,13 @@
       "tooltips": {
         "refreshBackground": "Actualizar fondo"
       }
+    },
+    "mini": {
+      "realtimeUpload": "Real-time Upload",
+      "realtimeDownload": "Real-time Download",
+      "alwaysOnTop": "Always on Top",
+      "autoHideFullscreen": "Auto-hide in Fullscreen",
+      "closeMiniWindow": "Close Mini Window"
     }
   }
 }

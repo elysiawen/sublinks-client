@@ -27,14 +27,7 @@
       },
       "title": "Ana Sayfa Ayarları"
     },
-    "title": "Ana Sayfa",
-    "mini": {
-      "realtimeUpload": "Real-time Upload",
-      "realtimeDownload": "Real-time Download",
-      "alwaysOnTop": "Always on Top",
-      "autoHideFullscreen": "Auto-hide in Fullscreen",
-      "closeMiniWindow": "Close Mini Window"
-    }
+    "title": "Ana Sayfa"
   },
   "components": {
     "proxyTun": {
@@ -159,6 +152,13 @@
       "tooltips": {
         "refreshBackground": "Arka Planı Yenile"
       }
+    },
+    "mini": {
+      "realtimeUpload": "Real-time Upload",
+      "realtimeDownload": "Real-time Download",
+      "alwaysOnTop": "Always on Top",
+      "autoHideFullscreen": "Auto-hide in Fullscreen",
+      "closeMiniWindow": "Close Mini Window"
     }
   }
 }

@@ -93,6 +93,13 @@ export interface TranslationResources {
           }
           title: string
         }
+        mini: {
+          alwaysOnTop: string
+          autoHideFullscreen: string
+          closeMiniWindow: string
+          realtimeDownload: string
+          realtimeUpload: string
+        }
         proxyTun: {
           status: {
             systemProxyDisabled: string
@@ -235,14 +242,20 @@ export interface TranslationResources {
       notifications: {
         autoSyncFailed: string
         autoSyncSuccess: string
+        backToChangePassword: string
+        cannotConnectServer: string
         loggedOutLocal: string
         loggingIn: string
+        login: string
         loginFailed: string
         loginNoToken: string
         loginRequestFailed: string
         loginSuccess: string
+        loginTitle: string
         logoutFailed: string
         logoutSuccess: string
+        password: string
+        serverInvalidResponse: string
         sessionExpired: string
         syncActivating: string
         syncComplete: string
@@ -255,6 +268,10 @@ export interface TranslationResources {
         syncProcessingSub: string
         syncResult: string
         syncUpdatedCount: string
+        syncVerifying: string
+        totpCode: string
+        username: string
+        verify: string
       }
     }
     logs: {

@@ -27,14 +27,7 @@
       },
       "title": "Startseite-Einstellungen"
     },
-    "title": "Startseite",
-    "mini": {
-      "realtimeUpload": "Real-time Upload",
-      "realtimeDownload": "Real-time Download",
-      "alwaysOnTop": "Always on Top",
-      "autoHideFullscreen": "Auto-hide in Fullscreen",
-      "closeMiniWindow": "Close Mini Window"
-    }
+    "title": "Startseite"
   },
   "components": {
     "proxyTun": {
@@ -159,6 +152,13 @@
       "tooltips": {
         "refreshBackground": "Hintergrund aktualisieren"
       }
+    },
+    "mini": {
+      "realtimeUpload": "Real-time Upload",
+      "realtimeDownload": "Real-time Download",
+      "alwaysOnTop": "Always on Top",
+      "autoHideFullscreen": "Auto-hide in Fullscreen",
+      "closeMiniWindow": "Close Mini Window"
     }
   }
 }
