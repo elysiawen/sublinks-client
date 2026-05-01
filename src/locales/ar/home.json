@@ -27,7 +27,14 @@
       },
       "title": "Home Settings"
     },
-    "title": "Home"
+    "title": "Home",
+    "mini": {
+      "realtimeUpload": "Real-time Upload",
+      "realtimeDownload": "Real-time Download",
+      "alwaysOnTop": "Always on Top",
+      "autoHideFullscreen": "Auto-hide in Fullscreen",
+      "closeMiniWindow": "Close Mini Window"
+    }
   },
   "components": {
     "proxyTun": {

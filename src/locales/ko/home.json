@@ -27,7 +27,14 @@
       },
       "title": "홈 설정"
     },
-    "title": "홈"
+    "title": "홈",
+    "mini": {
+      "realtimeUpload": "Real-time Upload",
+      "realtimeDownload": "Real-time Download",
+      "alwaysOnTop": "Always on Top",
+      "autoHideFullscreen": "Auto-hide in Fullscreen",
+      "closeMiniWindow": "Close Mini Window"
+    }
   },
   "components": {
     "proxyTun": {

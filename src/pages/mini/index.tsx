@@ -19,6 +19,7 @@ import { LogicalSize } from '@tauri-apps/api/dpi'
 import { listen, emit } from '@tauri-apps/api/event'
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { useConnectionData } from '@/hooks/use-connection-data'
 import { useTrafficData } from '@/hooks/use-traffic-data'
@@ -46,6 +47,7 @@ const MiniPage = () => {
 
   // Reuse the exact same custom theme hook from the main app
   const { theme: muiTheme } = useCustomTheme()
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
 
   const { data: vergeConfig } = useQuery({
@@ -391,7 +393,7 @@ const MiniPage = () => {
                 borderRadius: 1,
               }}
             >
-              实时上传
+              {t('home.page.mini.realtimeUpload' as any)}
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, px: 1 }}>
               {paddedUploads.map((slot) => {
@@ -523,7 +525,7 @@ const MiniPage = () => {
                 borderRadius: 1,
               }}
             >
-              实时下载
+              {t('home.page.mini.realtimeDownload' as any)}
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, px: 1 }}>
               {paddedDownloads.map((slot) => {
@@ -661,13 +663,13 @@ const MiniPage = () => {
         >
           <MenuList dense sx={{ py: 0.5 }}>
             <MenuItem onClick={toggleAlwaysOnTop} sx={{ minWidth: 140 }}>
-              <ListItemText primary="窗口置顶显示" />
+              <ListItemText primary={t('home.page.mini.alwaysOnTop' as any)} />
               {isAlwaysOnTop && (
                 <CheckRounded fontSize="small" sx={{ ml: 2 }} />
               )}
             </MenuItem>
             <MenuItem onClick={toggleAutoHide} sx={{ minWidth: 140 }}>
-              <ListItemText primary="全屏自动隐藏" />
+              <ListItemText primary={t('home.page.mini.autoHideFullscreen' as any)} />
               {isAutoHide && <CheckRounded fontSize="small" sx={{ ml: 2 }} />}
             </MenuItem>
             <Divider sx={{ my: 0.5 }} />
@@ -675,7 +677,7 @@ const MiniPage = () => {
               onClick={handleCloseMini}
               sx={{ minWidth: 140, color: 'error.main' }}
             >
-              <ListItemText primary="关闭悬浮窗" />
+              <ListItemText primary={t('home.page.mini.closeMiniWindow' as any)} />
             </MenuItem>
           </MenuList>
         </Paper>

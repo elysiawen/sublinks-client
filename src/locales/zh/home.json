@@ -152,6 +152,13 @@
       "tooltips": {
         "refreshBackground": "刷新背景图"
       }
+    },
+    "mini": {
+      "realtimeUpload": "实时上传",
+      "realtimeDownload": "实时下载",
+      "alwaysOnTop": "窗口置顶显示",
+      "autoHideFullscreen": "全屏自动隐藏",
+      "closeMiniWindow": "关闭悬浮窗"
     }
   }
 }
