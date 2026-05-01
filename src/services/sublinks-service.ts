@@ -313,7 +313,7 @@ export const syncSubLinksSubscriptions = async (options?: {
       if (renamedCount > 0) details.push(`更新 ${renamedCount} 个`);
       if (deletedCount > 0) details.push(`删除 ${deletedCount} 个`);
       showNotice.success(msg + details.join("、"));
-    } else if (onProgress) {
+    } else {
       showNotice.info("SubLinks 订阅已是最新状态");
     }
 
