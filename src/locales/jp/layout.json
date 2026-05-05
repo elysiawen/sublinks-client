@@ -36,6 +36,15 @@
       }
     }
   },
+  "api": {
+    "messages": {
+      "usernameAndPasswordRequired": "Username and password are required",
+      "invalidCredentials": "Invalid username or password",
+      "accountDisabled": "Account has been disabled or suspended",
+      "serverError": "Internal server error",
+      "sessionExpired": "Session revoked or expired"
+    }
+  },
   "notifications": {
     "autoSyncSuccess": "サブスクリプションの同期に成功しました",
     "autoSyncFailed": "サブスクリプションの同期に失敗しました",

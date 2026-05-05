@@ -36,6 +36,15 @@
       }
     }
   },
+  "api": {
+    "messages": {
+      "usernameAndPasswordRequired": "Username and password are required",
+      "invalidCredentials": "Invalid username or password",
+      "accountDisabled": "Account has been disabled or suspended",
+      "serverError": "Internal server error",
+      "sessionExpired": "Session revoked or expired"
+    }
+  },
   "notifications": {
     "autoSyncSuccess": "訂閱列表同步成功",
     "autoSyncFailed": "訂閱列表同步失敗",

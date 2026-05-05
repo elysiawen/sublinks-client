@@ -17,6 +17,22 @@ import getSystem from "@/utils/get-system";
 const APP_VERSION = import.meta.env.APP_VERSION || "1.0.0";
 export const USER_AGENT = `SubLinks Client Desktop/${APP_VERSION} (${getSystem()})`;
 
+/**
+ * Map the current i18n language to an Accept-Language header value.
+ * The server parses the first language tag before the comma (e.g. zh-CN → zh).
+ */
+const getAcceptLanguage = (): string => {
+  const lang = i18n.language || "zh";
+  if (lang === "zhtw") return "zh-TW";
+  return lang;
+};
+
+export const apiHeaders = (): Record<string, string> => ({
+  "Content-Type": "application/json",
+  "User-Agent": USER_AGENT,
+  "Accept-Language": getAcceptLanguage(),
+});
+
 // Global flag to prevent concurrent syncs (login sync vs auto-sync)
 let syncInProgress = false;
 export const isSyncInProgress = () => syncInProgress;
@@ -40,10 +56,7 @@ export const refreshAccessToken = async (): Promise<boolean> => {
   try {
     const response = await fetch(`${baseUrl}/api/client/auth/refresh`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": USER_AGENT,
-      },
+      headers: apiHeaders(),
       body: JSON.stringify({ refreshToken }),
     });
 
@@ -65,7 +78,7 @@ export const refreshAccessToken = async (): Promise<boolean> => {
   } catch (error: any) {
     console.error("[SubLinks Service] Failed to refresh token:", error);
     showNotice.error(
-      `${i18n.t("settings.components.verge.advanced.notifications.refreshTokenFailed" as any)}: ${error.message || "网络错误"}`,
+      `${i18n.t("settings.components.verge.advanced.notifications.refreshTokenFailed" as any)}: ${error.message || i18n.t("layout.notifications.syncNetworkError" as any)}`,
     );
     return false;
   }
@@ -124,10 +137,13 @@ export const syncSubLinksSubscriptions = async (options?: {
     const userStr = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER);
 
     if (!token || !userStr || token === "undefined") {
-      console.error("[SubLinks Service] No valid token or user found for sync", {
-        hasToken: !!token,
-        tokenVal: token,
-      });
+      console.error(
+        "[SubLinks Service] No valid token or user found for sync",
+        {
+          hasToken: !!token,
+          tokenVal: token,
+        },
+      );
       return false;
     }
 
@@ -145,7 +161,7 @@ export const syncSubLinksSubscriptions = async (options?: {
       fetch(`${baseUrl}/api/client/subscriptions`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "User-Agent": USER_AGENT,
+          ...apiHeaders(),
         },
       }),
       getProfiles(),
@@ -166,7 +182,7 @@ export const syncSubLinksSubscriptions = async (options?: {
           finalResponse = await fetch(`${baseUrl}/api/client/subscriptions`, {
             headers: {
               Authorization: `Bearer ${newToken}`,
-              "User-Agent": USER_AGENT,
+              ...apiHeaders(),
             },
           });
         }
@@ -177,8 +193,12 @@ export const syncSubLinksSubscriptions = async (options?: {
         console.warn(
           "[SubLinks Service] Session expired after refresh attempt, logging out...",
         );
-        showNotice("error", i18n.t("layout.notifications.sessionExpired" as any));
-        await logoutSubLinks(i18n.t("layout.notifications.sessionExpired" as any));
+        const errData = await finalResponse.json().catch(() => ({}));
+        const sessionMsg =
+          errData.message ||
+          i18n.t("layout.api.messages.sessionExpired" as any);
+        showNotice("error", sessionMsg);
+        await logoutSubLinks(sessionMsg);
         return false;
       }
     }
@@ -186,7 +206,11 @@ export const syncSubLinksSubscriptions = async (options?: {
     if (!finalResponse.ok) {
       const errorData = await finalResponse.json().catch(() => ({}));
       throw new Error(
-        errorData.message || `请求失败 (${finalResponse.status})`,
+        (errorData.message ?? errorData.error) ||
+          i18n.t("layout.notifications.loginRequestFailed" as any, {
+            status: finalResponse.status,
+            text: "",
+          }),
       );
     }
 
@@ -208,10 +232,15 @@ export const syncSubLinksSubscriptions = async (options?: {
       for (const orphan of orphanedProfiles) {
         try {
           await deleteProfile(orphan.uid);
-          console.log(`[SubLinks Service] Deleted orphaned profile: ${orphan.name}`);
+          console.log(
+            `[SubLinks Service] Deleted orphaned profile: ${orphan.name}`,
+          );
           deletedCount++;
         } catch (e) {
-          console.error(`[SubLinks Service] Failed to delete profile ${orphan.uid}`, e);
+          console.error(
+            `[SubLinks Service] Failed to delete profile ${orphan.uid}`,
+            e,
+          );
         }
       }
     }
@@ -229,7 +258,13 @@ export const syncSubLinksSubscriptions = async (options?: {
     let currentIdx = 0;
     for (const sub of serverSubs) {
       currentIdx++;
-      onProgress?.(i18n.t("layout.notifications.syncProcessingSub" as any, { current: currentIdx, total, name: sub.name }));
+      onProgress?.(
+        i18n.t("layout.notifications.syncProcessingSub" as any, {
+          current: currentIdx,
+          total,
+          name: sub.name,
+        }),
+      );
       try {
         const existing = existingUrlMap.get(sub.url) as
           | IProfileItem
@@ -278,10 +313,14 @@ export const syncSubLinksSubscriptions = async (options?: {
       let activated = false;
       for (let attempt = 0; attempt < 3; attempt++) {
         try {
-          const result = await patchProfilesConfig({ current: targetUid }) as any;
+          const result = (await patchProfilesConfig({
+            current: targetUid,
+          })) as any;
           // Check if result indicates Busy (optimistic lock held)
-          if (result && result.status === 'Busy') {
-            console.log(`[SubLinks Service] Profile switch busy, retrying (${attempt + 1}/3)...`);
+          if (result && result.status === "Busy") {
+            console.log(
+              `[SubLinks Service] Profile switch busy, retrying (${attempt + 1}/3)...`,
+            );
             await new Promise((resolve) => setTimeout(resolve, 1000));
             continue;
           }
@@ -308,10 +347,29 @@ export const syncSubLinksSubscriptions = async (options?: {
 
     if (importedCount > 0 || deletedCount > 0 || renamedCount > 0) {
       const details = [];
-      if (importedCount > 0) details.push(i18n.t("layout.notifications.syncNewCount" as any, { count: importedCount }));
-      if (renamedCount > 0) details.push(i18n.t("layout.notifications.syncUpdatedCount" as any, { count: renamedCount }));
-      if (deletedCount > 0) details.push(i18n.t("layout.notifications.syncDeletedCount" as any, { count: deletedCount }));
-      showNotice.success(i18n.t("layout.notifications.syncResult" as any, { details: details.join("、") }));
+      if (importedCount > 0)
+        details.push(
+          i18n.t("layout.notifications.syncNewCount" as any, {
+            count: importedCount,
+          }),
+        );
+      if (renamedCount > 0)
+        details.push(
+          i18n.t("layout.notifications.syncUpdatedCount" as any, {
+            count: renamedCount,
+          }),
+        );
+      if (deletedCount > 0)
+        details.push(
+          i18n.t("layout.notifications.syncDeletedCount" as any, {
+            count: deletedCount,
+          }),
+        );
+      showNotice.success(
+        i18n.t("layout.notifications.syncResult" as any, {
+          details: details.join("、"),
+        }),
+      );
     } else {
       showNotice.info(i18n.t("layout.notifications.syncNoChanges" as any));
     }
@@ -321,7 +379,7 @@ export const syncSubLinksSubscriptions = async (options?: {
   } catch (err: any) {
     console.error("[SubLinks Service] Failed to sync subscriptions", err);
     showNotice.error(
-      i18n.t("layout.notifications.syncFailed" as any, { error: err.message || i18n.t("layout.notifications.syncNetworkError" as any) }),
+      err.message || i18n.t("layout.notifications.syncNetworkError" as any),
     );
     return false;
   } finally {
@@ -385,12 +443,13 @@ export const fetchSubLinksUserInfo = async () => {
     const response = await fetch(`${baseUrl}/api/client/auth/user`, {
       headers: {
         Authorization: `Bearer ${token}`,
-        "User-Agent": USER_AGENT,
+        ...apiHeaders(),
       },
     });
 
     // Check for 401 Unauthorized
     if (response.status === 401) {
+      const errBody = await response.json().catch(() => ({}));
       console.warn("[SubLinks Service] User Info 401, attempting refresh...");
       const refreshed = await refreshAccessToken();
       if (refreshed) {
@@ -402,7 +461,7 @@ export const fetchSubLinksUserInfo = async () => {
           const retryResponse = await fetch(`${baseUrl}/api/client/auth/user`, {
             headers: {
               Authorization: `Bearer ${newToken}`,
-              "User-Agent": USER_AGENT,
+              ...apiHeaders(),
             },
           });
           if (retryResponse.ok) {
@@ -421,7 +480,10 @@ export const fetchSubLinksUserInfo = async () => {
       }
       // If refresh failed or retry failed, force logout
       console.warn("[SubLinks Service] Refresh failed, logging out...");
-      await logoutSubLinks(i18n.t("layout.notifications.sessionExpired" as any));
+      await logoutSubLinks(
+        (errBody.message ?? errBody.error) ||
+          i18n.t("layout.api.messages.sessionExpired" as any),
+      );
       return;
     }
 
@@ -441,7 +503,7 @@ export const fetchSubLinksUserInfo = async () => {
   } catch (error: any) {
     console.error("[SubLinks Service] Failed to fetch user info:", error);
     showNotice.error(
-      `${i18n.t("settings.components.verge.advanced.notifications.fetchUserInfoFailed" as any)}: ${error.message || "网络错误"}`,
+      `${i18n.t("settings.components.verge.advanced.notifications.fetchUserInfoFailed" as any)}: ${error.message || i18n.t("layout.notifications.syncNetworkError" as any)}`,
     );
   }
 };
@@ -470,10 +532,7 @@ export const logoutSubLinks = async (
     try {
       const response = await fetch(`${baseUrl}/api/client/auth/logout`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": USER_AGENT,
-        },
+        headers: apiHeaders(),
         body: JSON.stringify({ refreshToken }),
       });
 
@@ -481,20 +540,29 @@ export const logoutSubLinks = async (
       if (response.ok || data.success) {
         apiResult = {
           success: true,
-          message: data.message || i18n.t("layout.notifications.logoutSuccess" as any),
+          message:
+            (data.message ?? data.error) ||
+            i18n.t("layout.notifications.logoutSuccess" as any),
         };
       } else {
         apiResult = {
           success: false,
-          message: data.message || `HTTP ${response.status}`,
+          message: (data.message ?? data.error) || `HTTP ${response.status}`,
         };
       }
     } catch (e: any) {
       console.error("[SubLinks Service] Logout API failed", e);
-      apiResult = { success: false, message: e.message || "Network Error" };
+      apiResult = {
+        success: false,
+        message:
+          e.message || i18n.t("layout.notifications.syncNetworkError" as any),
+      };
     }
   } else {
-    apiResult = { success: true, message: i18n.t("layout.notifications.loggedOutLocal" as any) };
+    apiResult = {
+      success: true,
+      message: i18n.t("layout.notifications.loggedOutLocal" as any),
+    };
   }
 
   // Clear auth data immediately

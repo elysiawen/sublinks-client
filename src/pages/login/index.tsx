@@ -18,6 +18,7 @@ import { showNotice } from "@/services/notice-service";
 import {
   syncSubLinksSubscriptions,
   USER_AGENT,
+  apiHeaders,
 } from "@/services/sublinks-service";
 
 const LoginPage = () => {
@@ -41,7 +42,12 @@ const LoginPage = () => {
       SUBLINKS_CONFIG.STORAGE_KEYS.LOGOUT_REASON,
     );
     if (reason) {
-      if (reason.includes("expired") || reason.includes("invalid") || reason.includes("过期") || reason.includes("失效")) {
+      if (
+        reason.includes("expired") ||
+        reason.includes("invalid") ||
+        reason.includes("过期") ||
+        reason.includes("失效")
+      ) {
         showNotice("error", reason);
       } else {
         showNotice("success", reason);
@@ -73,10 +79,7 @@ const LoginPage = () => {
 
       const response = await fetch(`${apiUrl}/api/client/auth/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": USER_AGENT,
-        },
+        headers: apiHeaders(),
         body: JSON.stringify(bodyPayload),
       });
 
@@ -86,19 +89,38 @@ const LoginPage = () => {
         data = text ? JSON.parse(text) : {};
       } catch {
         if (!response.ok) {
-          throw new Error(t("layout.notifications.loginRequestFailed" as any, { status: response.status, text }));
+          throw new Error(
+            t("layout.notifications.loginRequestFailed" as any, {
+              status: response.status,
+              text,
+            }),
+          );
         }
         throw new Error(t("layout.notifications.serverInvalidResponse" as any));
       }
 
       if (!response.ok) {
-        throw new Error(data.message || t("layout.notifications.loginFailed" as any, { status: response.status }));
+        const serverMsg = data.message ?? data.error;
+        const fallbackKey = (() => {
+          switch (response.status) {
+            case 400:
+              return "layout.api.messages.usernameAndPasswordRequired";
+            case 401:
+              return "layout.api.messages.invalidCredentials";
+            case 403:
+              return "layout.api.messages.accountDisabled";
+            default:
+              return "layout.api.messages.serverError";
+          }
+        })();
+        throw new Error(serverMsg || t(fallbackKey as any));
       }
 
       if (data.requires2FA) {
         setRequires2FA(true);
-        if (data.message) {
-          showNotice("info", data.message);
+        const twoFAMsg = data.message ?? data.error;
+        if (twoFAMsg) {
+          showNotice("info", twoFAMsg);
         }
         return;
       }
@@ -140,7 +162,10 @@ const LoginPage = () => {
       // Trigger auth change event for seamless login
       window.dispatchEvent(new Event("sublinks-auth-change"));
     } catch (err: any) {
-      showNotice("error", err.message || t("layout.notifications.cannotConnectServer" as any));
+      showNotice(
+        "error",
+        err.message || t("layout.notifications.cannotConnectServer" as any),
+      );
     } finally {
       setLoading(false);
     }

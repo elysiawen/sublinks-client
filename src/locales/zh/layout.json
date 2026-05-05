@@ -36,6 +36,15 @@
       }
     }
   },
+  "api": {
+    "messages": {
+      "usernameAndPasswordRequired": "用户名和密码不能为空",
+      "invalidCredentials": "用户名或密码错误",
+      "accountDisabled": "账户已被停用或封禁",
+      "serverError": "服务器内部错误",
+      "sessionExpired": "会话已被撤销或过期"
+    }
+  },
   "notifications": {
     "autoSyncSuccess": "订阅列表同步成功",
     "autoSyncFailed": "订阅列表同步失败",
