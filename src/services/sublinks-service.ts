@@ -24,6 +24,7 @@ export const USER_AGENT = `SubLinks Client Desktop/${APP_VERSION} (${getSystem()
 const getAcceptLanguage = (): string => {
   const lang = i18n.language || "zh";
   if (lang === "zhtw") return "zh-TW";
+  if (lang === "jp") return "ja";
   return lang;
 };
 
