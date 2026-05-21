@@ -221,7 +221,6 @@
       },
       "updateDialog": {
         "title": "New Version Found",
-        "version": "Version",
         "releaseTime": "Release Time",
         "download": "Download Update",
         "cancel": "Cancel"

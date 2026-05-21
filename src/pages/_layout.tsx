@@ -5,14 +5,14 @@ import {
   closestCenter,
   useSensor,
   useSensors,
-} from '@dnd-kit/core'
+} from "@dnd-kit/core";
 import {
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { LogoutRounded, PersonRounded } from '@mui/icons-material'
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { LogoutRounded, PersonRounded } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -27,59 +27,59 @@ import {
   Paper,
   ThemeProvider,
   Typography,
-} from '@mui/material'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import type { CSSProperties } from 'react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { Outlet, useLocation, useNavigate } from 'react-router'
+} from "@mui/material";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import type { CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Outlet, useLocation, useNavigate } from "react-router";
 
-import logoIcon from '@/assets/image/logo.ico'
-import { BaseErrorBoundary } from '@/components/base'
-import { LayoutItem } from '@/components/layout/layout-item'
-import { LayoutTraffic } from '@/components/layout/layout-traffic'
-import { NoticeManager } from '@/components/layout/notice-manager'
-import { UpdateButton } from '@/components/layout/update-button'
-import { WindowControls } from '@/components/layout/window-controller'
-import { SUBLINKS_CONFIG } from '@/configs/sublinks-config'
-import { useI18n } from '@/hooks/use-i18n'
-import { useVerge } from '@/hooks/use-verge'
-import { useWindowDecorations } from '@/hooks/use-window'
-import { useAppData } from '@/providers/app-data-context'
-import { showNotice } from '@/services/notice-service'
-import { useThemeMode } from '@/services/states'
+import logoIcon from "@/assets/image/logo.ico";
+import { BaseErrorBoundary } from "@/components/base";
+import { LayoutItem } from "@/components/layout/layout-item";
+import { LayoutTraffic } from "@/components/layout/layout-traffic";
+import { NoticeManager } from "@/components/layout/notice-manager";
+import { UpdateButton } from "@/components/layout/update-button";
+import { WindowControls } from "@/components/layout/window-controller";
+import { SUBLINKS_CONFIG } from "@/configs/sublinks-config";
+import { useI18n } from "@/hooks/use-i18n";
+import { useVerge } from "@/hooks/use-verge";
+import { useWindowDecorations } from "@/hooks/use-window";
+import { useAppData } from "@/providers/app-data-context";
+import { showNotice } from "@/services/notice-service";
+import { useThemeMode } from "@/services/states";
 import {
   syncSubLinksSubscriptions,
   logoutSubLinks,
   fetchSubLinksUserInfo,
   isSyncInProgress,
-} from '@/services/sublinks-service'
-import getSystem from '@/utils/get-system'
+} from "@/services/sublinks-service";
+import getSystem from "@/utils/get-system";
 
 import {
   useCustomTheme,
   useLayoutEvents,
   useLoadingOverlay,
   useNavMenuOrder,
-} from './_layout/hooks'
-import { handleNoticeMessage } from './_layout/utils'
-import { navItems } from './_routers'
-import LoginPage from './login'
-import LogsPage from './logs'
+} from "./_layout/hooks";
+import { handleNoticeMessage } from "./_layout/utils";
+import { navItems } from "./_routers";
+import LoginPage from "./login";
+import LogsPage from "./logs";
 
-import 'dayjs/locale/ru'
-import 'dayjs/locale/zh-cn'
+import "dayjs/locale/ru";
+import "dayjs/locale/zh-cn";
 
-export const portableFlag = false
+export const portableFlag = false;
 
-type NavItem = (typeof navItems)[number]
+type NavItem = (typeof navItems)[number];
 
-type MenuContextPosition = { top: number; left: number }
+type MenuContextPosition = { top: number; left: number };
 
 interface SortableNavMenuItemProps {
-  item: NavItem
-  label: string
+  item: NavItem;
+  label: string;
 }
 
 const SortableNavMenuItem = ({ item, label }: SortableNavMenuItemProps) => {
@@ -92,15 +92,15 @@ const SortableNavMenuItem = ({ item, label }: SortableNavMenuItemProps) => {
     isDragging,
   } = useSortable({
     id: item.path,
-  })
+  });
 
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-  }
+  };
 
   if (isDragging) {
-    style.zIndex = 100
+    style.zIndex = 100;
   }
 
   return (
@@ -117,39 +117,39 @@ const SortableNavMenuItem = ({ item, label }: SortableNavMenuItemProps) => {
     >
       {label}
     </LayoutItem>
-  )
-}
+  );
+};
 
-dayjs.extend(relativeTime)
+dayjs.extend(relativeTime);
 
-const OS = getSystem()
+const OS = getSystem();
 
 const Layout = () => {
-  const mode = useThemeMode()
-  const isDark = mode !== 'light'
-  const { t } = useTranslation()
-  const { theme } = useCustomTheme()
-  const { verge, mutateVerge, patchVerge } = useVerge()
-  const { language } = verge ?? {}
-  const navCollapsed = verge?.collapse_navbar ?? false
-  const { switchLanguage } = useI18n()
-  const navigate = useNavigate()
-  const { pathname } = useLocation()
-  const isLogsPage = pathname === '/logs'
-  const logsPageMountedRef = useRef(false)
-  if (isLogsPage) logsPageMountedRef.current = true
-  const themeReady = useMemo(() => Boolean(theme), [theme])
+  const mode = useThemeMode();
+  const isDark = mode !== "light";
+  const { t } = useTranslation();
+  const { theme } = useCustomTheme();
+  const { verge, mutateVerge, patchVerge } = useVerge();
+  const { language } = verge ?? {};
+  const navCollapsed = verge?.collapse_navbar ?? false;
+  const { switchLanguage } = useI18n();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const isLogsPage = pathname === "/logs";
+  const logsPageMountedRef = useRef(false);
+  if (isLogsPage) logsPageMountedRef.current = true;
+  const themeReady = useMemo(() => Boolean(theme), [theme]);
 
-  const [menuUnlocked, setMenuUnlocked] = useState(false)
+  const [menuUnlocked, setMenuUnlocked] = useState(false);
   const [menuContextPosition, setMenuContextPosition] =
-    useState<MenuContextPosition | null>(null)
+    useState<MenuContextPosition | null>(null);
 
   // Logout Dialog State
-  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false)
-  const [loggingOut, setLoggingOut] = useState(false)
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
-  const windowControlsRef = useRef<any>(null)
-  const { decorated } = useWindowDecorations()
+  const windowControlsRef = useRef<any>(null);
+  const { decorated } = useWindowDecorations();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -160,7 +160,7 @@ const Layout = () => {
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
-  )
+  );
 
   const handleMenuOrderOptimisticUpdate = useCallback(
     (order: string[]) => {
@@ -168,15 +168,15 @@ const Layout = () => {
         (prev: IVergeConfig | undefined) =>
           prev ? { ...prev, menu_order: order } : prev,
         false,
-      )
+      );
     },
     [mutateVerge],
-  )
+  );
 
   const handleMenuOrderPersist = useCallback(
     (order: string[]) => patchVerge({ menu_order: order }),
     [patchVerge],
-  )
+  );
 
   const {
     menuOrder,
@@ -190,84 +190,88 @@ const Layout = () => {
     storedOrder: verge?.menu_order,
     onOptimisticUpdate: handleMenuOrderOptimisticUpdate,
     onPersist: handleMenuOrderPersist,
-  })
+  });
 
   const handleMenuContextMenu = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
-      event.preventDefault()
-      event.stopPropagation()
-      setMenuContextPosition({ top: event.clientY, left: event.clientX })
+      event.preventDefault();
+      event.stopPropagation();
+      setMenuContextPosition({ top: event.clientY, left: event.clientX });
     },
     [],
-  )
+  );
 
   const handleMenuContextClose = useCallback(() => {
-    setMenuContextPosition(null)
-  }, [])
+    setMenuContextPosition(null);
+  }, []);
 
   const handleResetMenuOrder = useCallback(() => {
-    setMenuContextPosition(null)
-    void resetMenuOrder()
-  }, [resetMenuOrder])
+    setMenuContextPosition(null);
+    void resetMenuOrder();
+  }, [resetMenuOrder]);
 
   const handleUnlockMenu = useCallback(() => {
-    setMenuUnlocked(true)
-    setMenuContextPosition(null)
-  }, [])
+    setMenuUnlocked(true);
+    setMenuContextPosition(null);
+  }, []);
 
   const handleLockMenu = useCallback(() => {
-    setMenuUnlocked(false)
-    setMenuContextPosition(null)
-  }, [])
+    setMenuUnlocked(false);
+    setMenuContextPosition(null);
+  }, []);
 
   const handleToggleNavCollapsed = useCallback(() => {
-    setMenuContextPosition(null)
-    void patchVerge({ collapse_navbar: !navCollapsed })
-  }, [navCollapsed, patchVerge])
+    setMenuContextPosition(null);
+    void patchVerge({ collapse_navbar: !navCollapsed });
+  }, [navCollapsed, patchVerge]);
 
   const customTitlebar = useMemo(
     () =>
       !decorated ? (
-        <div className="the_titlebar" data-tauri-drag-region="true">
+        <div className="the_titlebar">
           <Typography
             variant="caption"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: "bold",
               opacity: 0.8,
-              pointerEvents: 'none',
+              pointerEvents: "none",
               ml: 2,
             }}
           >
             {SUBLINKS_CONFIG.PRODUCT_NAME}
           </Typography>
+          <div
+            className="the_titlebar-drag-region"
+            data-tauri-drag-region="true"
+          />
           <WindowControls ref={windowControlsRef} />
         </div>
       ) : null,
     [decorated],
-  )
+  );
 
-  useLoadingOverlay(themeReady)
+  useLoadingOverlay(themeReady);
 
   const handleNotice = useCallback(
     (payload: [string, string]) => {
-      const [status, msg] = payload
+      const [status, msg] = payload;
       try {
-        handleNoticeMessage(status, msg, t, navigate)
+        handleNoticeMessage(status, msg, t, navigate);
       } catch (error) {
-        console.error('[通知处理] 失败:', error)
+        console.error("[通知处理] 失败:", error);
       }
     },
     [t, navigate],
-  )
+  );
 
-  useLayoutEvents(handleNotice)
+  useLayoutEvents(handleNotice);
 
   useEffect(() => {
     if (language) {
-      dayjs.locale(language === 'zh' ? 'zh-cn' : language)
-      switchLanguage(language)
+      dayjs.locale(language === "zh" ? "zh-cn" : language);
+      switchLanguage(language);
     }
-  }, [language, switchLanguage])
+  }, [language, switchLanguage]);
 
   // Sidebar visibility filtering (SubLinks customization)
   const [sidebarVisibility, setSidebarVisibility] = useState<
@@ -275,125 +279,128 @@ const Layout = () => {
   >(() => {
     const saved = localStorage.getItem(
       SUBLINKS_CONFIG.STORAGE_KEYS.SIDEBAR_VISIBILITY,
-    )
+    );
     if (saved) {
       try {
-        return JSON.parse(saved)
+        return JSON.parse(saved);
       } catch (ignore) {
-        return {}
+        return {};
       }
     }
-    return {}
-  })
+    return {};
+  });
 
   useEffect(() => {
     const handleVisibilityUpdate = () => {
       const saved = localStorage.getItem(
         SUBLINKS_CONFIG.STORAGE_KEYS.SIDEBAR_VISIBILITY,
-      )
+      );
       if (saved) {
         try {
-          setSidebarVisibility(JSON.parse(saved))
+          setSidebarVisibility(JSON.parse(saved));
         } catch (e) {
-          console.error('Failed to parse sidebar visibility', e)
+          console.error("Failed to parse sidebar visibility", e);
         }
       }
-    }
+    };
     window.addEventListener(
-      'sidebar-visibility-change',
+      "sidebar-visibility-change",
       handleVisibilityUpdate,
-    )
+    );
     return () =>
       window.removeEventListener(
-        'sidebar-visibility-change',
+        "sidebar-visibility-change",
         handleVisibilityUpdate,
-      )
-  }, [])
+      );
+  }, []);
 
   const visibleMenuOrder = useMemo(() => {
-    const essentialPaths = ['/', '/settings']
+    const essentialPaths = ["/", "/settings"];
     return menuOrder.filter(
       (path: string) =>
         essentialPaths.includes(path) || sidebarVisibility[path] !== false,
-    )
-  }, [menuOrder, sidebarVisibility])
+    );
+  }, [menuOrder, sidebarVisibility]);
 
   // Auth State - Use state to support seamless login/logout
   const [token, setToken] = useState<string | null>(() => {
-    const t = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN)
+    const t = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
     // Handle "undefined" string from previous bugs
-    if (t === 'undefined') {
-      localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN)
-      return null
+    if (t === "undefined") {
+      localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
+      return null;
     }
-    return t
-  })
+    return t;
+  });
 
   useEffect(() => {
     const handleAuthChange = () => {
-      const newToken = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN)
-      setToken(newToken)
-    }
-    window.addEventListener('sublinks-auth-change', handleAuthChange)
+      const newToken = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
+      setToken(newToken);
+    };
+    window.addEventListener("sublinks-auth-change", handleAuthChange);
     return () =>
-      window.removeEventListener('sublinks-auth-change', handleAuthChange)
-  }, [])
+      window.removeEventListener("sublinks-auth-change", handleAuthChange);
+  }, []);
 
   // Sync user object (optional, mostly for display if needed)
   const [user, setUser] = useState<any>(() => {
-    const userStr = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER)
+    const userStr = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER);
     try {
-      return userStr ? JSON.parse(userStr) : null
+      return userStr ? JSON.parse(userStr) : null;
     } catch {
-      return null
+      return null;
     }
-  })
+  });
 
   useEffect(() => {
     const handleAuthChange = () => {
-      const userStr = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER)
+      const userStr = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER);
       try {
-        setUser(userStr ? JSON.parse(userStr) : null)
+        setUser(userStr ? JSON.parse(userStr) : null);
       } catch {
-        setUser(null)
+        setUser(null);
       }
-    }
-    window.addEventListener('sublinks-auth-change', handleAuthChange)
+    };
+    window.addEventListener("sublinks-auth-change", handleAuthChange);
     return () =>
-      window.removeEventListener('sublinks-auth-change', handleAuthChange)
-  }, [])
+      window.removeEventListener("sublinks-auth-change", handleAuthChange);
+  }, []);
 
   // Cache avatar URL to avoid localStorage.getItem during render
   const avatarUrl = useMemo(() => {
-    if (!user?.avatar) return undefined
-    return localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.AVATAR_CACHE) || user.avatar
-  }, [user?.avatar])
+    if (!user?.avatar) return undefined;
+    return (
+      localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.AVATAR_CACHE) ||
+      user.avatar
+    );
+  }, [user?.avatar]);
 
-  const { proxies } = useAppData()
+  const { proxies } = useAppData();
 
   // Auto-sync subscriptions and user info on startup
-  const syncAttemptedRef = useRef(false)
-  const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const userInfoFetchedRef = useRef(false)
+  const syncAttemptedRef = useRef(false);
+  const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const userInfoFetchedRef = useRef(false);
 
   useEffect(() => {
     // Check if auto-sync is enabled in settings
-    const autoSyncEnabled = verge?.sublinks_auto_sync ?? false
+    const autoSyncEnabled = verge?.sublinks_auto_sync ?? false;
 
     if (token) {
       // 仅当内核就绪（proxies 不为空）且未获取过用户信息时，才发起请求
       if (proxies && !userInfoFetchedRef.current) {
-        userInfoFetchedRef.current = true
-        fetchSubLinksUserInfo()
+        userInfoFetchedRef.current = true;
+        fetchSubLinksUserInfo();
       }
 
       // Skip auto-sync if already attempted or if login sync is in progress
       if (!syncAttemptedRef.current && autoSyncEnabled && !isSyncInProgress()) {
-        syncAttemptedRef.current = true
+        syncAttemptedRef.current = true;
 
         // Clear any existing timer
         if (syncTimerRef.current) {
-          clearTimeout(syncTimerRef.current)
+          clearTimeout(syncTimerRef.current);
         }
 
         // Delay sync to allow core and app to stabilize
@@ -401,19 +408,19 @@ const Layout = () => {
           syncSubLinksSubscriptions()
             .then(() => {
               showNotice(
-                'success',
-                t('layout.notifications.autoSyncSuccess') as string,
-              )
+                "success",
+                t("layout.notifications.autoSyncSuccess") as string,
+              );
             })
             .catch((err) => {
-              console.error('[Auto-Sync] Failed:', err)
+              console.error("[Auto-Sync] Failed:", err);
               showNotice(
-                'error',
-                t('layout.notifications.autoSyncFailed') as string,
-              )
-            })
-          syncTimerRef.current = null
-        }, 1000)
+                "error",
+                t("layout.notifications.autoSyncFailed") as string,
+              );
+            });
+          syncTimerRef.current = null;
+        }, 1000);
       }
     }
 
@@ -421,27 +428,27 @@ const Layout = () => {
     return () => {
       // Only clear if we haven't started syncing yet
       if (syncTimerRef.current && !syncAttemptedRef.current) {
-        clearTimeout(syncTimerRef.current)
-        syncTimerRef.current = null
+        clearTimeout(syncTimerRef.current);
+        syncTimerRef.current = null;
       }
-    }
-  }, [token, verge?.sublinks_auto_sync, proxies, t])
+    };
+  }, [token, verge?.sublinks_auto_sync, proxies, t]);
 
   if (!themeReady) {
     return (
       <div
         style={{
-          width: '100vw',
-          height: '100vh',
-          background: mode === 'light' ? '#fff' : '#181a1b',
-          transition: 'background 0.2s',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: mode === 'light' ? '#333' : '#fff',
+          width: "100vw",
+          height: "100vh",
+          background: mode === "light" ? "#fff" : "#181a1b",
+          transition: "background 0.2s",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: mode === "light" ? "#333" : "#fff",
         }}
       ></div>
-    )
+    );
   }
 
   // Auth gating - show login page if no token
@@ -451,47 +458,49 @@ const Layout = () => {
         <NoticeManager position={verge?.notice_position} />
         <LoginPage />
       </ThemeProvider>
-    )
+    );
   }
 
   const handleLogoutClick = () => {
-    setLogoutDialogOpen(true)
-  }
+    setLogoutDialogOpen(true);
+  };
 
   const handleLogoutConfirm = async () => {
-    setLoggingOut(true)
+    setLoggingOut(true);
     try {
-      const result = await logoutSubLinks(t('layout.notifications.logoutSuccess'))
+      const result = await logoutSubLinks(
+        t("layout.notifications.logoutSuccess"),
+      );
       if (!result.success) {
         showNotice(
-          'error',
-          result.message || (t('layout.notifications.logoutFailed') as string),
-        )
+          "error",
+          result.message || (t("layout.notifications.logoutFailed") as string),
+        );
       }
     } catch (e: any) {
       showNotice(
-        'error',
-        t('layout.notifications.logoutFailed') + ': ' + e.message,
-      )
+        "error",
+        t("layout.notifications.logoutFailed") + ": " + e.message,
+      );
     } finally {
-      setLoggingOut(false)
-      setLogoutDialogOpen(false)
+      setLoggingOut(false);
+      setLogoutDialogOpen(false);
     }
-  }
+  };
 
   const handleLogoutCancel = () => {
     if (!loggingOut) {
-      setLogoutDialogOpen(false)
+      setLogoutDialogOpen(false);
     }
-  }
+  };
 
   return (
     <ThemeProvider theme={theme}>
       <NoticeManager position={verge?.notice_position} />
       <div
         style={{
-          animation: 'fadeIn 0.5s',
-          WebkitAnimation: 'fadeIn 0.5s',
+          animation: "fadeIn 0.5s",
+          WebkitAnimation: "fadeIn 0.5s",
         }}
       />
       <style>
@@ -505,29 +514,29 @@ const Layout = () => {
       <Paper
         square
         elevation={0}
-        className={`${OS} layout${navCollapsed ? ' layout--nav-collapsed' : ''}`}
+        className={`${OS} layout${navCollapsed ? " layout--nav-collapsed" : ""}`}
         style={{
-          borderTopLeftRadius: '0px',
-          borderTopRightRadius: '0px',
+          borderTopLeftRadius: "0px",
+          borderTopRightRadius: "0px",
         }}
         onContextMenu={(e) => {
           if (
-            OS === 'windows' &&
-            !['input', 'textarea'].includes(
+            OS === "windows" &&
+            !["input", "textarea"].includes(
               e.currentTarget.tagName.toLowerCase(),
             ) &&
             !e.currentTarget.isContentEditable
           ) {
-            e.preventDefault()
+            e.preventDefault();
           }
         }}
         sx={[
           ({ palette }) => ({ bgcolor: palette.background.paper }),
-          OS === 'linux'
+          OS === "linux"
             ? {
-                borderRadius: '8px',
-                width: '100vw',
-                height: '100vh',
+                borderRadius: "8px",
+                width: "100vw",
+                height: "100vh",
               }
             : {},
         ]}
@@ -541,9 +550,9 @@ const Layout = () => {
               <div
                 data-tauri-drag-region="true"
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
                 }}
               >
                 <Box
@@ -552,22 +561,22 @@ const Layout = () => {
                   sx={{
                     height: 39,
                     width: 39,
-                    objectFit: 'contain',
+                    objectFit: "contain",
                   }}
                 />
                 {!navCollapsed && (
                   <Typography
                     variant="h6"
                     sx={{
-                      fontWeight: 'bold',
-                      color: isDark ? 'white' : 'black',
-                      userSelect: 'none',
-                      fontSize: '1.5rem',
+                      fontWeight: "bold",
+                      color: isDark ? "white" : "black",
+                      userSelect: "none",
+                      fontSize: "1.5rem",
                       lineHeight: 1,
-                      whiteSpace: 'nowrap',
+                      whiteSpace: "nowrap",
                     }}
                   >
-                    {SUBLINKS_CONFIG.PRODUCT_NAME.split(' ')[0]}
+                    {SUBLINKS_CONFIG.PRODUCT_NAME.split(" ")[0]}
                   </Typography>
                 )}
               </div>
@@ -579,21 +588,21 @@ const Layout = () => {
                 sx={(theme) => ({
                   px: 1.5,
                   py: 0.75,
-                  mx: 'auto',
+                  mx: "auto",
                   mb: 1,
                   maxWidth: 250,
                   borderRadius: 1.5,
                   fontSize: 12,
                   fontWeight: 600,
-                  textAlign: 'center',
+                  textAlign: "center",
                   color: theme.palette.warning.contrastText,
                   bgcolor:
-                    theme.palette.mode === 'light'
+                    theme.palette.mode === "light"
                       ? theme.palette.warning.main
                       : theme.palette.warning.dark,
                 })}
               >
-                {t('layout.components.navigation.menu.reorderMode')}
+                {t("layout.components.navigation.menu.reorderMode")}
               </Box>
             )}
 
@@ -609,9 +618,9 @@ const Layout = () => {
                     onContextMenu={handleMenuContextMenu}
                   >
                     {visibleMenuOrder.map((path) => {
-                      const item = navItemMap.get(path)
+                      const item = navItemMap.get(path);
                       if (!item) {
-                        return null
+                        return null;
                       }
                       return (
                         <SortableNavMenuItem
@@ -619,30 +628,23 @@ const Layout = () => {
                           item={item}
                           label={t(item.label)}
                         />
-                      )
+                      );
                     })}
                   </List>
                 </SortableContext>
               </DndContext>
             ) : (
-              <List
-                className="the-menu"
-                onContextMenu={handleMenuContextMenu}
-              >
+              <List className="the-menu" onContextMenu={handleMenuContextMenu}>
                 {visibleMenuOrder.map((path) => {
-                  const item = navItemMap.get(path)
+                  const item = navItemMap.get(path);
                   if (!item) {
-                    return null
+                    return null;
                   }
                   return (
-                    <LayoutItem
-                      key={item.path}
-                      to={item.path}
-                      icon={item.icon}
-                    >
+                    <LayoutItem key={item.path} to={item.path} icon={item.icon}>
                       {t(item.label)}
                     </LayoutItem>
-                  )
+                  );
                 })}
               </List>
             )}
@@ -668,23 +670,23 @@ const Layout = () => {
             >
               <MenuItem onClick={handleToggleNavCollapsed} dense>
                 {navCollapsed
-                  ? t('layout.components.navigation.menu.expandNavBar')
-                  : t('layout.components.navigation.menu.collapseNavBar')}
+                  ? t("layout.components.navigation.menu.expandNavBar")
+                  : t("layout.components.navigation.menu.collapseNavBar")}
               </MenuItem>
               <MenuItem
                 onClick={menuUnlocked ? handleLockMenu : handleUnlockMenu}
                 dense
               >
                 {menuUnlocked
-                  ? t('layout.components.navigation.menu.lock')
-                  : t('layout.components.navigation.menu.unlock')}
+                  ? t("layout.components.navigation.menu.lock")
+                  : t("layout.components.navigation.menu.unlock")}
               </MenuItem>
               <MenuItem
                 onClick={handleResetMenuOrder}
                 dense
                 disabled={isDefaultOrder}
               >
-                {t('layout.components.navigation.menu.restoreDefaultOrder')}
+                {t("layout.components.navigation.menu.restoreDefaultOrder")}
               </MenuItem>
             </Menu>
 
@@ -692,24 +694,24 @@ const Layout = () => {
             <Box
               sx={{
                 mx: 2,
-                mt: 'auto',
+                mt: "auto",
                 mb: 2,
                 p: 1.5,
                 borderRadius: 2,
                 bgcolor: (theme) =>
-                  theme.palette.mode === 'light'
-                    ? 'rgba(0, 0, 0, 0.05)'
-                    : 'rgba(255, 255, 255, 0.05)',
-                display: 'flex',
-                flexDirection: 'column',
+                  theme.palette.mode === "light"
+                    ? "rgba(0, 0, 0, 0.05)"
+                    : "rgba(255, 255, 255, 0.05)",
+                display: "flex",
+                flexDirection: "column",
                 gap: 1.5,
               }}
             >
               <Box
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  overflow: 'hidden',
+                  display: "flex",
+                  alignItems: "center",
+                  overflow: "hidden",
                 }}
               >
                 {user?.avatar ? (
@@ -719,13 +721,13 @@ const Layout = () => {
                     sx={{
                       height: 44,
                       width: 44,
-                      borderRadius: '50%',
+                      borderRadius: "50%",
                       mr: 1.5,
-                      objectFit: 'cover',
+                      objectFit: "cover",
                       flexShrink: 0,
                     }}
                     onError={(e: any) => {
-                      e.target.style.display = 'none'
+                      e.target.style.display = "none";
                     }}
                   />
                 ) : (
@@ -739,16 +741,20 @@ const Layout = () => {
                   />
                 )}
                 <Box sx={{ minWidth: 0 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }} noWrap>
-                    {user?.nickname || user?.username || 'User'}
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: "bold" }}
+                    noWrap
+                  >
+                    {user?.nickname || user?.username || "User"}
                   </Typography>
                   <Typography
                     variant="caption"
                     color="text.secondary"
                     noWrap
-                    sx={{ display: 'block' }}
+                    sx={{ display: "block" }}
                   >
-                    {t('layout.components.navigation.userInfo.loggedIn')}
+                    {t("layout.components.navigation.userInfo.loggedIn")}
                   </Typography>
                 </Box>
               </Box>
@@ -762,7 +768,7 @@ const Layout = () => {
                 startIcon={<LogoutRounded fontSize="small" />}
                 sx={{ borderRadius: 1.5 }}
               >
-                {t('layout.components.navigation.userInfo.logout')}
+                {t("layout.components.navigation.userInfo.logout")}
               </Button>
             </Box>
 
@@ -780,12 +786,12 @@ const Layout = () => {
               {logsPageMountedRef.current && (
                 <div
                   style={{
-                    position: 'absolute',
+                    position: "absolute",
                     top: 0,
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    display: isLogsPage ? undefined : 'none',
+                    display: isLogsPage ? undefined : "none",
                   }}
                 >
                   <LogsPage />
@@ -803,13 +809,13 @@ const Layout = () => {
         aria-labelledby="logout-dialog-title"
         aria-describedby="logout-dialog-description"
       >
-        <DialogTitle id="logout-dialog-title" sx={{ fontWeight: 'bold' }}>
-          {t('layout.components.navigation.userInfo.logoutConfirmationTitle')}
+        <DialogTitle id="logout-dialog-title" sx={{ fontWeight: "bold" }}>
+          {t("layout.components.navigation.userInfo.logoutConfirmationTitle")}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="logout-dialog-description">
             {t(
-              'layout.components.navigation.userInfo.logoutConfirmationMessage',
+              "layout.components.navigation.userInfo.logoutConfirmationMessage",
             )}
           </DialogContentText>
         </DialogContent>
@@ -819,7 +825,7 @@ const Layout = () => {
             color="inherit"
             disabled={loggingOut}
           >
-            {t('layout.components.navigation.userInfo.cancel')}
+            {t("layout.components.navigation.userInfo.cancel")}
           </Button>
           <Button
             onClick={handleLogoutConfirm}
@@ -829,13 +835,13 @@ const Layout = () => {
             autoFocus
           >
             {loggingOut
-              ? t('layout.components.navigation.userInfo.loggingOut')
-              : t('layout.components.navigation.userInfo.amountLogout')}
+              ? t("layout.components.navigation.userInfo.loggingOut")
+              : t("layout.components.navigation.userInfo.amountLogout")}
           </Button>
         </DialogActions>
       </Dialog>
     </ThemeProvider>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;

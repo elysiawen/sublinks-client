@@ -221,7 +221,6 @@
       },
       "updateDialog": {
         "title": "Versi baru ditemukan",
-        "version": "Versi",
         "releaseTime": "Waktu Rilis",
         "download": "Unduh Pembaruan",
         "cancel": "Batal"

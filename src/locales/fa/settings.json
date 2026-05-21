@@ -221,7 +221,6 @@
       },
       "updateDialog": {
         "title": "نسخه جدید پیدا شد",
-        "version": "نسخه",
         "releaseTime": "زمان انتشار",
         "download": "دانلود بروزرسانی",
         "cancel": "لغو"

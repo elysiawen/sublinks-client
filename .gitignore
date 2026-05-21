@@ -14,14 +14,7 @@ scripts/_env.sh
 .changelog_backups
 target
 CLAUDE.md
-.env.*
-!.env.example
-
-mock-update-api.mjs
 .vfox.toml
 .vfox/
-
-
-
 .claude
-.history
+AGENTS.md

@@ -256,7 +256,6 @@ export interface TranslationResources {
         loggedOutLocal: string;
         loggingIn: string;
         login: string;
-        loginFailed: string;
         loginNoToken: string;
         loginRequestFailed: string;
         loginSuccess: string;
@@ -265,11 +264,9 @@ export interface TranslationResources {
         logoutSuccess: string;
         password: string;
         serverInvalidResponse: string;
-        sessionExpired: string;
         syncActivating: string;
         syncComplete: string;
         syncDeletedCount: string;
-        syncFailed: string;
         syncFetchingSubs: string;
         syncNetworkError: string;
         syncNewCount: string;
@@ -527,6 +524,7 @@ export interface TranslationResources {
           instruction: string;
           minimumNodes: string;
           minimumNodesHint: string;
+          warning: string;
         };
         labels: {
           delayCheckReset: string;
@@ -788,7 +786,6 @@ export interface TranslationResources {
             download: string;
             releaseTime: string;
             title: string;
-            version: string;
           };
         };
       };

@@ -221,7 +221,6 @@
       },
       "updateDialog": {
         "title": "新しいバージョンが見つかりました",
-        "version": "バージョン",
         "releaseTime": "リリース時間",
         "download": "更新をダウンロード",
         "cancel": "キャンセル"

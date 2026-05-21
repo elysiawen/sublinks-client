@@ -221,7 +221,6 @@
       },
       "updateDialog": {
         "title": "새 버전 발견",
-        "version": "버전",
         "releaseTime": "배포 시간",
         "download": "업데이트 다운로드",
         "cancel": "취소"

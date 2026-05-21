@@ -221,7 +221,6 @@
       },
       "updateDialog": {
         "title": "發現新版本",
-        "version": "版本",
         "releaseTime": "發布時間",
         "download": "下載更新",
         "cancel": "取消"

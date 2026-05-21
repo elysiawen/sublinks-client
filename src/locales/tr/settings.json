@@ -221,7 +221,6 @@
       },
       "updateDialog": {
         "title": "Yeni sürüm bulundu",
-        "version": "Sürüm",
         "releaseTime": "Yayınlanma Zamanı",
         "download": "Güncellemeyi İndir",
         "cancel": "İptal"

@@ -11,7 +11,6 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
-import MonacoEditor from "@monaco-editor/react";
 import {
   VerticalAlignBottomRounded,
   VerticalAlignTopRounded,
@@ -42,13 +41,18 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { Virtuoso } from "react-virtuoso";
 
-import { BaseSearchBox, Switch } from "@/components/base";
+import {
+  BaseSearchBox,
+  MonacoEditor,
+  Switch,
+  VirtualList,
+} from "@/components/base";
 import { GroupItem } from "@/components/profile/group-item";
 import {
   getNetworkInterfaces,
@@ -58,6 +62,7 @@ import {
 import { showNotice } from "@/services/notice-service";
 import { useThemeMode } from "@/services/states";
 import type { TranslationKey } from "@/types/generated/i18n-keys";
+import type { MonacoEditorInstance } from "@/types/monaco";
 import getSystem from "@/utils/get-system";
 
 interface Props {
@@ -153,6 +158,7 @@ export const GroupsEditorViewer = (props: Props) => {
     [t],
   );
   const themeMode = useThemeMode();
+  const editorRef = useRef<MonacoEditorInstance | null>(null);
   const [prevData, setPrevData] = useState("");
   const [currData, setCurrData] = useState("");
   const [visualization, setVisualization] = useState(true);
@@ -188,8 +194,96 @@ export const GroupsEditorViewer = (props: Props) => {
     [appendSeq, match],
   );
 
+  const renderItem = (index: number): React.ReactNode => {
+    const shift = filteredPrependSeq.length > 0 ? 1 : 0;
+    if (filteredPrependSeq.length > 0 && index === 0) {
+      return (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={onPrependDragEnd}
+        >
+          <SortableContext
+            items={filteredPrependSeq.map((x) => {
+              return x.name;
+            })}
+          >
+            {filteredPrependSeq.map((item) => {
+              return (
+                <GroupItem
+                  key={item.name}
+                  type="prepend"
+                  group={item}
+                  onDelete={() => {
+                    setPrependSeq(
+                      prependSeq.filter((v) => v.name !== item.name),
+                    );
+                  }}
+                />
+              );
+            })}
+          </SortableContext>
+        </DndContext>
+      );
+    } else if (index < filteredGroupList.length + shift) {
+      const newIndex = index - shift;
+      return (
+        <GroupItem
+          key={filteredGroupList[newIndex].name}
+          type={
+            deleteSeq.includes(filteredGroupList[newIndex].name)
+              ? "delete"
+              : "original"
+          }
+          group={filteredGroupList[newIndex]}
+          onDelete={() => {
+            if (deleteSeq.includes(filteredGroupList[newIndex].name)) {
+              setDeleteSeq(
+                deleteSeq.filter((v) => v !== filteredGroupList[newIndex].name),
+              );
+            } else {
+              setDeleteSeq((prev) => [
+                ...prev,
+                filteredGroupList[newIndex].name,
+              ]);
+            }
+          }}
+        />
+      );
+    } else {
+      return (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={onAppendDragEnd}
+        >
+          <SortableContext
+            items={filteredAppendSeq.map((x) => {
+              return x.name;
+            })}
+          >
+            {filteredAppendSeq.map((item) => {
+              return (
+                <GroupItem
+                  key={item.name}
+                  type="append"
+                  group={item}
+                  onDelete={() => {
+                    setAppendSeq(appendSeq.filter((v) => v.name !== item.name));
+                  }}
+                />
+              );
+            })}
+          </SortableContext>
+        </DndContext>
+      );
+    }
+  };
+
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
@@ -397,6 +491,13 @@ export const GroupsEditorViewer = (props: Props) => {
     getInterfaceNameList();
   }, [fetchContent, fetchProfile, getInterfaceNameList, open]);
 
+  useEffect(() => {
+    return () => {
+      editorRef.current?.dispose();
+      editorRef.current = null;
+    };
+  }, []);
+
   const validateGroup = () => {
     const group = formIns.getValues();
     if (group.name === "") {
@@ -414,7 +515,11 @@ export const GroupsEditorViewer = (props: Props) => {
         setCurrData(nextData);
       }
 
-      await saveProfileFile(property, nextData);
+      if (!(await saveProfileFile(property, nextData))) {
+        await fetchContent();
+        onClose();
+        return;
+      }
       showNotice.success("shared.feedback.notifications.saved");
       setPrevData(nextData);
       onSave?.(prevData, nextData);
@@ -615,7 +720,7 @@ export const GroupsEditorViewer = (props: Props) => {
                       />
                       <TextField
                         autoComplete="new-password"
-                        placeholder="http://cp.cloudflare.com"
+                        placeholder="http://cp.cloudflare.com/generate_204"
                         size="small"
                         sx={{ width: "calc(100% - 150px)" }}
                         {...field}
@@ -1003,109 +1108,15 @@ export const GroupsEditorViewer = (props: Props) => {
               }}
             >
               <BaseSearchBox onSearch={(match) => setMatch(() => match)} />
-              <Virtuoso
-                style={{ height: "calc(100% - 24px)", marginTop: "8px" }}
-                totalCount={
+              <VirtualList
+                count={
                   filteredGroupList.length +
                   (filteredPrependSeq.length > 0 ? 1 : 0) +
                   (filteredAppendSeq.length > 0 ? 1 : 0)
                 }
-                increaseViewportBy={256}
-                itemContent={(index) => {
-                  const shift = filteredPrependSeq.length > 0 ? 1 : 0;
-                  if (filteredPrependSeq.length > 0 && index === 0) {
-                    return (
-                      <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={onPrependDragEnd}
-                      >
-                        <SortableContext
-                          items={filteredPrependSeq.map((x) => {
-                            return x.name;
-                          })}
-                        >
-                          {filteredPrependSeq.map((item) => {
-                            return (
-                              <GroupItem
-                                key={item.name}
-                                type="prepend"
-                                group={item}
-                                onDelete={() => {
-                                  setPrependSeq(
-                                    prependSeq.filter(
-                                      (v) => v.name !== item.name,
-                                    ),
-                                  );
-                                }}
-                              />
-                            );
-                          })}
-                        </SortableContext>
-                      </DndContext>
-                    );
-                  } else if (index < filteredGroupList.length + shift) {
-                    const newIndex = index - shift;
-                    return (
-                      <GroupItem
-                        key={filteredGroupList[newIndex].name}
-                        type={
-                          deleteSeq.includes(filteredGroupList[newIndex].name)
-                            ? "delete"
-                            : "original"
-                        }
-                        group={filteredGroupList[newIndex]}
-                        onDelete={() => {
-                          if (
-                            deleteSeq.includes(filteredGroupList[newIndex].name)
-                          ) {
-                            setDeleteSeq(
-                              deleteSeq.filter(
-                                (v) => v !== filteredGroupList[newIndex].name,
-                              ),
-                            );
-                          } else {
-                            setDeleteSeq((prev) => [
-                              ...prev,
-                              filteredGroupList[newIndex].name,
-                            ]);
-                          }
-                        }}
-                      />
-                    );
-                  } else {
-                    return (
-                      <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={onAppendDragEnd}
-                      >
-                        <SortableContext
-                          items={filteredAppendSeq.map((x) => {
-                            return x.name;
-                          })}
-                        >
-                          {filteredAppendSeq.map((item) => {
-                            return (
-                              <GroupItem
-                                key={item.name}
-                                type="append"
-                                group={item}
-                                onDelete={() => {
-                                  setAppendSeq(
-                                    appendSeq.filter(
-                                      (v) => v.name !== item.name,
-                                    ),
-                                  );
-                                }}
-                              />
-                            );
-                          })}
-                        </SortableContext>
-                      </DndContext>
-                    );
-                  }
-                }}
+                estimateSize={56}
+                renderItem={renderItem}
+                style={{ height: "calc(100% - 24px)", marginTop: "8px" }}
               />
             </List>
           </>
@@ -1115,6 +1126,9 @@ export const GroupsEditorViewer = (props: Props) => {
             language="yaml"
             value={currData}
             theme={themeMode === "light" ? "light" : "vs-dark"}
+            onMount={(editorInstance) => {
+              editorRef.current = editorInstance;
+            }}
             options={{
               tabSize: 2, // 根据语言类型设置缩进大小
               minimap: {
