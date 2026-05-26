@@ -72,6 +72,17 @@ jobs:
         if: github.event.inputs[matrix.input] == 'true'
         uses: actions/checkout@v6
 
+      - name: Create .env from secrets
+        if: github.event.inputs[matrix.input] == 'true'
+        shell: bash
+        run: |
+          cat > .env.production << EOF
+          SUBLINKS_API_URL=${{ secrets.SUBLINKS_API_URL }}
+          UPDATE_API_URL=${{ secrets.UPDATE_API_URL }}
+          UPDATE_APP_NAME=${{ secrets.UPDATE_APP_NAME }}
+          UPDATE_ENABLED=${{ secrets.UPDATE_ENABLED }}
+          EOF
+
       - name: Install Rust Stable
         if: github.event.inputs[matrix.input] == 'true'
         uses: dtolnay/rust-toolchain@1.95.0

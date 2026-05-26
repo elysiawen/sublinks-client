@@ -144,6 +144,16 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
+      - name: Create .env from secrets
+        shell: bash
+        run: |
+          cat > .env.production << EOF
+          SUBLINKS_API_URL=${{ secrets.SUBLINKS_API_URL }}
+          UPDATE_API_URL=${{ secrets.UPDATE_API_URL }}
+          UPDATE_APP_NAME=${{ secrets.UPDATE_APP_NAME }}
+          UPDATE_ENABLED=${{ secrets.UPDATE_ENABLED }}
+          EOF
+
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@master
         with:
@@ -256,6 +266,16 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
+
+      - name: Create .env from secrets
+        shell: bash
+        run: |
+          cat > .env.production << EOF
+          SUBLINKS_API_URL=${{ secrets.SUBLINKS_API_URL }}
+          UPDATE_API_URL=${{ secrets.UPDATE_API_URL }}
+          UPDATE_APP_NAME=${{ secrets.UPDATE_APP_NAME }}
+          UPDATE_ENABLED=${{ secrets.UPDATE_ENABLED }}
+          EOF
 
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@master
@@ -407,6 +427,16 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
+
+      - name: Create .env from secrets
+        shell: bash
+        run: |
+          cat > .env.production << EOF
+          SUBLINKS_API_URL=${{ secrets.SUBLINKS_API_URL }}
+          UPDATE_API_URL=${{ secrets.UPDATE_API_URL }}
+          UPDATE_APP_NAME=${{ secrets.UPDATE_APP_NAME }}
+          UPDATE_ENABLED=${{ secrets.UPDATE_ENABLED }}
+          EOF
 
       - name: Add Rust Target
         run: rustup target add ${{ matrix.target }}

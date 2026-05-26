@@ -177,6 +177,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
+      - name: Create .env and sync version
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          cat > .env.production << EOF
+          APP_VERSION=$VERSION
+          SUBLINKS_API_URL=${{ secrets.SUBLINKS_API_URL }}
+          UPDATE_API_URL=${{ secrets.UPDATE_API_URL }}
+          UPDATE_APP_NAME=${{ secrets.UPDATE_APP_NAME }}
+          UPDATE_ENABLED=${{ secrets.UPDATE_ENABLED }}
+          EOF
+          node scripts/sync-version.mjs production
+
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@master
         with:
@@ -295,6 +308,19 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
+
+      - name: Create .env and sync version
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          cat > .env.production << EOF
+          APP_VERSION=$VERSION
+          SUBLINKS_API_URL=${{ secrets.SUBLINKS_API_URL }}
+          UPDATE_API_URL=${{ secrets.UPDATE_API_URL }}
+          UPDATE_APP_NAME=${{ secrets.UPDATE_APP_NAME }}
+          UPDATE_ENABLED=${{ secrets.UPDATE_ENABLED }}
+          EOF
+          node scripts/sync-version.mjs production
 
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@master
@@ -442,6 +468,19 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
+
+      - name: Create .env and sync version
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          cat > .env.production << EOF
+          APP_VERSION=$VERSION
+          SUBLINKS_API_URL=${{ secrets.SUBLINKS_API_URL }}
+          UPDATE_API_URL=${{ secrets.UPDATE_API_URL }}
+          UPDATE_APP_NAME=${{ secrets.UPDATE_APP_NAME }}
+          UPDATE_ENABLED=${{ secrets.UPDATE_ENABLED }}
+          EOF
+          node scripts/sync-version.mjs production
 
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@master
