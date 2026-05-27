@@ -24,6 +24,14 @@ use std::time::Duration;
 
 static CURRENT_SWITCHING_PROFILE: AtomicBool = AtomicBool::new(false);
 
+fn profile_import_error(err: &anyhow::Error) -> std::string::String {
+    if let Some(cause) = err.chain().find(|cause| cause.to_string().contains("TLS 1.0/1.1")) {
+        return cause.to_string();
+    }
+
+    format!("导入订阅失败: {err:#}")
+}
+
 #[tauri::command]
 pub async fn get_profiles() -> CmdResult<SharedDraft<IProfiles>> {
     logging!(debug, Type::Cmd, "获取配置文件列表");
@@ -76,7 +84,7 @@ pub async fn import_profile(
         }
         Err(e) => {
             logging!(error, Type::Cmd, "[导入订阅] 下载失败: {}", e);
-            return Err(format!("导入订阅失败: {}", e).into());
+            return Err(profile_import_error(&e).into());
         }
     };
 
@@ -347,9 +355,9 @@ pub async fn patch_profile(index: String, profile: PrfItem) -> CmdResult {
     // 如果更新间隔或允许自动更新变更，异步刷新定时器
     if should_refresh_timer {
         crate::process::AsyncHandler::spawn(move || async move {
-            logging!(info, Type::Timer, "定时器更新间隔已变更，正在刷新定时器...");
+            logging!(info, Type::Timer, "Timer update settings changed, refreshing timer...");
             if let Err(e) = crate::core::Timer::global().refresh().await {
-                logging!(error, Type::Timer, "刷新定时器失败: {}", e);
+                logging!(error, Type::Timer, "Failed to refresh timer: {}", e);
             } else {
                 // 刷新成功后发送自定义事件，不触发配置重载
                 crate::core::handle::Handle::notify_timer_updated(&index);

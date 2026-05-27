@@ -39,7 +39,10 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
-import { closeAllConnections } from "tauri-plugin-mihomo-api";
+import {
+  closeAllConnections,
+  selectNodeForGroup,
+} from "tauri-plugin-mihomo-api";
 
 import { BasePage, DialogRef } from "@/components/base";
 import { ProfileItem } from "@/components/profile/profile-item";
@@ -52,12 +55,13 @@ import { ConfigViewer } from "@/components/setting/mods/config-viewer";
 import { useListen } from "@/hooks/use-listen";
 import { useProfiles } from "@/hooks/use-profiles";
 import {
+  calcuProxies,
+  createProfile,
   deleteProfile,
   enhanceProfiles,
   getRuntimeLogs,
   reorderProfile,
   updateProfile,
-  createProfile,
 } from "@/services/cmds";
 import { showNotice } from "@/services/notice-service";
 import { queryClient } from "@/services/query-client";
@@ -176,9 +180,9 @@ const ProfilePage = () => {
 
   const {
     profiles = {},
-    activateSelected,
     patchProfiles,
     mutateProfiles,
+    activateSelected,
     error,
     isStale,
   } = useProfiles();
@@ -392,6 +396,22 @@ const ProfilePage = () => {
           return;
         }
 
+        // 选择所记忆的节点
+        const current = profiles.items?.find((e) => e.uid === profile);
+        for (const item of current?.selected ?? []) {
+          if (item.name && item.now) {
+            try {
+              await selectNodeForGroup(item.name, item.now);
+            } catch (err) {
+              debugLog(
+                `[Profile] 选择节点失败: ${item.name} -> ${item.now}`,
+                err,
+              );
+            }
+          }
+        }
+        queryClient.setQueryData(["getProxies"], await calcuProxies());
+
         // 完成切换
         await mutateLogs();
         closeAllConnections();
@@ -452,9 +472,9 @@ const ProfilePage = () => {
       profiles,
       patchProfiles,
       mutateLogs,
-      executeBackgroundTasks,
       handleProfileInterrupt,
       cleanupSwitchState,
+      executeBackgroundTasks,
     ],
   );
   const onSelect = async (current: string, force: boolean) => {
