@@ -27,6 +27,20 @@ pub async fn open_logs_dir() -> CmdResult<()> {
     open::that(log_dir).stringify_err()
 }
 
+/// 打开应用日志文件
+#[tauri::command]
+pub async fn open_app_log() -> CmdResult<()> {
+    let log_file = dirs::app_latest_log().stringify_err()?;
+    open::that(log_file).stringify_err()
+}
+
+/// 打开核心日志文件
+#[tauri::command]
+pub async fn open_core_log() -> CmdResult<()> {
+    let log_file = dirs::clash_latest_log().stringify_err()?;
+    open::that(log_file).stringify_err()
+}
+
 /// 打开网页链接
 #[tauri::command]
 pub fn open_web_url(url: String) -> CmdResult<()> {
