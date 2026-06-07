@@ -74,6 +74,18 @@
     "totpCode": "6 位验证码 (TOTP)",
     "backToChangePassword": "返回修改密码",
     "verify": "验证",
-    "login": "登录"
+    "login": "登录",
+    "browserLogin": "打开浏览器登录",
+    "passwordLogin": "账号密码登录",
+    "deviceAuthTitle": "浏览器登录",
+    "deviceAuthDesc": "点击下方按钮打开浏览器完成登录",
+    "deviceAuthOpenBrowser": "打开浏览器",
+    "deviceAuthWaiting": "等待浏览器登录...",
+    "deviceAuthExpired": "登录已超时，请重试",
+    "deviceAuthSuccess": "浏览器登录成功",
+    "deviceAuthManualCopy": "或手动复制链接到浏览器打开：",
+    "deviceAuthCopyLink": "复制链接",
+    "deviceAuthDenied": "您拒绝了登录授权",
+    "deviceAuthTooMany": "并发登录请求过多，请稍后再试"
   }
 }

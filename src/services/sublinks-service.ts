@@ -575,32 +575,41 @@ export const logoutSubLinks = async (
 
   try {
     const profilesData = await getProfiles();
+    const profileCount = profilesData?.items?.length || 0;
 
-    // First, deactivate current profile to prevent core restarts during deletion
-    // (deleteProfile only triggers update_config_forced when deleting the CURRENT profile)
-    if (profilesData?.items && profilesData.items.length > 0) {
-      // Step 1: Clear current profile (triggers one core restart)
-      await patchProfilesConfig({ current: undefined }).catch(() => {});
+    if (profileCount > 0) {
+      // Step 1: Clear config list (single core restart, fast)
+      // This makes the UI appear clean immediately
+      await patchProfilesConfig({
+        current: undefined,
+        items: [],
+      }).catch(() => {});
 
-      // Step 2: Delete all profile files (no core restarts since no current profile)
-      for (const item of profilesData.items) {
-        try {
-          await deleteProfile(item.uid);
-        } catch (e) {
-          console.error(
-            `[SubLinks Service] Failed to delete profile ${item.uid}`,
-            e,
-          );
-        }
-      }
       console.log(
-        `[SubLinks Service] Deleted ${profilesData.items.length} profile files`,
+        `[SubLinks Service] Cleared ${profileCount} profiles from config`,
+      );
+
+      // Step 2: Delete actual profile files in background (non-blocking)
+      // User can proceed to login page while files are being cleaned up
+      const itemsToDelete = profilesData!.items!;
+      setTimeout(async () => {
+        for (const item of itemsToDelete) {
+          try {
+            await deleteProfile(item.uid);
+          } catch {
+            // Ignore errors during cleanup
+          }
+        }
+        console.log(
+          "[SubLinks Service] Background profile file cleanup completed",
+        );
+      }, 0);
+    } else {
+      // No profiles, just clear the config
+      await patchProfilesConfig({ items: [], current: undefined }).catch(
+        () => {},
       );
     }
-
-    // Step 3: Clear the profile list
-    await patchProfilesConfig({ items: [], current: undefined });
-    console.log("[SubLinks Service] Cleared all profiles from config");
   } catch (err) {
     console.error("[SubLinks Service] Error during logout cleanup", err);
   }

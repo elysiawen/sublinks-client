@@ -252,7 +252,18 @@ export interface TranslationResources {
         autoSyncFailed: string;
         autoSyncSuccess: string;
         backToChangePassword: string;
+        browserLogin: string;
         cannotConnectServer: string;
+        deviceAuthCopyLink: string;
+        deviceAuthDenied: string;
+        deviceAuthDesc: string;
+        deviceAuthExpired: string;
+        deviceAuthManualCopy: string;
+        deviceAuthOpenBrowser: string;
+        deviceAuthSuccess: string;
+        deviceAuthTitle: string;
+        deviceAuthTooMany: string;
+        deviceAuthWaiting: string;
         loggedOutLocal: string;
         loggingIn: string;
         login: string;
@@ -263,6 +274,7 @@ export interface TranslationResources {
         logoutFailed: string;
         logoutSuccess: string;
         password: string;
+        passwordLogin: string;
         serverInvalidResponse: string;
         syncActivating: string;
         syncComplete: string;

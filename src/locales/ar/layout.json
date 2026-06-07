@@ -74,6 +74,18 @@
     "totpCode": "6-digit code (TOTP)",
     "backToChangePassword": "Back to change password",
     "verify": "Verify",
-    "login": "Login"
+    "login": "Login",
+    "browserLogin": "Open Browser Login",
+    "passwordLogin": "Username/Password Login",
+    "deviceAuthTitle": "Browser Login",
+    "deviceAuthDesc": "Click the button below to open browser and complete login",
+    "deviceAuthOpenBrowser": "Open Browser",
+    "deviceAuthWaiting": "Waiting for browser login...",
+    "deviceAuthExpired": "Login timed out, please try again",
+    "deviceAuthSuccess": "Browser login successful",
+    "deviceAuthManualCopy": "Or copy the link manually to open in browser:",
+    "deviceAuthCopyLink": "Copy Link",
+    "deviceAuthDenied": "You denied the login authorization",
+    "deviceAuthTooMany": "Too many login requests, please try again later"
   }
 }
