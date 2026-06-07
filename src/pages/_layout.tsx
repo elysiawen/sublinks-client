@@ -40,7 +40,6 @@ import { BaseErrorBoundary } from "@/components/base";
 import { LayoutItem } from "@/components/layout/layout-item";
 import { LayoutTraffic } from "@/components/layout/layout-traffic";
 import { NoticeManager } from "@/components/layout/notice-manager";
-import { UpdateButton } from "@/components/layout/update-button";
 import { WindowControls } from "@/components/layout/window-controller";
 import { SUBLINKS_CONFIG } from "@/configs/sublinks-config";
 import { useI18n } from "@/hooks/use-i18n";
@@ -136,17 +135,15 @@ const Layout = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isLogsPage = pathname === "/logs";
-  const logsPageMountedRef = useRef(false);
-  if (isLogsPage) logsPageMountedRef.current = true;
   const themeReady = useMemo(() => Boolean(theme), [theme]);
-
-  const [menuUnlocked, setMenuUnlocked] = useState(false);
-  const [menuContextPosition, setMenuContextPosition] =
-    useState<MenuContextPosition | null>(null);
 
   // Logout Dialog State
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+
+  const [menuUnlocked, setMenuUnlocked] = useState(false);
+  const [menuContextPosition, setMenuContextPosition] =
+    useState<MenuContextPosition | null>(null);
 
   const windowControlsRef = useRef<any>(null);
   const { decorated } = useWindowDecorations();
@@ -165,8 +162,7 @@ const Layout = () => {
   const handleMenuOrderOptimisticUpdate = useCallback(
     (order: string[]) => {
       mutateVerge(
-        (prev: IVergeConfig | undefined) =>
-          prev ? { ...prev, menu_order: order } : prev,
+        (prev) => (prev ? { ...prev, menu_order: order } : prev),
         false,
       );
     },
@@ -322,10 +318,9 @@ const Layout = () => {
     );
   }, [menuOrder, sidebarVisibility]);
 
-  // Auth State - Use state to support seamless login/logout
+  // Auth State
   const [token, setToken] = useState<string | null>(() => {
     const t = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
-    // Handle "undefined" string from previous bugs
     if (t === "undefined") {
       localStorage.removeItem(SUBLINKS_CONFIG.STORAGE_KEYS.TOKEN);
       return null;
@@ -343,7 +338,7 @@ const Layout = () => {
       window.removeEventListener("sublinks-auth-change", handleAuthChange);
   }, []);
 
-  // Sync user object (optional, mostly for display if needed)
+  // User state
   const [user, setUser] = useState<any>(() => {
     const userStr = localStorage.getItem(SUBLINKS_CONFIG.STORAGE_KEYS.USER);
     try {
@@ -367,7 +362,7 @@ const Layout = () => {
       window.removeEventListener("sublinks-auth-change", handleAuthChange);
   }, []);
 
-  // Cache avatar URL to avoid localStorage.getItem during render
+  // Cache avatar URL
   const avatarUrl = useMemo(() => {
     if (!user?.avatar) return undefined;
     return (
@@ -384,26 +379,21 @@ const Layout = () => {
   const userInfoFetchedRef = useRef(false);
 
   useEffect(() => {
-    // Check if auto-sync is enabled in settings
     const autoSyncEnabled = verge?.sublinks_auto_sync ?? false;
 
     if (token) {
-      // 仅当内核就绪（proxies 不为空）且未获取过用户信息时，才发起请求
       if (proxies && !userInfoFetchedRef.current) {
         userInfoFetchedRef.current = true;
         fetchSubLinksUserInfo();
       }
 
-      // Skip auto-sync if already attempted or if login sync is in progress
       if (!syncAttemptedRef.current && autoSyncEnabled && !isSyncInProgress()) {
         syncAttemptedRef.current = true;
 
-        // Clear any existing timer
         if (syncTimerRef.current) {
           clearTimeout(syncTimerRef.current);
         }
 
-        // Delay sync to allow core and app to stabilize
         syncTimerRef.current = setTimeout(() => {
           syncSubLinksSubscriptions()
             .then(() => {
@@ -424,9 +414,7 @@ const Layout = () => {
       }
     }
 
-    // Cleanup function - but don't clear the timer if sync was already scheduled
     return () => {
-      // Only clear if we haven't started syncing yet
       if (syncTimerRef.current && !syncAttemptedRef.current) {
         clearTimeout(syncTimerRef.current);
         syncTimerRef.current = null;
@@ -434,33 +422,7 @@ const Layout = () => {
     };
   }, [token, verge?.sublinks_auto_sync, proxies, t]);
 
-  if (!themeReady) {
-    return (
-      <div
-        style={{
-          width: "100vw",
-          height: "100vh",
-          background: mode === "light" ? "#fff" : "#181a1b",
-          transition: "background 0.2s",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: mode === "light" ? "#333" : "#fff",
-        }}
-      ></div>
-    );
-  }
-
-  // Auth gating - show login page if no token
-  if (!token) {
-    return (
-      <ThemeProvider theme={theme}>
-        <NoticeManager position={verge?.notice_position} />
-        <LoginPage />
-      </ThemeProvider>
-    );
-  }
-
+  // Logout handlers
   const handleLogoutClick = () => {
     setLogoutDialogOpen(true);
   };
@@ -494,8 +456,36 @@ const Layout = () => {
     }
   };
 
+  if (!themeReady) {
+    return (
+      <div
+        style={{
+          width: "100vw",
+          height: "100vh",
+          background: mode === "light" ? "#fff" : "#181a1b",
+          transition: "background 0.2s",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: mode === "light" ? "#333" : "#fff",
+        }}
+      ></div>
+    );
+  }
+
+  // Auth gating - show login page if no token
+  if (!token) {
+    return (
+      <ThemeProvider theme={theme}>
+        <NoticeManager position={verge?.notice_position} />
+        <LoginPage />
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider theme={theme}>
+      {/* 左侧底部窗口控制按钮 */}
       <NoticeManager position={verge?.notice_position} />
       <div
         style={{
@@ -580,7 +570,6 @@ const Layout = () => {
                   </Typography>
                 )}
               </div>
-              <UpdateButton className="the-newbtn" />
             </div>
 
             {menuUnlocked && (
@@ -783,7 +772,7 @@ const Layout = () => {
               <BaseErrorBoundary>
                 <Outlet />
               </BaseErrorBoundary>
-              {logsPageMountedRef.current && (
+              {isLogsPage && (
                 <div
                   style={{
                     position: "absolute",
@@ -791,7 +780,6 @@ const Layout = () => {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    display: isLogsPage ? undefined : "none",
                   }}
                 >
                   <LogsPage />
@@ -801,7 +789,6 @@ const Layout = () => {
           </div>
         </div>
       </Paper>
-
       {/* Logout Confirmation Dialog */}
       <Dialog
         open={logoutDialogOpen}

@@ -64,7 +64,7 @@ Supports Windows (x64/x86), Linux (x64/arm64) and macOS 11+ (intel/apple).
   - Aesthetic "Pill-style" notification bar with `BackdropFilter` blur and smooth Entrance animations.
   - Transparent error reporting: clearly distinguishes between "Network Connection Failure" and "Already Latest Version" during manual checks.
   - Granular control over auto-update logic in Advanced and Miscellaneous settings.
-- **Continuous Improvement**: Successfully merged the latest `upstream/dev` branch for top-tier stability and kernel performance.
+- **Continuous Improvement**: Regularly synced with the latest `upstream/dev` branch (last sync: 2026-06-07) for top-tier stability and kernel performance.
 - **Modern Tech Stack**: Built with performance-oriented **Rust** and the latest **Tauri v2** framework.
 - **Clean Aesthetic**: Simplified UI layouts, refined iconography, and reduced configuration clutter.
 
@@ -74,7 +74,7 @@ Supports Windows (x64/x86), Linux (x64/arm64) and macOS 11+ (intel/apple).
 
 ### 1. 环境准备
 
-本项目需要 **Rust** (1.75+) 和 **Node.js** (18+) 环境。
+本项目需要 **Rust** (1.95+) 和 **Node.js** (18+) 环境。
 
 - **Windows 用户**: 推荐使用 MSVC 工具链，并安装 GNU `patch` 工具。
 - **macOS/Linux 用户**: 确保已安装必要的编译依赖（如 `webkit2gtk`, `libayatana-appindicator` 等）。
@@ -128,7 +128,7 @@ pnpm run prebuild
 
 ### 1. Prerequisites
 
-- **Rust** (1.75+)
+- **Rust** (1.95+)
 - **Node.js** (18+)
 - **pnpm** (via Corepack)
 
@@ -163,7 +163,7 @@ Customize the client behavior by editing `.env`. The following prefixes are expo
 ### 5. Architecture Notes
 
 - **App ID**: Hardcoded as `com.sublinks.client` in Tauri configs and `sublinks` in Rust utils.
-- **Upstream Sync**: This repo periodically merges from `clash-verge-rev/clash-verge-rev` dev branch.
+- **Upstream Sync**: This repo periodically merges from `clash-verge-rev/clash-verge-rev` dev branch (last sync: 2026-06-07).
 
 ## 致谢
 

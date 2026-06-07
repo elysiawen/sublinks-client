@@ -25,7 +25,7 @@ import {
 import { LoadingButton } from "@mui/lab";
 import { Box, Button, Divider, Grid, IconButton, Stack } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { listen, TauriEvent } from "@tauri-apps/api/event";
+import { TauriEvent } from "@tauri-apps/api/event";
 import { readTextFile } from "@tauri-apps/plugin-fs";
 import { useLockFn } from "ahooks";
 import { throttle } from "lodash-es";
@@ -59,15 +59,23 @@ import {
   createProfile,
   deleteProfile,
   enhanceProfiles,
+  //restartCore,
   getRuntimeLogs,
   reorderProfile,
   updateProfile,
 } from "@/services/cmds";
 import { showNotice } from "@/services/notice-service";
 import { queryClient } from "@/services/query-client";
-import { useSetLoadingCache, useThemeMode } from "@/services/states";
+import {
+  useLoadingCache,
+  useSetLoadingCache,
+  useThemeMode,
+} from "@/services/states";
 import { syncSubLinksSubscriptions } from "@/services/sublinks-service";
 import { debugLog } from "@/utils/debug";
+
+// 与 src-tauri/src/main.rs 的 worker_limit 上限(8)保持一致，避免前后端更新风暴不对齐
+const PROFILE_UPDATE_WORKER_LIMIT = 8;
 
 // 记录profile切换状态
 const debugProfileSwitch = (action: string, profile: string, extra?: any) => {
@@ -108,7 +116,6 @@ const ProfilePage = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { addListener } = useListen();
-  const [syncing, setSyncing] = useState(false);
   const [activatings, setActivatings] = useState<string[]>([]);
 
   // Batch selection states
@@ -182,7 +189,6 @@ const ProfilePage = () => {
     profiles = {},
     patchProfiles,
     mutateProfiles,
-    activateSelected,
     error,
     isStale,
   } = useProfiles();
@@ -280,6 +286,7 @@ const ProfilePage = () => {
     return [...new Set([profiles.current ?? ""])].filter(Boolean);
   };
 
+  const [syncing, setSyncing] = useState(false);
   const onSync = async () => {
     setSyncing(true);
     await syncSubLinksSubscriptions();
@@ -296,34 +303,6 @@ const ProfilePage = () => {
       }
     }
   };
-
-  const executeBackgroundTasks = useCallback(
-    async (
-      profile: string,
-      sequence: number,
-      abortController: AbortController,
-    ) => {
-      try {
-        if (
-          sequence === requestSequenceRef.current &&
-          switchingProfileRef.current === profile &&
-          !abortController.signal.aborted
-        ) {
-          await activateSelected(profiles);
-          debugLog(`[Profile] 后台处理完成，序列号: ${sequence}`);
-        } else {
-          debugProfileSwitch(
-            "BACKGROUND_TASK_SKIPPED",
-            profile,
-            `序列号过期或被中断: ${sequence} vs ${requestSequenceRef.current}`,
-          );
-        }
-      } catch (err: any) {
-        console.warn("Failed to activate selected proxies:", err);
-      }
-    },
-    [activateSelected, profiles],
-  );
 
   const activateProfile = useCallback(
     async (profile: string, notifySuccess: boolean) => {
@@ -426,17 +405,6 @@ const ProfilePage = () => {
         debugLog(
           `[Profile] 切换到 ${profile} 完成，序列号: ${currentSequence}，开始后台处理`,
         );
-
-        // 延迟执行后台任务
-        setTimeout(
-          () =>
-            executeBackgroundTasks(
-              profile,
-              currentSequence,
-              currentAbortController,
-            ),
-          50,
-        );
       } catch (err: any) {
         if (pendingRequestRef.current) {
           pendingRequestRef.current = null;
@@ -474,7 +442,6 @@ const ProfilePage = () => {
       mutateLogs,
       handleProfileInterrupt,
       cleanupSwitchState,
-      executeBackgroundTasks,
     ],
   );
   const onSelect = async (current: string, force: boolean) => {
@@ -549,34 +516,68 @@ const ProfilePage = () => {
   });
 
   // 更新所有订阅
+  const loadingCache = useLoadingCache();
   const setLoadingCache = useSetLoadingCache();
-  const onUpdateAll = useLockFn(async () => {
-    const throttleMutate = throttle(mutateProfiles, 2000, {
-      trailing: true,
-    });
-    const updateOne = async (uid: string) => {
-      try {
-        await updateProfile(uid);
-        throttleMutate();
-      } catch (err: any) {
-        console.error(`更新订阅 ${uid} 失败:`, err);
-      } finally {
-        setLoadingCache((cache) => ({ ...cache, [uid]: false }));
-      }
-    };
-
-    return new Promise((resolve) => {
+  const setLoadingProfiles = useCallback(
+    (uids: string[], loading: boolean) => {
       setLoadingCache((cache) => {
-        // 获取没有正在更新的订阅
-        const items = profileItems.filter(
-          (e) => e.type === "remote" && !cache[e.uid],
-        );
-        const change = Object.fromEntries(items.map((e) => [e.uid, true]));
-
-        Promise.allSettled(items.map((e) => updateOne(e.uid))).then(resolve);
-        return { ...cache, ...change };
+        const next = new Set(cache);
+        for (const uid of uids) {
+          if (loading) {
+            next.add(uid);
+          } else {
+            next.delete(uid);
+          }
+        }
+        return next;
       });
-    });
+    },
+    [setLoadingCache],
+  );
+  const runProfileUpdates = useCallback(
+    async (uids: string[]) => {
+      if (uids.length === 0) return;
+
+      const throttleMutate = throttle(mutateProfiles, 2000, {
+        trailing: true,
+      });
+      let cursor = 0;
+
+      const updateOne = async (uid: string) => {
+        try {
+          await updateProfile(uid);
+          throttleMutate();
+        } catch (err: any) {
+          console.error(`更新订阅 ${uid} 失败:`, err);
+        }
+      };
+
+      const worker = async () => {
+        while (cursor < uids.length) {
+          const uid = uids[cursor++];
+          await updateOne(uid);
+        }
+      };
+
+      try {
+        const active = Math.min(PROFILE_UPDATE_WORKER_LIMIT, uids.length);
+        await Promise.allSettled(Array.from({ length: active }, worker));
+      } finally {
+        setLoadingProfiles(uids, false);
+        // 避免长时间批量更新后列表数据过晚刷新
+        void mutateProfiles();
+      }
+    },
+    [mutateProfiles, setLoadingProfiles],
+  );
+  const onUpdateAll = useLockFn(async () => {
+    const items = profileItems.filter((e) => e.type === "remote");
+    const target = items
+      .map((item) => item.uid)
+      .filter((uid) => !loadingCache.has(uid));
+
+    setLoadingProfiles(target, true);
+    await runProfileUpdates(target);
   });
 
   // Batch selection functions
@@ -667,59 +668,6 @@ const ProfilePage = () => {
     ? "rgba(0, 0, 0, 0.06)"
     : "rgba(255, 255, 255, 0.06)";
 
-  // 监听后端配置变更
-  useEffect(() => {
-    let unlistenPromise: Promise<() => void> | undefined;
-    let lastProfileId: string | null = null;
-    let lastUpdateTime = 0;
-    const debounceDelay = 200;
-
-    let refreshTimer: number | null = null;
-
-    const setupListener = async () => {
-      unlistenPromise = listen<string>("profile-changed", (event) => {
-        const newProfileId = event.payload;
-        const now = Date.now();
-
-        debugLog(`[Profile] 收到配置变更事件: ${newProfileId}`);
-
-        if (
-          lastProfileId === newProfileId &&
-          now - lastUpdateTime < debounceDelay
-        ) {
-          debugLog(`[Profile] 重复事件被防抖，跳过`);
-          return;
-        }
-
-        lastProfileId = newProfileId;
-        lastUpdateTime = now;
-
-        debugLog(`[Profile] 执行配置数据刷新`);
-
-        if (refreshTimer !== null) {
-          window.clearTimeout(refreshTimer);
-        }
-
-        // 使用异步调度避免阻塞事件处理
-        refreshTimer = window.setTimeout(() => {
-          mutateProfiles().catch((error) => {
-            console.error("[Profile] 配置数据刷新失败:", error);
-          });
-          refreshTimer = null;
-        }, 0);
-      });
-    };
-
-    setupListener();
-
-    return () => {
-      if (refreshTimer !== null) {
-        window.clearTimeout(refreshTimer);
-      }
-      unlistenPromise?.then((unlisten) => unlisten()).catch(console.error);
-    };
-  }, [mutateProfiles]);
-
   // 组件卸载时清理中断控制器
   useEffect(() => {
     return () => {
@@ -747,6 +695,15 @@ const ProfilePage = () => {
                 onClick={toggleBatchMode}
               >
                 <CheckBoxOutlineBlankRounded />
+              </IconButton>
+
+              <IconButton
+                size="small"
+                color="inherit"
+                title={t("profiles.page.actions.updateAll")}
+                onClick={onUpdateAll}
+              >
+                <RefreshRounded />
               </IconButton>
 
               <IconButton

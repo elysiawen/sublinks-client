@@ -1,4 +1,4 @@
-- **Mihomo(Meta) 内核升级至 v1.19.21**
+- **Mihomo(Meta) 内核升级至 v1.19.27**
 
 ## v2.4.7
 
@@ -41,18 +41,12 @@
 - 修复 gzip 压缩订阅响应被当作无效 YAML 导致导入失败的问题
 - 修复订阅 URL 使用空密码 Basic Auth 时未发送认证信息的问题
 - Linux 托盘可能与其他 tauri 程序托盘冲突导致图标异常
+- 修复前端连接页面导致的内存泄漏
 
 <details>
 <summary><strong> ✨ 新增功能 </strong></summary>
 
 - 增加 TrustTunnel, OpenVPN, Tailscale, GostRelay 节点显示支持
-
-</details>
-
-<details>
-<summary><strong> 🧹 移除变更 </strong></summary>
-
-- 移除订阅下载 TLS 校验失败后的静态根证书回退重试
 
 </details>
 
