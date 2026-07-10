@@ -26,24 +26,41 @@ import {
   MenuItem,
   Paper,
   ThemeProvider,
+  ThemeProvider,
   Typography,
 } from "@mui/material";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import type { CSSProperties } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
 
+import iconDark from "@/assets/image/icon_dark.svg?react";
+import iconLight from "@/assets/image/icon_light.svg?react";
 import logoIcon from "@/assets/image/logo.ico";
+import LogoSvg from "@/assets/image/logo.svg?react";
 import { BaseErrorBoundary } from "@/components/base";
 import { LayoutItem } from "@/components/layout/layout-item";
 import { LayoutTraffic } from "@/components/layout/layout-traffic";
 import { NoticeManager } from "@/components/layout/notice-manager";
-import { WindowControls } from "@/components/layout/window-controller";
+import { UpdateButton } from "@/components/layout/update-button";
+import {
+  WindowControls,
+  WindowResizeHandles,
+} from "@/components/layout/window-controller";
 import { SUBLINKS_CONFIG } from "@/configs/sublinks-config";
 import { useI18n } from "@/hooks/use-i18n";
 import { useVerge } from "@/hooks/use-verge";
+import { useVisibility } from "@/hooks/use-visibility";
 import { useWindowDecorations } from "@/hooks/use-window";
 import { useAppData } from "@/providers/app-data-context";
 import { showNotice } from "@/services/notice-service";
@@ -63,14 +80,15 @@ import {
   useNavMenuOrder,
 } from "./_layout/hooks";
 import { handleNoticeMessage } from "./_layout/utils";
-import { navItems } from "./_routers";
+import { navItems, preloadLogsPage, preloadNavigationRoutes } from "./_routers";
 import LoginPage from "./login";
-import LogsPage from "./logs";
 
 import "dayjs/locale/ru";
 import "dayjs/locale/zh-cn";
 
 export const portableFlag = false;
+
+const LogsPage = lazy(() => preloadLogsPage());
 
 type NavItem = (typeof navItems)[number];
 
@@ -106,6 +124,7 @@ const SortableNavMenuItem = ({ item, label }: SortableNavMenuItemProps) => {
     <LayoutItem
       to={item.path}
       icon={item.icon}
+      onPreload={item.preload}
       sortable={{
         setNodeRef,
         attributes,
@@ -135,6 +154,7 @@ const Layout = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isLogsPage = pathname === "/logs";
+  const pageVisible = useVisibility();
   const themeReady = useMemo(() => Boolean(theme), [theme]);
 
   // Logout Dialog State
@@ -223,7 +243,7 @@ const Layout = () => {
 
   const customTitlebar = useMemo(
     () =>
-      !decorated ? (
+      decorated === false ? (
         <div className="the_titlebar">
           <Typography
             variant="caption"
@@ -247,6 +267,22 @@ const Layout = () => {
   );
 
   useLoadingOverlay(themeReady);
+
+  useEffect(() => {
+    if (!themeReady || !pageVisible) {
+      return
+    }
+
+    const controller = new AbortController()
+    const timerId = window.setTimeout(() => {
+      void preloadNavigationRoutes(controller.signal)
+    }, 2000)
+
+    return () => {
+      controller.abort()
+      window.clearTimeout(timerId)
+    }
+  }, [themeReady, pageVisible])
 
   const handleNotice = useCallback(
     (payload: [string, string]) => {
@@ -531,6 +567,8 @@ const Layout = () => {
             : {},
         ]}
       >
+        {decorated === false && <WindowResizeHandles />}
+
         {/* Custom titlebar - rendered only when decorated is false, memoized for performance */}
         {customTitlebar}
 
@@ -630,7 +668,12 @@ const Layout = () => {
                     return null;
                   }
                   return (
-                    <LayoutItem key={item.path} to={item.path} icon={item.icon}>
+                    <LayoutItem
+                      key={item.path}
+                      to={item.path}
+                      icon={item.icon}
+                      onPreload={item.preload}
+                    >
                       {t(item.label)}
                     </LayoutItem>
                   );
@@ -782,7 +825,9 @@ const Layout = () => {
                     bottom: 0,
                   }}
                 >
-                  <LogsPage />
+                  <Suspense fallback={null}>
+                    <LogsPage />
+                  </Suspense>
                 </div>
               )}
             </div>

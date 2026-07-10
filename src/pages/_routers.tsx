@@ -3,10 +3,12 @@ import ForkRightRoundedIcon from "@mui/icons-material/ForkRightRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import InfoOutlined from "@mui/icons-material/InfoOutlined";
 import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
+import LockOpenRoundedIcon from "@mui/icons-material/LockOpenRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import SpeedOutlined from "@mui/icons-material/SpeedOutlined";
 import SubjectRoundedIcon from "@mui/icons-material/SubjectRounded";
 import WifiRoundedIcon from "@mui/icons-material/WifiRounded";
+import { lazy, Suspense, type ComponentType } from "react";
 import { createBrowserRouter, RouteObject } from "react-router";
 
 import ConnectionsSvg from "@/assets/image/itemicon/connections.svg?react";
@@ -16,17 +18,96 @@ import ProfilesSvg from "@/assets/image/itemicon/profiles.svg?react";
 import ProxiesSvg from "@/assets/image/itemicon/proxies.svg?react";
 import RulesSvg from "@/assets/image/itemicon/rules.svg?react";
 import SettingsSvg from "@/assets/image/itemicon/settings.svg?react";
+import UnlockSvg from "@/assets/image/itemicon/unlock.svg?react";
+import { ensureLanguageSections } from "@/services/i18n";
 
 import Layout from "./_layout";
 import AboutPage from "./about";
-import ConnectionsPage from "./connections";
 import HomePage from "./home";
 import MiniPage from "./mini";
-import ProfilesPage from "./profiles";
-import ProxiesPage from "./proxies";
-import RulesPage from "./rules";
-import SettingsPage from "./settings";
 import TestPage from "./test";
+
+const waitForWarmupIdle = (signal: AbortSignal) =>
+  new Promise<void>((resolve) => {
+    let idleId: number | undefined;
+    let timeoutId: number | undefined;
+
+    const cleanup = () => {
+      signal.removeEventListener("abort", finish);
+      if (idleId !== undefined) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
+      }
+    };
+
+    const finish = () => {
+      cleanup();
+      resolve();
+    };
+
+    if (signal.aborted) {
+      resolve();
+      return;
+    }
+
+    signal.addEventListener("abort", finish, { once: true });
+
+    if (window.requestIdleCallback) {
+      idleId = window.requestIdleCallback(finish, { timeout: 500 });
+    } else {
+      timeoutId = window.setTimeout(finish, 120);
+    }
+  });
+
+const createRoutePreload = (
+  load: () => Promise<{ default: ComponentType }>,
+  sections?: string | readonly string[],
+) => {
+  let componentPromise: Promise<{ default: ComponentType }> | undefined;
+
+  const loadComponent = () => {
+    componentPromise ??= load().catch((error) => {
+      componentPromise = undefined;
+      throw error;
+    });
+
+    return componentPromise;
+  };
+
+  if (!sections) {
+    return loadComponent;
+  }
+
+  return async () => {
+    const [component] = await Promise.all([
+      loadComponent(),
+      ensureLanguageSections(sections),
+    ]);
+    return component;
+  };
+};
+
+const createLazyRoute = (
+  load: () => Promise<{ default: ComponentType }>,
+  sections?: string | readonly string[],
+) => {
+  const preload = createRoutePreload(load, sections);
+  const Component = lazy(preload);
+  const LazyRoute = () => (
+    <Suspense fallback={null}>
+      <Component />
+    </Suspense>
+  );
+
+  return { Component: LazyRoute, preload };
+};
+
+export const preloadLogsPage = createRoutePreload(
+  () => import("./logs"),
+  "logs",
+);
 
 export const navItems = [
   {
@@ -39,13 +120,13 @@ export const navItems = [
     label: "layout.components.navigation.tabs.proxies",
     path: "/proxies",
     icon: [<WifiRoundedIcon key="mui" />, <ProxiesSvg key="svg" />],
-    Component: ProxiesPage,
+    ...createLazyRoute(() => import("./proxies")),
   },
   {
     label: "layout.components.navigation.tabs.profiles",
     path: "/profile",
     icon: [<DnsRoundedIcon key="mui" />, <ProfilesSvg key="svg" />],
-    Component: ProfilesPage,
+    ...createLazyRoute(() => import("./profiles"), "rules"),
   },
   {
     label: "layout.components.navigation.tabs.test",
@@ -57,25 +138,32 @@ export const navItems = [
     label: "layout.components.navigation.tabs.connections",
     path: "/connections",
     icon: [<LanguageRoundedIcon key="mui" />, <ConnectionsSvg key="svg" />],
-    Component: ConnectionsPage,
+    ...createLazyRoute(() => import("./connections"), "connections"),
   },
   {
     label: "layout.components.navigation.tabs.rules",
     path: "/rules",
     icon: [<ForkRightRoundedIcon key="mui" />, <RulesSvg key="svg" />],
-    Component: RulesPage,
+    ...createLazyRoute(() => import("./rules"), "rules"),
   },
   {
     label: "layout.components.navigation.tabs.logs",
     path: "/logs",
     icon: [<SubjectRoundedIcon key="mui" />, <LogsSvg key="svg" />],
     Component: () => null /* LogsPage rendered in Layout only on /logs route */,
+    preload: preloadLogsPage,
+  },
+  {
+    label: "layout.components.navigation.tabs.unlock",
+    path: "/unlock",
+    icon: [<LockOpenRoundedIcon key="mui" />, <UnlockSvg key="svg" />],
+    ...createLazyRoute(() => import("./unlock")),
   },
   {
     label: "layout.components.navigation.tabs.settings",
     path: "/settings",
     icon: [<SettingsRoundedIcon key="mui" />, <SettingsSvg key="svg" />],
-    Component: SettingsPage,
+    ...createLazyRoute(() => import("./settings")),
   },
   {
     label: "layout.components.navigation.tabs.about",
@@ -84,6 +172,38 @@ export const navItems = [
     Component: AboutPage,
   },
 ];
+
+const navigationWarmupPriority = ["/connections", "/logs", "/rules"];
+
+const navigationWarmupItems = [...navItems].sort((left, right) => {
+  const leftIndex = navigationWarmupPriority.indexOf(left.path);
+  const rightIndex = navigationWarmupPriority.indexOf(right.path);
+  const leftRank =
+    leftIndex === -1 ? navigationWarmupPriority.length : leftIndex;
+  const rightRank =
+    rightIndex === -1 ? navigationWarmupPriority.length : rightIndex;
+
+  return leftRank - rightRank;
+});
+
+export const preloadNavigationRoutes = async (signal: AbortSignal) => {
+  for (const item of navigationWarmupItems) {
+    if (signal.aborted) {
+      return;
+    }
+    const preload = "preload" in item ? item.preload : undefined;
+    if (!preload) {
+      continue;
+    }
+
+    await waitForWarmupIdle(signal);
+    if (signal.aborted) {
+      return;
+    }
+
+    await preload().catch(() => {});
+  }
+};
 
 export const router = createBrowserRouter([
   {

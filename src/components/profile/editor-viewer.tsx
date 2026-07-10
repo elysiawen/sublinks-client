@@ -3,6 +3,7 @@ import {
   ContentPasteRounded,
   FormatPaintRounded,
   OpenInFullRounded,
+  RestartAltRounded,
 } from "@mui/icons-material";
 import {
   Button,
@@ -47,6 +48,7 @@ export interface EditorViewerProps {
   saveDisabled?: boolean;
   onChange?: (value: string) => void;
   onSave?: () => void | Promise<void>;
+  onResetToDefault?: () => void;
   onClose: () => void;
   onValidate?: (markers: MonacoMarker[]) => void;
 }
@@ -63,6 +65,7 @@ export const EditorViewer = ({
   saveDisabled = false,
   onChange,
   onSave,
+  onResetToDefault,
   onClose,
   onValidate,
 }: EditorViewerProps) => {
@@ -304,6 +307,17 @@ export const EditorViewer = ({
       </DialogContent>
 
       <DialogActions>
+        {!readOnly && onResetToDefault && (
+          <Button
+            onClick={onResetToDefault}
+            variant="outlined"
+            color="warning"
+            startIcon={<RestartAltRounded />}
+            disabled={loading}
+          >
+            {t('shared.actions.resetToDefault')}
+          </Button>
+        )}
         <Button onClick={handleClose} variant="outlined">
           {t(readOnly ? "shared.actions.close" : "shared.actions.cancel")}
         </Button>

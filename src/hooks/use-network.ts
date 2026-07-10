@@ -1,6 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-
-import { getNetworkInterfacesInfo } from "@/services/cmds";
+import { getNetworkInterfacesInfo } from '@/services/cmds'
+import { useQuery } from '@/services/query-client'
 
 export const useNetworkInterfaces = () => {
   const {
@@ -10,17 +9,17 @@ export const useNetworkInterfaces = () => {
     isLoading,
     refetch: mutate,
   } = useQuery({
-    queryKey: ["getNetworkInterfacesInfo"],
+    queryKey: ['getNetworkInterfacesInfo'],
     queryFn: getNetworkInterfacesInfo,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     placeholderData: [],
-  });
+  })
 
   return {
     networkInterfaces: data || [],
     loading: isLoading || isFetching,
     error,
     mutate,
-  };
-};
+  }
+}

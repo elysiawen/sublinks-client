@@ -163,7 +163,7 @@ Customize the client behavior by editing `.env`. The following prefixes are expo
 ### 5. Architecture Notes
 
 - **App ID**: Hardcoded as `com.sublinks.client` in Tauri configs and `sublinks` in Rust utils.
-- **Upstream Sync**: This repo periodically merges from `clash-verge-rev/clash-verge-rev` dev branch (last sync: 2026-06-07).
+- **Upstream Sync**: This repo periodically merges from `clash-verge-rev/clash-verge-rev` dev branch.
 
 ## 致谢
 
