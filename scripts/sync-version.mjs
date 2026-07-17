@@ -28,6 +28,7 @@ async function syncVersion() {
 
     const envPath = path.join(cwd, envFile)
     const tauriConfPath = path.join(cwd, 'src-tauri', 'tauri.conf.json')
+    const packageJsonPath = path.join(cwd, 'package.json')
 
     if (!fs.existsSync(envPath) || !fs.existsSync(tauriConfPath)) {
       log_debug(`Version sync skipped: missing ${envFile} or tauri.conf.json`)
@@ -45,15 +46,25 @@ async function syncVersion() {
 
     // Read and update tauri.conf.json
     const tauriConf = JSON.parse(await fsp.readFile(tauriConfPath, 'utf-8'))
-    if (tauriConf.version === appVersion) {
-      log_info(`Version already in sync: ${appVersion} (from ${envFile})`)
-      return
+    const oldTauriVersion = tauriConf.version
+    if (oldTauriVersion !== appVersion) {
+      tauriConf.version = appVersion
+      await fsp.writeFile(tauriConfPath, JSON.stringify(tauriConf, null, 2) + '\n')
+      log_success(`tauri.conf.json version synced: ${oldTauriVersion} → ${appVersion}`)
     }
 
-    const oldVersion = tauriConf.version
-    tauriConf.version = appVersion
-    await fsp.writeFile(tauriConfPath, JSON.stringify(tauriConf, null, 2) + '\n')
-    log_success(`Version synced: ${oldVersion} → ${appVersion} (from ${envFile})`)
+    // Read and update package.json
+    if (fs.existsSync(packageJsonPath)) {
+      const packageJson = JSON.parse(await fsp.readFile(packageJsonPath, 'utf-8'))
+      const oldPkgVersion = packageJson.version
+      if (oldPkgVersion !== appVersion) {
+        packageJson.version = appVersion
+        await fsp.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n')
+        log_success(`package.json version synced: ${oldPkgVersion} → ${appVersion}`)
+      }
+    }
+
+    log_info(`All versions in sync: ${appVersion} (from ${envFile})`)
   } catch (err) {
     log_error('Version sync failed:', err.message)
   }
