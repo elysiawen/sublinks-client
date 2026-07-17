@@ -54,6 +54,33 @@ const MiniPage = () => {
     queryFn: getVergeConfig,
   });
 
+  const updateWindowSize = useCallback(() => {
+    if (!paperRef.current) return;
+    const trafficRect = paperRef.current.getBoundingClientRect();
+    let width = trafficRect.width;
+    let height = trafficRect.height;
+
+    if (menuRef.current) {
+      const menuRect = menuRef.current.getBoundingClientRect();
+      width = Math.max(width, menuRect.right + 24);
+      height = Math.max(height, menuRect.bottom + 24);
+    }
+
+    if (hoverPanelRef.current) {
+      const hoverRect = hoverPanelRef.current.getBoundingClientRect();
+      width = Math.max(width, hoverRect.right + 32);
+      height = Math.max(height, hoverRect.bottom + 32);
+    }
+
+    width = Math.ceil(width);
+    height = Math.ceil(height);
+
+    if (width > 0 && height > 0) {
+      const window = getCurrentWebviewWindow();
+      window.setSize(new LogicalSize(width, height)).catch(console.error);
+    }
+  }, []);
+
   useEffect(() => {
     hideInitialOverlay();
 
@@ -98,33 +125,6 @@ const MiniPage = () => {
       clearTimeout(saveTimeout);
     };
   }, [updateWindowSize]);
-
-  const updateWindowSize = useCallback(() => {
-    if (!paperRef.current) return;
-    const trafficRect = paperRef.current.getBoundingClientRect();
-    let width = trafficRect.width;
-    let height = trafficRect.height;
-
-    if (menuRef.current) {
-      const menuRect = menuRef.current.getBoundingClientRect();
-      width = Math.max(width, menuRect.right + 24);
-      height = Math.max(height, menuRect.bottom + 24);
-    }
-
-    if (hoverPanelRef.current) {
-      const hoverRect = hoverPanelRef.current.getBoundingClientRect();
-      width = Math.max(width, hoverRect.right + 32);
-      height = Math.max(height, hoverRect.bottom + 32);
-    }
-
-    width = Math.ceil(width);
-    height = Math.ceil(height);
-
-    if (width > 0 && height > 0) {
-      const window = getCurrentWebviewWindow();
-      window.setSize(new LogicalSize(width, height)).catch(console.error);
-    }
-  }, []);
 
   // Dynamically resize the window to fit the content
   useEffect(() => {
