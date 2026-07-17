@@ -578,32 +578,22 @@ export const logoutSubLinks = async (
     const profileCount = profilesData?.items?.length || 0;
 
     if (profileCount > 0) {
-      // Step 1: Clear config list (single core restart, fast)
-      // This makes the UI appear clean immediately
+      // Step 1: Delete profile files FIRST (while they still exist in config index)
+      const itemsToDelete = profilesData!.items!;
+      for (const item of itemsToDelete) {
+        try {
+          await deleteProfile(item.uid);
+        } catch {
+          // Ignore errors during cleanup
+        }
+      }
+      console.log(`[SubLinks Service] Deleted ${profileCount} profiles`);
+
+      // Step 2: Clear config list after files are deleted
       await patchProfilesConfig({
         current: undefined,
         items: [],
       }).catch(() => {});
-
-      console.log(
-        `[SubLinks Service] Cleared ${profileCount} profiles from config`,
-      );
-
-      // Step 2: Delete actual profile files in background (non-blocking)
-      // User can proceed to login page while files are being cleaned up
-      const itemsToDelete = profilesData!.items!;
-      setTimeout(async () => {
-        for (const item of itemsToDelete) {
-          try {
-            await deleteProfile(item.uid);
-          } catch {
-            // Ignore errors during cleanup
-          }
-        }
-        console.log(
-          "[SubLinks Service] Background profile file cleanup completed",
-        );
-      }, 0);
     } else {
       // No profiles, just clear the config
       await patchProfilesConfig({ items: [], current: undefined }).catch(

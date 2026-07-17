@@ -3,7 +3,7 @@ use crate::config::Config;
 use crate::core::autostart;
 use crate::{cmd::StringifyErr as _, feat, utils::dirs};
 use smartstring::alias::String;
-use tauri::{AppHandle, Manager as _};
+use tauri::{AppHandle, Emitter as _, Manager as _};
 
 /// 打开应用程序所在目录
 #[tauri::command]
@@ -111,10 +111,10 @@ const MINI_WINDOW_HEIGHT: f64 = 56.0;
 #[tauri::command]
 pub async fn open_mini_window(app_handle: AppHandle) -> CmdResult<()> {
     if let Some(window) = app_handle.get_webview_window(MINI_WINDOW_LABEL) {
-        let logical_size = tauri::LogicalSize::new(MINI_WINDOW_WIDTH, MINI_WINDOW_HEIGHT);
-        window.set_size(tauri::Size::Logical(logical_size)).stringify_err()?;
         window.show().stringify_err()?;
         window.set_focus().stringify_err()?;
+        // 通知前端重新计算窗口大小
+        let _ = window.emit("mini-window-shown", ());
         return Ok(());
     }
 
@@ -150,7 +150,7 @@ pub async fn open_mini_window(app_handle: AppHandle) -> CmdResult<()> {
 #[tauri::command]
 pub async fn close_mini_window(app_handle: AppHandle) -> CmdResult<()> {
     if let Some(window) = app_handle.get_webview_window(MINI_WINDOW_LABEL) {
-        window.close().stringify_err()?;
+        window.hide().stringify_err()?;
     }
     Ok(())
 }

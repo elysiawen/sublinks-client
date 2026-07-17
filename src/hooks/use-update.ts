@@ -1,53 +1,46 @@
-import { setCacheData, useQuery } from '@/services/query-client'
-import { checkUpdateSafe } from '@/services/update'
+import { setCacheData, useQuery } from "@/services/query-client";
+import { getUpdateInfo, type IUpdateInfo } from "@/services/update-service";
 
-import { useVerge } from './use-verge'
+import { useVerge } from "./use-verge";
 
-export interface UpdateInfo {
-  version: string
-  body: string
-  date: string
-  available: boolean
-  downloadAndInstall: (onEvent?: any) => Promise<void>
-}
+export type { IUpdateInfo };
 
-const LAST_CHECK_KEY = 'last_check_update'
+const LAST_CHECK_KEY = "last_check_update";
 
 export const readLastCheckTime = (): number | null => {
-  const stored = localStorage.getItem(LAST_CHECK_KEY)
-  if (!stored) return null
-  const ts = parseInt(stored, 10)
-  return isNaN(ts) ? null : ts
-}
+  const stored = localStorage.getItem(LAST_CHECK_KEY);
+  if (!stored) return null;
+  const ts = parseInt(stored, 10);
+  return isNaN(ts) ? null : ts;
+};
 
 export const updateLastCheckTime = (timestamp?: number): number => {
-  const now = timestamp ?? Date.now()
-  localStorage.setItem(LAST_CHECK_KEY, now.toString())
-  setCacheData([LAST_CHECK_KEY], now)
-  return now
-}
+  const now = timestamp ?? Date.now();
+  localStorage.setItem(LAST_CHECK_KEY, now.toString());
+  setCacheData([LAST_CHECK_KEY], now);
+  return now;
+};
 
 // --- useUpdate hook ---
 
 export const useUpdate = (enabled: boolean = true) => {
-  const { verge } = useVerge()
-  const { auto_check_update } = verge || {}
+  const { verge } = useVerge();
+  const { auto_check_update } = verge || {};
 
   // Determine if we should check for updates
-  // If enabled is explicitly false, don't check
-  // Otherwise, respect the auto_check_update setting (or default to true if null/undefined for manual triggers)
-  const shouldCheck = enabled && auto_check_update !== false
+  const updateEnabled = import.meta.env.UPDATE_ENABLED === "true";
+  const shouldCheck = enabled && updateEnabled && auto_check_update !== false;
 
   const {
     data: updateInfo,
     refetch: checkUpdate,
     isFetching: isValidating,
   } = useQuery({
-    queryKey: ['checkUpdate'],
+    queryKey: ["checkUpdate"],
     queryFn: async () => {
-      const result = await checkUpdateSafe()
-      updateLastCheckTime()
-      return result
+      const result = await getUpdateInfo();
+      if (result) updateLastCheckTime();
+      return result;
     },
     enabled: shouldCheck,
     retry: 2,
@@ -55,7 +48,7 @@ export const useUpdate = (enabled: boolean = true) => {
     refetchInterval: 24 * 60 * 60 * 1000,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: false,
-  })
+  });
 
   // Shared last check timestamp
   const { data: lastCheckUpdate } = useQuery({
@@ -63,12 +56,12 @@ export const useUpdate = (enabled: boolean = true) => {
     queryFn: readLastCheckTime,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-  })
+  });
 
   return {
     updateInfo,
     checkUpdate,
     loading: isValidating,
     lastCheckUpdate: lastCheckUpdate ?? null,
-  }
-}
+  };
+};

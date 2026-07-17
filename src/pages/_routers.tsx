@@ -3,7 +3,6 @@ import ForkRightRoundedIcon from "@mui/icons-material/ForkRightRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import InfoOutlined from "@mui/icons-material/InfoOutlined";
 import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
-import LockOpenRoundedIcon from "@mui/icons-material/LockOpenRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import SpeedOutlined from "@mui/icons-material/SpeedOutlined";
 import SubjectRoundedIcon from "@mui/icons-material/SubjectRounded";
@@ -18,7 +17,6 @@ import ProfilesSvg from "@/assets/image/itemicon/profiles.svg?react";
 import ProxiesSvg from "@/assets/image/itemicon/proxies.svg?react";
 import RulesSvg from "@/assets/image/itemicon/rules.svg?react";
 import SettingsSvg from "@/assets/image/itemicon/settings.svg?react";
-import UnlockSvg from "@/assets/image/itemicon/unlock.svg?react";
 import { ensureLanguageSections } from "@/services/i18n";
 
 import Layout from "./_layout";
@@ -152,12 +150,6 @@ export const navItems = [
     icon: [<SubjectRoundedIcon key="mui" />, <LogsSvg key="svg" />],
     Component: () => null /* LogsPage rendered in Layout only on /logs route */,
     preload: preloadLogsPage,
-  },
-  {
-    label: "layout.components.navigation.tabs.unlock",
-    path: "/unlock",
-    icon: [<LockOpenRoundedIcon key="mui" />, <UnlockSvg key="svg" />],
-    ...createLazyRoute(() => import("./unlock")),
   },
   {
     label: "layout.components.navigation.tabs.settings",

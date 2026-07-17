@@ -26,7 +26,6 @@ import {
   MenuItem,
   Paper,
   ThemeProvider,
-  ThemeProvider,
   Typography,
 } from "@mui/material";
 import dayjs from "dayjs";
@@ -44,15 +43,11 @@ import {
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router";
 
-import iconDark from "@/assets/image/icon_dark.svg?react";
-import iconLight from "@/assets/image/icon_light.svg?react";
 import logoIcon from "@/assets/image/logo.ico";
-import LogoSvg from "@/assets/image/logo.svg?react";
 import { BaseErrorBoundary } from "@/components/base";
 import { LayoutItem } from "@/components/layout/layout-item";
 import { LayoutTraffic } from "@/components/layout/layout-traffic";
 import { NoticeManager } from "@/components/layout/notice-manager";
-import { UpdateButton } from "@/components/layout/update-button";
 import {
   WindowControls,
   WindowResizeHandles,
@@ -270,19 +265,19 @@ const Layout = () => {
 
   useEffect(() => {
     if (!themeReady || !pageVisible) {
-      return
+      return;
     }
 
-    const controller = new AbortController()
+    const controller = new AbortController();
     const timerId = window.setTimeout(() => {
-      void preloadNavigationRoutes(controller.signal)
-    }, 2000)
+      void preloadNavigationRoutes(controller.signal);
+    }, 2000);
 
     return () => {
-      controller.abort()
-      window.clearTimeout(timerId)
-    }
-  }, [themeReady, pageVisible])
+      controller.abort();
+      window.clearTimeout(timerId);
+    };
+  }, [themeReady, pageVisible]);
 
   const handleNotice = useCallback(
     (payload: [string, string]) => {
