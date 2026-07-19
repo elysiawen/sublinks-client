@@ -933,7 +933,6 @@ interface IVergeConfig {
   auto_delay_detection_interval_minutes?: number;
   enable_builtin_enhanced?: boolean;
   auto_log_clean?: 0 | 1 | 2 | 3 | 4;
-  sublinks_auto_sync?: boolean;
   enable_auto_backup_schedule?: boolean;
   auto_backup_interval_hours?: number;
   auto_backup_on_change?: boolean;
@@ -946,6 +945,7 @@ interface IVergeConfig {
   enable_hover_jump_navigator?: boolean;
   hover_jump_navigator_delay?: number;
   enable_external_controller?: boolean;
+  sublinks_auto_sync?: boolean;
   enable_mini_window?: boolean;
   mini_window_pos_x?: number;
   mini_window_pos_y?: number;

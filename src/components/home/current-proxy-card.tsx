@@ -114,7 +114,7 @@ export const CurrentProxyCard = () => {
   const { proxies } = useProxiesData();
   const { clashConfig } = useClashConfigData();
   const { rules } = useRulesData();
-  const { refreshProxy, isProfileSwitching } = useAppRefreshers();
+  const { refreshProxy } = useAppRefreshers();
   const { isCoreDataPending } = useCoreDataStatus();
   const { verge } = useVerge();
   const { current: currentProfile } = useProfiles();
@@ -974,7 +974,7 @@ export const CurrentProxyCard = () => {
               value={state.selection.group}
               onChange={handleGroupChange}
               label={t("home.components.currentProxy.labels.group")}
-              disabled={isGlobalMode || isDirectMode || isProfileSwitching}
+              disabled={isGlobalMode || isDirectMode}
             >
               {state.proxyData.groups.map((group) => (
                 <MenuItem key={group.name} value={group.name}>
@@ -994,7 +994,7 @@ export const CurrentProxyCard = () => {
               value={state.selection.proxy}
               onChange={handleProxyChange}
               label={t("home.components.currentProxy.labels.proxy")}
-              disabled={isDirectMode || isProfileSwitching}
+              disabled={isDirectMode}
               renderValue={renderProxyValue}
               MenuProps={{
                 slotProps: {

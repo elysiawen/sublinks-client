@@ -1,6 +1,7 @@
 import { alpha, Box, Button, LinearProgress } from "@mui/material";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { open as openUrl } from "@tauri-apps/plugin-shell";
+import type { DownloadEvent } from "@tauri-apps/plugin-updater";
 import { useLockFn } from "ahooks";
 import type { Ref } from "react";
 import {
@@ -18,7 +19,6 @@ import { BaseDialog, DialogRef } from "@/components/base";
 import { useUpdate } from "@/hooks/use-update";
 import { showNotice } from "@/services/notice-service";
 import { useSetUpdateState, useUpdateState } from "@/services/states";
-import getSystem from "@/utils/get-system";
 
 type MarkdownNode = {
   type: string;
@@ -145,21 +145,21 @@ export function UpdateViewer({ ref }: { ref?: Ref<DialogRef> }) {
   }));
 
   const markdownContent = useMemo(() => {
-    if (!updateInfo?.note) {
+    if (!updateInfo?.body) {
       return "New Version is available";
     }
-    return updateInfo?.note;
+    return updateInfo?.body;
   }, [updateInfo]);
 
   const breakChangeFlag = useMemo(() => {
-    if (!updateInfo?.note) {
+    if (!updateInfo?.body) {
       return false;
     }
-    return updateInfo?.note.toLowerCase().includes("break change");
+    return updateInfo?.body.toLowerCase().includes("break change");
   }, [updateInfo]);
 
   const onUpdate = useLockFn(async () => {
-    if (!updateInfo?.downloadUrl) return;
+    if (!updateInfo?.body) return;
     if (breakChangeFlag) {
       showNotice.error("settings.modals.update.messages.breakChangeError");
       return;
@@ -171,41 +171,32 @@ export function UpdateViewer({ ref }: { ref?: Ref<DialogRef> }) {
     downloadedRef.current = 0;
     totalRef.current = 0;
 
+    const onDownloadEvent = (event: DownloadEvent) => {
+      if (event.event === "Started") {
+        const contentLength = event.data.contentLength ?? 0;
+        totalRef.current = contentLength;
+        setTotal(contentLength);
+        setDownloaded(0);
+        downloadedRef.current = 0;
+        return;
+      }
+
+      if (event.event === "Progress") {
+        setDownloaded((prev) => {
+          const next = prev + event.data.chunkLength;
+          downloadedRef.current = next;
+          return next;
+        });
+      }
+
+      if (event.event === "Finished" && totalRef.current === 0) {
+        totalRef.current = downloadedRef.current;
+        setTotal(downloadedRef.current);
+      }
+    };
+
     try {
-      const response = await fetch(updateInfo.downloadUrl);
-      if (!response.ok) {
-        throw new Error(`Download failed: HTTP ${response.status}`);
-      }
-      const contentLength = Number(response.headers.get("content-length") ?? 0);
-      setTotal(contentLength);
-      totalRef.current = contentLength;
-
-      const reader = response.body?.getReader();
-      if (!reader) {
-        throw new Error("No readable stream available");
-      }
-
-      const chunks: Uint8Array[] = [];
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-        downloadedRef.current += value.length;
-        setDownloaded(downloadedRef.current);
-      }
-
-      const blob = new Blob(chunks as BlobPart[]);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download =
-        updateInfo.version?.fileName ??
-        `${getSystem()}-latest.${getSystem() === "windows" ? "exe" : "tar.gz"}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
+      await updateInfo.downloadAndInstall(onDownloadEvent);
       await relaunch();
     } catch (err: any) {
       showNotice.error(err);
@@ -241,7 +232,7 @@ export function UpdateViewer({ ref }: { ref?: Ref<DialogRef> }) {
             }}
           >
             {t("settings.modals.update.title", {
-              version: updateInfo?.version?.version ?? "",
+              version: updateInfo?.version ?? "",
             })}
           </Box>
           <Button
@@ -250,7 +241,7 @@ export function UpdateViewer({ ref }: { ref?: Ref<DialogRef> }) {
             sx={{ whiteSpace: "nowrap" }}
             onClick={() => {
               openUrl(
-                `https://github.com/clash-verge-rev/clash-verge-rev/releases/tag/v${updateInfo?.version?.version}`,
+                `https://github.com/clash-verge-rev/clash-verge-rev/releases/tag/v${updateInfo?.version}`,
               );
             }}
           >

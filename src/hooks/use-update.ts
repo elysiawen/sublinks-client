@@ -1,9 +1,7 @@
 import { setCacheData, useQuery } from "@/services/query-client";
-import { getUpdateInfo, type IUpdateInfo } from "@/services/update-service";
+import { checkUpdateSafe } from "@/services/update";
 
 import { useVerge } from "./use-verge";
-
-export type { IUpdateInfo };
 
 const LAST_CHECK_KEY = "last_check_update";
 
@@ -28,8 +26,9 @@ export const useUpdate = (enabled: boolean = true) => {
   const { auto_check_update } = verge || {};
 
   // Determine if we should check for updates
-  const updateEnabled = import.meta.env.UPDATE_ENABLED === "true";
-  const shouldCheck = enabled && updateEnabled && auto_check_update !== false;
+  // If enabled is explicitly false, don't check
+  // Otherwise, respect the auto_check_update setting (or default to true if null/undefined for manual triggers)
+  const shouldCheck = enabled && auto_check_update !== false;
 
   const {
     data: updateInfo,
@@ -38,8 +37,8 @@ export const useUpdate = (enabled: boolean = true) => {
   } = useQuery({
     queryKey: ["checkUpdate"],
     queryFn: async () => {
-      const result = await getUpdateInfo();
-      if (result) updateLastCheckTime();
+      const result = await checkUpdateSafe();
+      updateLastCheckTime();
       return result;
     },
     enabled: shouldCheck,

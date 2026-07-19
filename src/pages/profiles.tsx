@@ -120,8 +120,8 @@ const ProfilePage = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { addListener } = useListen();
-  const [syncing, setSyncing] = useState(false);
   const [activatings, setActivatings] = useState<string[]>([]);
+  const [syncing, setSyncing] = useState(false);
   const [switchTarget, setSwitchTarget] = useState<string | null>(null);
   const [visibleSwitchingProfile, setVisibleSwitchingProfile] = useState<
     string | null
@@ -261,6 +261,16 @@ const ProfilePage = () => {
 
   const currentActivatings = () => {
     return [...new Set([profiles.current ?? ""])].filter(Boolean);
+  };
+
+  const onSync = async () => {
+    setSyncing(true);
+    try {
+      await syncSubLinksSubscriptions();
+    } finally {
+      setSyncing(false);
+      await mutateProfiles();
+    }
   };
 
   const onDragEnd = async (event: DragEndEvent) => {
@@ -566,16 +576,6 @@ const ProfilePage = () => {
     setLoadingProfiles(target, true);
     await runProfileUpdates(target);
   });
-
-  const onSync = async () => {
-    setSyncing(true);
-    try {
-      await syncSubLinksSubscriptions();
-    } finally {
-      setSyncing(false);
-      await mutateProfiles();
-    }
-  };
 
   // Batch selection functions
   const toggleBatchMode = () => {
