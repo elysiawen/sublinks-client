@@ -193,7 +193,7 @@ const SettingVergeBasic = ({ onError }: Props) => {
             {Object.values(navigationItems).map((page) => {
               return (
                 <MenuItem key={page.path} value={page.path}>
-                  {t(page.label)}
+                  {t(page.label as never)}
                 </MenuItem>
               );
             })}

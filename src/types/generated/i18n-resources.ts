@@ -93,6 +93,13 @@ export interface TranslationResources {
           };
           title: string;
         };
+        mini: {
+          alwaysOnTop: string;
+          autoHideFullscreen: string;
+          closeMiniWindow: string;
+          realtimeDownload: string;
+          realtimeUpload: string;
+        };
         proxyTun: {
           status: {
             systemProxyDisabled: string;
@@ -143,6 +150,25 @@ export interface TranslationResources {
             minutes: string;
           };
         };
+        welcomeBanner: {
+          greetings: {
+            afternoon: string;
+            earlyMorning: string;
+            evening: string;
+            forenoon: string;
+            lateNight: string;
+            morning: string;
+            night: string;
+            noon: string;
+          };
+          hitokoto: {
+            fallback: string;
+            loading: string;
+          };
+          tooltips: {
+            refreshBackground: string;
+          };
+        };
       };
       page: {
         cards: {
@@ -169,12 +195,27 @@ export interface TranslationResources {
           lightweightMode: string;
           manual: string;
           settings: string;
+          skipVersion: string;
+          updateAvailable: string;
+          updateNow: string;
         };
       };
     };
     layout: {
+      api: {
+        messages: {
+          accountDisabled: string;
+          invalidCredentials: string;
+          serverError: string;
+          sessionExpired: string;
+          usernameAndPasswordRequired: string;
+        };
+      };
       components: {
         navigation: {
+          aboutPage: {
+            attribution: string;
+          };
           menu: {
             collapseNavBar: string;
             expandNavBar: string;
@@ -184,6 +225,7 @@ export interface TranslationResources {
             unlock: string;
           };
           tabs: {
+            about: string;
             connections: string;
             home: string;
             logs: string;
@@ -191,9 +233,63 @@ export interface TranslationResources {
             proxies: string;
             rules: string;
             settings: string;
-            unlock: string;
+            test: string;
+            test_media: string;
+            test_web: string;
+          };
+          userInfo: {
+            amountLogout: string;
+            cancel: string;
+            loggedIn: string;
+            loggingOut: string;
+            logout: string;
+            logoutConfirmationMessage: string;
+            logoutConfirmationTitle: string;
           };
         };
+      };
+      notifications: {
+        autoSyncFailed: string;
+        autoSyncSuccess: string;
+        backToChangePassword: string;
+        browserLogin: string;
+        cannotConnectServer: string;
+        deviceAuthCopyLink: string;
+        deviceAuthDenied: string;
+        deviceAuthDesc: string;
+        deviceAuthExpired: string;
+        deviceAuthManualCopy: string;
+        deviceAuthOpenBrowser: string;
+        deviceAuthSuccess: string;
+        deviceAuthTitle: string;
+        deviceAuthTooMany: string;
+        deviceAuthWaiting: string;
+        loggedOutLocal: string;
+        loggingIn: string;
+        login: string;
+        loginNoToken: string;
+        loginRequestFailed: string;
+        loginSuccess: string;
+        loginTitle: string;
+        logoutFailed: string;
+        logoutSuccess: string;
+        password: string;
+        passwordLogin: string;
+        serverInvalidResponse: string;
+        syncActivating: string;
+        syncComplete: string;
+        syncDeletedCount: string;
+        syncFetchingSubs: string;
+        syncNetworkError: string;
+        syncNewCount: string;
+        syncNoChanges: string;
+        syncProcessingSub: string;
+        syncResult: string;
+        syncUpdatedCount: string;
+        syncVerifying: string;
+        totpCode: string;
+        username: string;
+        verify: string;
       };
     };
     logs: {
@@ -346,6 +442,7 @@ export interface TranslationResources {
         actions: {
           import: string;
           reactivate: string;
+          syncSubscriptions: string;
           updateAll: string;
           viewRuntimeConfig: string;
         };
@@ -568,6 +665,10 @@ export interface TranslationResources {
     };
     settings: {
       components: {
+        sidebar: {
+          essential: string;
+          title: string;
+        };
         verge: {
           advanced: {
             actions: {
@@ -587,7 +688,12 @@ export interface TranslationResources {
               vergeVersion: string;
             };
             notifications: {
+              checking: string;
+              failed: string;
+              fetchUserInfoFailed: string;
               latestVersion: string;
+              newVersion: string;
+              refreshTokenFailed: string;
               versionCopied: string;
             };
             title: string;
@@ -606,6 +712,7 @@ export interface TranslationResources {
               hotkeySetting: string;
               language: string;
               layoutSetting: string;
+              miniWindow: string;
               misc: string;
               startPage: string;
               startupScript: string;
@@ -684,6 +791,12 @@ export interface TranslationResources {
               successColor: string;
               warningColor: string;
             };
+            title: string;
+          };
+          updateDialog: {
+            cancel: string;
+            download: string;
+            releaseTime: string;
             title: string;
           };
         };
@@ -1182,6 +1295,15 @@ export interface TranslationResources {
             tunMode: string;
             tunUnavailable: string;
           };
+        };
+        sublinks: {
+          descriptions: {
+            autoSync: string;
+          };
+          fields: {
+            autoSync: string;
+          };
+          title: string;
         };
         system: {
           fields: {
