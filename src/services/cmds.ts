@@ -49,9 +49,14 @@ export async function saveProfileFile(index: string, fileData: string) {
   );
 }
 
-export async function importProfile(url: string, option?: IProfileOption) {
+export async function importProfile(
+  url: string,
+  name?: string,
+  option?: IProfileOption,
+) {
   return invoke<void>("import_profile", {
     url,
+    name,
     option: option || { with_proxy: true },
   });
 }
