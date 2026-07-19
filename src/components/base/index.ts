@@ -6,10 +6,7 @@ export { BaseLoading } from "./base-loading";
 export { BaseLoadingOverlay } from "./base-loading-overlay";
 export { BasePage } from "./base-page";
 export { BaseSearchBox, type SearchState } from "./base-search-box";
-export {
-  BaseSplitChipEditor,
-  type BaseSplitChipEditorMode,
-} from "./base-split-chip-editor";
+export { BaseSplitChipEditor } from "./base-split-chip-editor";
 export { BaseStyledSelect } from "./base-styled-select";
 export { BaseStyledTextField } from "./base-styled-text-field";
 export { MonacoEditor } from "./monaco-editor";
@@ -19,4 +16,4 @@ export { VirtualList, type VirtualListHandle } from "./virtual-list";
 export {
   StickyVirtualList,
   type StickyVirtualListHandle,
-} from './sticky-virtual-list'
+} from "./sticky-virtual-list";

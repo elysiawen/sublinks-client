@@ -1,6 +1,12 @@
-import { getProfiles, patchProfile, patchProfilesConfig } from '@/services/cmds'
-import { useQuery } from '@/services/query-client'
-import { debugLog } from '@/utils/debug'
+import { useCallback, useRef } from "react";
+
+import {
+  getProfiles,
+  patchProfile,
+  patchProfilesConfig,
+} from "@/services/cmds";
+import { setCacheDataAsync, useQuery } from "@/services/query-client";
+import { debugLog } from "@/utils/debug";
 
 export const useProfiles = () => {
   const {
@@ -9,63 +15,61 @@ export const useProfiles = () => {
     error,
     isFetching: isValidating,
   } = useQuery({
-    queryKey: ['getProfiles'],
+    queryKey: ["getProfiles"],
     queryFn: async () => {
-      const data = await getProfiles()
+      const data = await getProfiles();
       debugLog(
-        '[useProfiles] 配置数据更新成功，配置数量:',
+        "[useProfiles] 配置数据更新成功，配置数量:",
         data?.items?.length || 0,
-      )
-      return data
+      );
+      return data;
     },
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    staleTime: 300, // SubLinks: reduced from 500ms for better responsiveness
+    staleTime: 500,
     retry: 3,
     retryDelay: 1000,
     refetchInterval: false,
-  })
+  });
 
-  const mutateProfiles = async () => {
-    await refetch()
-  }
+  const refetchRef = useRef(refetch);
+  refetchRef.current = refetch;
+  const mutateProfiles = useCallback(async () => {
+    await refetchRef.current();
+  }, []);
 
-  const patchProfiles = async (
-    value: Partial<IProfilesConfig>,
-    signal?: AbortSignal,
-    options?: { deferRefreshOnSuccess?: boolean },
-  ) => {
-    try {
-      if (signal?.aborted) {
-        throw new DOMException('Operation was aborted', 'AbortError')
+  const patchProfiles = useCallback(
+    async (value: Partial<IProfilesConfig>) => {
+      try {
+        const outcome = await patchProfilesConfig(value);
+
+        if (outcome.status === "valid") {
+          await setCacheDataAsync<IProfilesConfig>(
+            ["getProfiles"],
+            (current) => (current ? { ...current, ...value } : current),
+          );
+        } else if (outcome.status !== "busy") {
+          await mutateProfiles();
+        }
+
+        return outcome;
+      } catch (error) {
+        await mutateProfiles();
+        throw error;
       }
-      const success = await patchProfilesConfig(value)
+    },
+    [mutateProfiles],
+  );
 
-      if (signal?.aborted) {
-        throw new DOMException('Operation was aborted', 'AbortError')
+  const patchCurrent = useCallback(
+    async (value: Partial<IProfileItem>) => {
+      if (profiles?.current) {
+        await patchProfile(profiles.current, value);
+        void mutateProfiles();
       }
-
-      if (!options?.deferRefreshOnSuccess || !success) {
-        await mutateProfiles()
-      }
-
-      return success
-    } catch (error) {
-      if (error instanceof DOMException && error.name === 'AbortError') {
-        throw error
-      }
-
-      await mutateProfiles()
-      throw error
-    }
-  }
-
-  const patchCurrent = async (value: Partial<IProfileItem>) => {
-    if (profiles?.current) {
-      await patchProfile(profiles.current, value)
-      mutateProfiles()
-    }
-  }
+    },
+    [mutateProfiles, profiles],
+  );
 
   return {
     profiles,
@@ -77,5 +81,5 @@ export const useProfiles = () => {
     isLoading: isValidating,
     error,
     isStale: !profiles && !error && !isValidating, // 检测是否处于异常状态
-  }
-}
+  };
+};

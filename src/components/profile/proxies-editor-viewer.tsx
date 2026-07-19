@@ -8,6 +8,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import {
+  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
@@ -179,16 +180,6 @@ export const ProxiesEditorViewer = (props: Props) => {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
-  const reorder = (
-    list: IProxyConfig[],
-    startIndex: number,
-    endIndex: number,
-  ) => {
-    const result = Array.from(list);
-    const [removed] = result.splice(startIndex, 1);
-    result.splice(endIndex, 0, removed);
-    return result;
-  };
   const onPrependDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (over) {
@@ -204,7 +195,7 @@ export const ProxiesEditorViewer = (props: Props) => {
           }
         });
 
-        setPrependSeq(reorder(prependSeq, activeIndex, overIndex));
+        setPrependSeq(arrayMove(prependSeq, activeIndex, overIndex));
       }
     }
   };
@@ -222,7 +213,7 @@ export const ProxiesEditorViewer = (props: Props) => {
             overIndex = index;
           }
         });
-        setAppendSeq(reorder(appendSeq, activeIndex, overIndex));
+        setAppendSeq(arrayMove(appendSeq, activeIndex, overIndex));
       }
     }
   };

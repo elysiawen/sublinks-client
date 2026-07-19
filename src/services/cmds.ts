@@ -14,11 +14,13 @@ export async function getProfiles() {
 }
 
 export async function enhanceProfiles() {
-  return invoke<boolean>("enhance_profiles");
+  return (
+    (await invoke<ValidationOutcome>("enhance_profiles")).status === "valid"
+  );
 }
 
 export async function patchProfilesConfig(profiles: IProfilesConfig) {
-  return invoke<boolean>("patch_profiles_config", { profiles });
+  return invoke<ValidationOutcome>("patch_profiles_config", { profiles });
 }
 
 export async function createProfile(
@@ -37,17 +39,19 @@ export async function readProfileFile(index: string) {
 }
 
 export async function saveProfileFile(index: string, fileData: string) {
-  return invoke<boolean>("save_profile_file", { index, fileData });
+  return (
+    (
+      await invoke<ValidationOutcome>("save_profile_file", {
+        index,
+        fileData,
+      })
+    ).status === "valid"
+  );
 }
 
-export async function importProfile(
-  url: string,
-  name?: string,
-  option?: IProfileOption,
-) {
+export async function importProfile(url: string, option?: IProfileOption) {
   return invoke<void>("import_profile", {
     url,
-    name,
     option: option || { with_proxy: true },
   });
 }
@@ -81,7 +85,7 @@ export async function getClashInfo() {
 // Fault-tolerant current proxy mode read (does not depend on mihomo /configs
 // strict BaseConfig deserialization); used as a fallback for the home mode card.
 export async function getClashMode() {
-  return invoke<string | null>('get_clash_mode')
+  return invoke<string | null>("get_clash_mode");
 }
 
 // Get runtime config which controlled by verge
@@ -89,12 +93,12 @@ export async function getRuntimeConfig() {
   return invoke<IConfigData | null>("get_runtime_config");
 }
 
-export async function getRuntimeYaml() {
-  return invoke<string | null>("get_runtime_yaml");
+export async function getRuntimeProxyGroupOrder() {
+  return invoke<string[]>("get_runtime_proxy_group_order");
 }
 
-export async function getRuntimeExists() {
-  return invoke<string[]>("get_runtime_exists");
+export async function getRuntimeYaml() {
+  return invoke<string | null>("get_runtime_yaml");
 }
 
 export async function getRuntimeLogs() {
@@ -132,10 +136,12 @@ export async function calcuProxies(): Promise<{
   records: Record<string, IProxyItem>;
   proxies: IProxyItem[];
 }> {
-  const [proxyResponse, providerResponse] = await Promise.all([
-    getProxies(),
-    calcuProxyProviders(),
-  ]);
+  const [proxyResponse, providerResponse, runtimeGroupOrder] =
+    await Promise.all([
+      getProxies(),
+      calcuProxyProviders(),
+      getRuntimeProxyGroupOrder(),
+    ]);
 
   const proxyRecord = proxyResponse.proxies;
   const providerRecord = providerResponse;
@@ -199,6 +205,19 @@ export async function calcuProxies(): Promise<{
       .concat(globalGroups);
   }
 
+  const groupOrder = new Map(
+    runtimeGroupOrder.map((name, index) => [name, index]),
+  );
+
+  groups.sort((a, b) => {
+    const aIndex = groupOrder.get(a.name) ?? Number.MAX_SAFE_INTEGER;
+    const bIndex = groupOrder.get(b.name) ?? Number.MAX_SAFE_INTEGER;
+    if (aIndex !== bIndex) return aIndex - bIndex;
+    if (a.name < b.name) return -1;
+    if (a.name > b.name) return 1;
+    return 0;
+  });
+
   const proxies = [direct, reject].concat(
     Object.values(proxyRecord).filter(
       (p) => !p?.all?.length && p?.name !== "DIRECT" && p?.name !== "REJECT",
@@ -210,11 +229,14 @@ export async function calcuProxies(): Promise<{
     all: global?.all?.map((item) => generateItem(item)) || [],
   };
 
+  // 原本的 records 拥有所有节点信息，新版本内核需要将 provider 的节点信息合并到 records 中, 同时兼容旧版本数据
+  const records = { ...proxyRecord, ...providerMap };
+
   return {
     global: _global as IProxyGroupItem,
     direct: direct as IProxyItem,
     groups,
-    records: proxyRecord as Record<string, IProxyItem>,
+    records: records as Record<string, IProxyItem>,
     proxies: (proxies as IProxyItem[]) ?? [],
   };
 }
@@ -254,10 +276,6 @@ export async function getClashLogs() {
   }, []);
 }
 
-export async function clearLogs() {
-  return invoke<void>("clear_logs");
-}
-
 export async function getVergeConfig() {
   return invoke<IVergeConfig>("get_verge_config");
 }
@@ -292,21 +310,8 @@ export async function getAutotemProxy() {
   }
 }
 
-export async function getAutoLaunchStatus() {
-  try {
-    return await invoke<boolean>("get_auto_launch_status");
-  } catch (error) {
-    console.error("获取自启动状态失败:", error);
-    return false;
-  }
-}
-
 export async function changeClashCore(clashCore: string) {
   return invoke<string | null>("change_clash_core", { clashCore });
-}
-
-export async function startCore() {
-  return invoke<void>("start_core");
 }
 
 export async function stopCore() {
@@ -345,38 +350,6 @@ export const openWebUrl = async (url: string) => {
   }
 };
 
-export async function cmdGetProxyDelay(
-  name: string,
-  timeout: number,
-  url?: string,
-) {
-  // 确保URL不为空
-  const testUrl = url || "http://cp.cloudflare.com";
-
-  try {
-    // 不再在前端编码代理名称，由后端统一处理编码
-    const result = await invoke<{ delay: number }>(
-      "clash_api_get_proxy_delay",
-      {
-        name,
-        url: testUrl, // 传递经过验证的URL
-        timeout,
-      },
-    );
-
-    // 验证返回结果中是否有delay字段，并且值是一个有效的数字
-    if (result && typeof result.delay === "number") {
-      return result;
-    } else {
-      // 返回一个有效的结果对象，但标记为超时
-      return { delay: 1e6 };
-    }
-  } catch {
-    // 返回一个有效的结果对象，但标记为错误
-    return { delay: 1e6 };
-  }
-}
-
 export async function cmdTestDelay(url: string) {
   return invoke<number>("test_delay", { url });
 }
@@ -387,20 +360,8 @@ export async function invoke_uwp_tool() {
   );
 }
 
-export async function getPortableFlag() {
-  return invoke<boolean>("get_portable_flag");
-}
-
 export async function openDevTools() {
   return invoke("open_devtools");
-}
-
-export async function openMiniWindow() {
-  return invoke("open_mini_window");
-}
-
-export async function closeMiniWindow() {
-  return invoke("close_mini_window");
 }
 
 export async function exitApp() {
@@ -506,7 +467,7 @@ export async function saveWebdavConfig(
 
 export async function listWebDavBackup() {
   const list: IWebDavFile[] = await invoke<IWebDavFile[]>("list_webdav_backup");
-  list.map((item) => {
+  list.forEach((item) => {
     item.filename = item.href.split("/").pop() as string;
   });
   return list;
@@ -514,14 +475,6 @@ export async function listWebDavBackup() {
 
 export async function listLocalBackup() {
   return invoke<ILocalBackupFile[]>("list_local_backup");
-}
-
-export async function scriptValidateNotice(status: string, msg: string) {
-  return invoke<void>("script_validate_notice", { status, msg });
-}
-
-export async function validateScriptFile(filePath: string) {
-  return invoke<boolean>("validate_script_file", { filePath });
 }
 
 // 获取当前运行模式
@@ -544,16 +497,6 @@ export const uninstallService = async () => {
   return invoke<void>("uninstall_service");
 };
 
-// 重装系统服务
-export const reinstallService = async () => {
-  return invoke<void>("reinstall_service");
-};
-
-// 修复系统服务
-export const repairService = async () => {
-  return invoke<void>("repair_service");
-};
-
 // 系统服务是否可用
 export const isServiceAvailable = async () => {
   try {
@@ -565,10 +508,6 @@ export const isServiceAvailable = async () => {
 };
 export const entry_lightweight_mode = async () => {
   return invoke<void>("entry_lightweight_mode");
-};
-
-export const exit_lightweight_mode = async () => {
-  return invoke<void>("exit_lightweight_mode");
 };
 
 export const isAdmin = async () => {
@@ -592,3 +531,11 @@ export const isPortInUse = async (port: number) => {
     return false;
   }
 };
+
+export async function openMiniWindow() {
+  return invoke("open_mini_window");
+}
+
+export async function closeMiniWindow() {
+  return invoke("close_mini_window");
+}

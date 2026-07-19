@@ -57,7 +57,7 @@ import { useI18n } from "@/hooks/use-i18n";
 import { useVerge } from "@/hooks/use-verge";
 import { useVisibility } from "@/hooks/use-visibility";
 import { useWindowDecorations } from "@/hooks/use-window";
-import { useAppData } from "@/providers/app-data-context";
+import { useProxiesData } from "@/providers/app-data-context";
 import { showNotice } from "@/services/notice-service";
 import { useThemeMode } from "@/services/states";
 import {
@@ -402,7 +402,7 @@ const Layout = () => {
     );
   }, [user?.avatar]);
 
-  const { proxies } = useAppData();
+  const { proxies } = useProxiesData();
 
   // Auto-sync subscriptions and user info on startup
   const syncAttemptedRef = useRef(false);

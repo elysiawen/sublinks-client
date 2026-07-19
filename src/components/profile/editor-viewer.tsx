@@ -34,7 +34,7 @@ import getSystem from "@/utils/get-system";
 
 const appWindow = getCurrentWebviewWindow();
 
-export type EditorLanguage = "yaml" | "javascript" | "css";
+type EditorLanguage = "yaml" | "javascript" | "css";
 
 export interface EditorViewerProps {
   open: boolean;
@@ -315,7 +315,7 @@ export const EditorViewer = ({
             startIcon={<RestartAltRounded />}
             disabled={loading}
           >
-            {t('shared.actions.resetToDefault')}
+            {t("shared.actions.resetToDefault")}
           </Button>
         )}
         <Button onClick={handleClose} variant="outlined">

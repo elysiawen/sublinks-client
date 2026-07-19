@@ -1,6 +1,6 @@
-import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual'
-import { useLockFn } from 'ahooks'
-import { throttle } from 'lodash-es'
+import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual";
+import { useLockFn } from "ahooks";
+import { throttle } from "lodash-es";
 import {
   lazy,
   Suspense,
@@ -10,46 +10,46 @@ import {
   useMemo,
   useRef,
   useState,
-} from 'react'
-import { delayGroup, healthcheckProxyProvider } from 'tauri-plugin-mihomo-api'
+} from "react";
+import { delayGroup } from "tauri-plugin-mihomo-api";
 
 import {
   BaseEmpty,
   BaseLoading,
   StickyVirtualList,
   type StickyVirtualListHandle,
-} from '@/components/base'
-import { useProxySelection } from '@/hooks/use-proxy-selection'
-import { useVerge } from '@/hooks/use-verge'
-import { useProxiesData } from '@/providers/app-data-context'
-import { calcuProxies } from '@/services/cmds'
-import delayManager from '@/services/delay'
-import { useQuery } from '@/services/query-client'
-import { debugLog } from '@/utils/debug'
+} from "@/components/base";
+import { useProxySelection } from "@/hooks/use-proxy-selection";
+import { useVerge } from "@/hooks/use-verge";
+import { useProxiesData } from "@/providers/app-data-context";
+import { calcuProxies } from "@/services/cmds";
+import delayManager from "@/services/delay";
+import { useQuery } from "@/services/query-client";
+import { debugLog } from "@/utils/debug";
 
 import {
   DEFAULT_HOVER_DELAY,
   ProxyGroupNavigator,
-} from './proxy-group-navigator'
-import { ProxyRender } from './proxy-render'
-import { type IRenderItem, useRenderList } from './use-render-list'
+} from "./proxy-group-navigator";
+import { ProxyRender } from "./proxy-render";
+import { type IRenderItem, useRenderList } from "./use-render-list";
 
 const ProxyGroupsChain = lazy(() =>
-  import('./proxy-groups-chain').then((m) => ({
+  import("./proxy-groups-chain").then((m) => ({
     default: m.ProxyGroupsChain,
   })),
-)
+);
 
 function useStableCallback<T extends (...args: any[]) => any>(fn: T): T {
-  const ref = useRef(fn)
-  ref.current = fn
-  return useCallback((...args: Parameters<T>) => ref.current(...args), []) as T
+  const ref = useRef(fn);
+  ref.current = fn;
+  return useCallback((...args: Parameters<T>) => ref.current(...args), []) as T;
 }
 
 interface Props {
-  mode: string
-  isChainMode?: boolean
-  chainConfigData?: string | null
+  mode: string;
+  isChainMode?: boolean;
+  chainConfigData?: string | null;
 }
 
 function useProxyRenderState(
@@ -57,119 +57,102 @@ function useProxyRenderState(
   isChainMode: boolean,
   activeSelectedGroup: string | null,
 ) {
-  const { verge } = useVerge()
+  const { verge } = useVerge();
   const { renderList, onProxies, onHeadState } = useRenderList(
     mode,
     isChainMode,
     activeSelectedGroup,
-  )
+  );
   const scrollPositionKey = useMemo(
     () =>
       isChainMode
-        ? `${mode}:chain:${activeSelectedGroup ?? 'all'}`
+        ? `${mode}:chain:${activeSelectedGroup ?? "all"}`
         : `${mode}:normal`,
     [activeSelectedGroup, isChainMode, mode],
-  )
+  );
 
   const getGroupHeadState = useCallback(
     (groupName: string) => {
       const headItem = renderList.find(
         (item) => item.type === 1 && item.group?.name === groupName,
-      )
-      return headItem?.headState
+      );
+      return headItem?.headState;
     },
     [renderList],
-  )
+  );
 
-  const timeout = verge?.default_latency_timeout || 10000
+  const timeout = verge?.default_latency_timeout || 10000;
 
   // 测全部延迟
   const handleCheckAll = useStableCallback(
     useLockFn(async (groupName: string) => {
-      debugLog(`[ProxyGroups] 开始测试所有延迟，组: ${groupName}`)
+      debugLog(`[ProxyGroups] 开始测试所有延迟，组: ${groupName}`);
 
       const proxies = renderList
         .filter(
           (e) => e.group?.name === groupName && (e.type === 2 || e.type === 4),
         )
         .flatMap((e) => e.proxyCol || e.proxy!)
-        .filter(Boolean)
+        .filter(Boolean);
 
-      debugLog(`[ProxyGroups] 找到代理数量: ${proxies.length}`)
+      debugLog(`[ProxyGroups] 找到代理数量: ${proxies.length}`);
 
-      const providers = new Set(
-        proxies.map((p) => p!.provider!).filter(Boolean),
-      )
-
-      if (providers.size) {
-        debugLog(`[ProxyGroups] 发现提供者，数量: ${providers.size}`)
-        Promise.allSettled(
-          [...providers].map((p) => healthcheckProxyProvider(p)),
-        ).then(() => {
-          debugLog(`[ProxyGroups] 提供者健康检查完成`)
-          onProxies()
-        })
-      }
-
-      const names = proxies.filter((p) => !p!.provider).map((p) => p!.name)
-      debugLog(`[ProxyGroups] 过滤后需要测试的代理数量: ${names.length}`)
-
-      const url = delayManager.getUrl(groupName)
-      debugLog(`[ProxyGroups] 测试URL: ${url}, 超时: ${timeout}ms`)
+      const url = delayManager.getUrl(groupName);
+      debugLog(`[ProxyGroups] 测试URL: ${url}, 超时: ${timeout}ms`);
 
       try {
         await Promise.race([
-          delayManager.checkListDelay(names, groupName, timeout),
+          delayManager.checkListDelay(proxies, groupName, timeout),
           delayGroup(groupName, url, timeout).then((result) => {
             debugLog(
               `[ProxyGroups] getGroupProxyDelays返回结果数量:`,
               Object.keys(result || {}).length,
-            )
+            );
           }), // 查询group delays 将清除fixed(不关注调用结果)
-        ])
-        debugLog(`[ProxyGroups] 延迟测试完成，组: ${groupName}`)
+        ]);
+        debugLog(`[ProxyGroups] 延迟测试完成，组: ${groupName}`);
       } catch (error) {
-        console.error(`[ProxyGroups] 延迟测试出错，组: ${groupName}`, error)
+        console.error(`[ProxyGroups] 延迟测试出错，组: ${groupName}`, error);
       } finally {
-        const headState = getGroupHeadState(groupName)
+        const headState = getGroupHeadState(groupName);
         if (headState?.sortType === 1) {
-          onHeadState(groupName, { sortType: headState.sortType })
+          onHeadState(groupName, { sortType: headState.sortType });
         }
-        onProxies()
+        onProxies();
       }
     }),
-  )
+  );
 
   const saveScrollPosition = useCallback(
     (scrollTop: number) => {
-      const scrollPositions = localStorage.getItem('proxy-scroll-positions')
-        ? JSON.parse(localStorage.getItem('proxy-scroll-positions') ?? '{}')
-        : {}
-      scrollPositions[scrollPositionKey] = scrollTop
+      const scrollPositions = localStorage.getItem("proxy-scroll-positions")
+        ? JSON.parse(localStorage.getItem("proxy-scroll-positions") ?? "{}")
+        : {};
+      scrollPositions[scrollPositionKey] = scrollTop;
       try {
         localStorage.setItem(
-          'proxy-scroll-positions',
+          "proxy-scroll-positions",
           JSON.stringify(scrollPositions),
-        )
+        );
       } catch (e) {
-        console.error('Error saving scroll position:', e)
+        console.error("Error saving scroll position:", e);
       }
     },
     [scrollPositionKey],
-  )
+  );
 
   const getScrollPosition = useCallback(() => {
     try {
-      const savedPositions = localStorage.getItem('proxy-scroll-positions')
+      const savedPositions = localStorage.getItem("proxy-scroll-positions");
       if (savedPositions) {
-        const positions = JSON.parse(savedPositions)
-        const savedPosition = positions[scrollPositionKey]
-        return savedPosition ?? 0
+        const positions = JSON.parse(savedPositions);
+        const savedPosition = positions[scrollPositionKey];
+        return savedPosition ?? 0;
       }
     } catch (e) {
-      console.error('Error restoring scroll position:', e)
+      console.error("Error restoring scroll position:", e);
     }
-  }, [scrollPositionKey])
+  }, [scrollPositionKey]);
 
   return {
     verge,
@@ -179,68 +162,68 @@ function useProxyRenderState(
     handleCheckAll,
     saveScrollPosition,
     getScrollPosition,
-  }
+  };
 }
 
 function ChainProxyGroups(props: {
-  mode: string
-  chainConfigData?: string | null
+  mode: string;
+  chainConfigData?: string | null;
 }) {
-  const { mode, chainConfigData } = props
-  const { proxies: proxiesData } = useProxiesData()
-  const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
+  const { mode, chainConfigData } = props;
+  const { proxies: proxiesData } = useProxiesData();
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
 
   const availableGroups = useMemo(() => {
-    const groups = proxiesData?.groups
-    if (!groups) return []
+    const groups = proxiesData?.groups;
+    if (!groups) return [];
     return groups.filter(
-      (group: any) => group.type === 'Selector' || group.type === 'URLTest',
-    )
-  }, [proxiesData?.groups])
+      (group: any) => group.type === "Selector" || group.type === "URLTest",
+    );
+  }, [proxiesData?.groups]);
 
   const defaultRuleGroup = useMemo(() => {
-    if (mode === 'rule' && availableGroups.length > 0) {
-      return availableGroups[0].name
+    if (mode === "rule" && availableGroups.length > 0) {
+      return availableGroups[0].name;
     }
-    return null
-  }, [availableGroups, mode])
+    return null;
+  }, [availableGroups, mode]);
 
-  const activeSelectedGroup = selectedGroup ?? defaultRuleGroup
+  const activeSelectedGroup = selectedGroup ?? defaultRuleGroup;
   const {
     renderList,
     onHeadState,
     handleCheckAll,
     getScrollPosition,
     saveScrollPosition,
-  } = useProxyRenderState(mode, true, activeSelectedGroup)
+  } = useProxyRenderState(mode, true, activeSelectedGroup);
 
-  const parentRef = useRef<HTMLDivElement>(null)
-  const scrollTopRef = useRef(0)
-  const showScrollTopRef = useRef(false)
-  const activeStickyIndexRef = useRef<number | null>(null)
-  const [showScrollTop, setShowScrollTop] = useState(false)
+  const parentRef = useRef<HTMLDivElement>(null);
+  const scrollTopRef = useRef(0);
+  const showScrollTopRef = useRef(false);
+  const activeStickyIndexRef = useRef<number | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const stickyGroupIndexes = useMemo(
     () =>
       renderList.flatMap((item, index) =>
         item.type === 0 && !item.group.hidden ? [index] : [],
       ),
     [renderList],
-  )
+  );
 
   const rangeExtractor = useCallback(
     (range: Parameters<typeof defaultRangeExtractor>[0]) => {
       const activeStickyIndex = [...stickyGroupIndexes]
         .reverse()
-        .find((index) => index <= range.startIndex)
-      activeStickyIndexRef.current = activeStickyIndex ?? null
+        .find((index) => index <= range.startIndex);
+      activeStickyIndexRef.current = activeStickyIndex ?? null;
 
-      const indexes = defaultRangeExtractor(range)
+      const indexes = defaultRangeExtractor(range);
       return activeStickyIndex == null || indexes.includes(activeStickyIndex)
         ? indexes
-        : [activeStickyIndex, ...indexes]
+        : [activeStickyIndex, ...indexes];
     },
     [stickyGroupIndexes],
-  )
+  );
 
   const virtualizer = useVirtualizer({
     count: renderList.length,
@@ -249,74 +232,74 @@ function ChainProxyGroups(props: {
     overscan: 15,
     getItemKey: (index) => renderList[index]?.key ?? index,
     rangeExtractor,
-  })
-  const virtualItems = virtualizer.getVirtualItems()
-  const activeStickyIndex = activeStickyIndexRef.current
+  });
+  const virtualItems = virtualizer.getVirtualItems();
+  const activeStickyIndex = activeStickyIndexRef.current;
 
   // 从 localStorage 恢复滚动位置
   useLayoutEffect(() => {
-    if (renderList.length === 0) return
-    const node = parentRef.current
-    if (!node) return
+    if (renderList.length === 0) return;
+    const node = parentRef.current;
+    if (!node) return;
 
-    const savedPosition = getScrollPosition()
+    const savedPosition = getScrollPosition();
     if (savedPosition !== undefined) {
-      node.scrollTop = savedPosition
-      scrollTopRef.current = savedPosition
-      const nextShowScrollTop = savedPosition > 100
-      showScrollTopRef.current = nextShowScrollTop
-      queueMicrotask(() => setShowScrollTop(nextShowScrollTop))
+      node.scrollTop = savedPosition;
+      scrollTopRef.current = savedPosition;
+      const nextShowScrollTop = savedPosition > 100;
+      showScrollTopRef.current = nextShowScrollTop;
+      queueMicrotask(() => setShowScrollTop(nextShowScrollTop));
     }
-  }, [renderList.length, getScrollPosition])
+  }, [renderList.length, getScrollPosition]);
 
   const saveScrollPositionThrottled = useMemo(
     () => throttle(saveScrollPosition, 500),
     [saveScrollPosition],
-  )
+  );
 
   const handleScroll = useCallback(
     (event: Event) => {
-      const target = event.target as HTMLElement | null
-      const nextScrollTop = target?.scrollTop ?? 0
-      const nextShowScrollTop = nextScrollTop > 100
-      scrollTopRef.current = nextScrollTop
+      const target = event.target as HTMLElement | null;
+      const nextScrollTop = target?.scrollTop ?? 0;
+      const nextShowScrollTop = nextScrollTop > 100;
+      scrollTopRef.current = nextScrollTop;
 
       if (showScrollTopRef.current !== nextShowScrollTop) {
-        showScrollTopRef.current = nextShowScrollTop
-        setShowScrollTop(nextShowScrollTop)
+        showScrollTopRef.current = nextShowScrollTop;
+        setShowScrollTop(nextShowScrollTop);
       }
 
-      saveScrollPositionThrottled(nextScrollTop)
+      saveScrollPositionThrottled(nextScrollTop);
     },
     [saveScrollPositionThrottled],
-  )
+  );
 
   useEffect(() => {
-    const node = parentRef.current
-    if (!node) return
+    const node = parentRef.current;
+    if (!node) return;
 
-    const listener = handleScroll as EventListener
-    const options: AddEventListenerOptions = { passive: true }
+    const listener = handleScroll as EventListener;
+    const options: AddEventListenerOptions = { passive: true };
 
-    node.addEventListener('scroll', listener, options)
+    node.addEventListener("scroll", listener, options);
 
     return () => {
-      saveScrollPosition(scrollTopRef.current)
-      node.removeEventListener('scroll', listener, options)
-    }
-  }, [handleScroll, saveScrollPosition])
+      saveScrollPosition(scrollTopRef.current);
+      node.removeEventListener("scroll", listener, options);
+    };
+  }, [handleScroll, saveScrollPosition]);
 
   const scrollToTop = useCallback(() => {
     parentRef.current?.scrollTo?.({
       top: 0,
-      behavior: 'smooth',
-    })
-    scrollTopRef.current = 0
-  }, [])
+      behavior: "smooth",
+    });
+    scrollTopRef.current = 0;
+  }, []);
 
   const handleLocation = useStableCallback((group: IProxyGroupItem) => {
-    if (!group) return
-    const { name, now } = group
+    if (!group) return;
+    const { name, now } = group;
 
     const index = renderList.findIndex(
       (item) =>
@@ -324,15 +307,15 @@ function ChainProxyGroups(props: {
         ((item.type === 2 && item.proxy?.name === now) ||
           (item.type === 4 &&
             item.proxyCol?.some((proxy) => proxy.name === now))),
-    )
+    );
 
     if (index >= 0) {
       virtualizer.scrollToIndex(index, {
-        align: 'center',
-        behavior: 'smooth',
-      })
+        align: "center",
+        behavior: "smooth",
+      });
     }
-  })
+  });
 
   return (
     <Suspense fallback={<BaseLoading />}>
@@ -355,12 +338,12 @@ function ChainProxyGroups(props: {
         onScrollToTop={scrollToTop}
       />
     </Suspense>
-  )
+  );
 }
 
 function NormalProxyGroups(props: { mode: string }) {
-  const { mode } = props
-  const stickyListRef = useRef<StickyVirtualListHandle>(null)
+  const { mode } = props;
+  const stickyListRef = useRef<StickyVirtualListHandle>(null);
   const {
     verge,
     renderList,
@@ -369,142 +352,176 @@ function NormalProxyGroups(props: { mode: string }) {
     handleCheckAll,
     getScrollPosition,
     saveScrollPosition,
-  } = useProxyRenderState(mode, false, null)
-  const renderFirstRef = useRef(true)
+  } = useProxyRenderState(mode, false, null);
+  const renderFirstRef = useRef(true);
+  // 恢复滚动位置期间设为 true，避免程序化滚动触发的 scroll 事件把中间值写回存储
+  const isRestoringRef = useRef(false);
 
   // 目前无法使用 StickyVirtualList 的 initialOffset 值设置初始化，具体原因需排查
   // 从 localStorage 恢复滚动位置
   useLayoutEffect(() => {
-    if (renderList.length === 0) return
-    const node = stickyListRef.current?.getScrollElement()
-    if (!node) return
-    if (!renderFirstRef.current) return
+    if (renderList.length === 0) return;
+    if (!renderFirstRef.current) return;
+    const node = stickyListRef.current?.getScrollElement();
+    if (!node) return;
 
-    const savedPosition = getScrollPosition()
-    if (savedPosition !== undefined) {
-      node.scrollTop = savedPosition
-      if (node.scrollTop === savedPosition) {
-        renderFirstRef.current = false
-      }
-    } else {
-      // The position that hasn't been saved yet during the first render
-      renderFirstRef.current = false
+    const savedPosition = getScrollPosition();
+    // 未保存过位置或位置为 0（顶部）时无需恢复
+    if (!savedPosition) {
+      renderFirstRef.current = false;
+      return;
     }
-  }, [renderList.length, getScrollPosition])
+
+    // 虚拟列表初始使用预估高度，真实高度测量完成后总高度才会稳定。
+    // 尤其是过滤后节点数变少时，预估总高度常常不足以一次性滚动到目标位置，
+    // 因此跨帧重试，直到到达目标位置（或内容确实不够高）为止。
+    isRestoringRef.current = true;
+    let rafId = 0;
+    let attempts = 0;
+    const maxAttempts = 30;
+
+    const step = () => {
+      const el = stickyListRef.current?.getScrollElement();
+      if (!el) {
+        isRestoringRef.current = false;
+        return;
+      }
+
+      el.scrollTop = savedPosition;
+      attempts += 1;
+
+      const reached = Math.abs(el.scrollTop - savedPosition) <= 1;
+      if (reached || attempts >= maxAttempts) {
+        renderFirstRef.current = false;
+        isRestoringRef.current = false;
+        return;
+      }
+
+      rafId = requestAnimationFrame(step);
+    };
+
+    rafId = requestAnimationFrame(step);
+    return () => {
+      cancelAnimationFrame(rafId);
+      isRestoringRef.current = false;
+    };
+  }, [renderList.length, getScrollPosition]);
 
   const saveScrollPositionThrottled = useMemo(
     () => throttle(saveScrollPosition, 500),
     [saveScrollPosition],
-  )
+  );
 
   const handleScroll = useCallback(
     (event: Event) => {
-      const target = event.target as HTMLElement | null
-      const nextScrollTop = target?.scrollTop ?? 0
+      // 恢复位置过程中产生的滚动不写回存储，避免中间的钳制值覆盖真实位置
+      if (isRestoringRef.current) return;
+      const target = event.target as HTMLElement | null;
+      const nextScrollTop = target?.scrollTop ?? 0;
 
-      saveScrollPositionThrottled(nextScrollTop)
+      saveScrollPositionThrottled(nextScrollTop);
     },
     [saveScrollPositionThrottled],
-  )
+  );
 
   useEffect(() => {
-    const node = stickyListRef.current?.getScrollElement()
-    if (!node) return
+    const node = stickyListRef.current?.getScrollElement();
+    if (!node) return;
 
-    const listener = handleScroll as EventListener
-    const options: AddEventListenerOptions = { passive: true }
+    const listener = handleScroll as EventListener;
+    const options: AddEventListenerOptions = { passive: true };
 
-    node.addEventListener('scroll', listener, options)
+    node.addEventListener("scroll", listener, options);
 
     return () => {
-      node.removeEventListener('scroll', listener, options)
-    }
-  }, [handleScroll])
+      node.removeEventListener("scroll", listener, options);
+    };
+  }, [handleScroll]);
 
   const { handleProxyGroupChange } = useProxySelection({
     onSuccess: () => {
-      onProxies()
+      onProxies();
     },
     onError: (error) => {
-      console.error('代理切换失败', error)
-      onProxies()
+      console.error("代理切换失败", error);
+      onProxies();
     },
-  })
+  });
 
   const handleChangeProxy = useCallback(
     (group: IProxyGroupItem, proxy: IProxyItem) => {
-      if (!['Selector', 'URLTest', 'Fallback'].includes(group.type)) return
+      if (!["Selector", "URLTest", "Fallback"].includes(group.type)) return;
 
-      handleProxyGroupChange(group, proxy)
+      handleProxyGroupChange(group, proxy);
     },
     [handleProxyGroupChange],
-  )
+  );
 
   // 滚到对应的节点
   const handleLocation = useStableCallback((group: IProxyGroupItem) => {
-    if (!group) return
-    const { name, now } = group
+    if (!group) return;
+    const { name, now } = group;
 
     const index = renderList.findIndex(
       (e) =>
         e.group?.name === name &&
         ((e.type === 2 && e.proxy?.name === now) ||
           (e.type === 4 && e.proxyCol?.some((p) => p.name === now))),
-    )
+    );
 
     if (index >= 0) {
       stickyListRef.current?.scrollToIndex(index, {
-        align: 'center',
-        behavior: 'smooth',
-      })
+        align: "center",
+        behavior: "smooth",
+      });
     }
-  })
+  });
 
   // 定位到指定的代理组
   const handleGroupLocationByName = useCallback(
     (groupName: string) => {
       const index = renderList.findIndex(
         (item) => item.type === 0 && item.group?.name === groupName,
-      )
+      );
 
       if (index >= 0) {
         stickyListRef.current?.scrollToIndex(index, {
-          align: 'start',
-          behavior: 'smooth',
-        })
+          align: "start",
+          behavior: "smooth",
+        });
       }
     },
     [renderList],
-  )
+  );
 
   const proxyGroupNames = useMemo(() => {
     const names = renderList
       .filter((item) => item.type === 0 && item.group?.name)
-      .map((item) => item.group!.name)
-    return Array.from(new Set(names))
-  }, [renderList])
+      .map((item) => item.group!.name);
+    return Array.from(new Set(names));
+  }, [renderList]);
 
   // 点击代理组改变展开状态，先滚动到sticky的代理组位置，再收起展开状态
   const handleGroupToggle = useCallback(
     async (group: IProxyGroupItem) => {
       const index = renderList.findIndex(
         (item) => item.type === 0 && item.group.name === group.name,
-      )
-      if (index < 0) return
+      );
+      if (index < 0) return;
 
-      if (!stickyListRef.current?.isItemScrolledPastStart(index, 1)) return
+      if (!stickyListRef.current?.isItemScrolledPastStart(index, 1)) return;
 
       stickyListRef.current.scrollToIndex(index, {
-        align: 'start',
-        behavior: 'auto',
-      })
+        align: "start",
+        behavior: "auto",
+      });
 
       await new Promise<void>((resolve) => {
-        requestAnimationFrame(() => resolve())
-      })
+        requestAnimationFrame(() => resolve());
+      });
     },
     [renderList],
-  )
+  );
 
   const renderGroupItem = useCallback(
     (item: IRenderItem, _index: number, stickyed: boolean) => (
@@ -513,7 +530,13 @@ function NormalProxyGroups(props: { mode: string }) {
         stickyed={stickyed}
         onLocation={handleLocation}
         onCheckAll={handleCheckAll}
-        onHeadState={onHeadState}
+        onHeadState={async (groupName, patch) => {
+          if (stickyed && patch.filterText !== undefined) {
+            handleGroupLocationByName(groupName);
+            await stickyListRef.current?.waitForScrollEnd();
+          }
+          onHeadState(groupName, patch);
+        }}
         onChangeProxy={handleChangeProxy}
         onGroupToggle={handleGroupToggle}
       />
@@ -524,8 +547,9 @@ function NormalProxyGroups(props: { mode: string }) {
       onHeadState,
       handleLocation,
       handleGroupToggle,
+      handleGroupLocationByName,
     ],
-  )
+  );
 
   const renderProxyItem = useCallback(
     (item: IRenderItem) => (
@@ -539,10 +563,10 @@ function NormalProxyGroups(props: { mode: string }) {
       />
     ),
     [handleChangeProxy, handleCheckAll, onHeadState, handleLocation],
-  )
+  );
 
   return (
-    <div style={{ position: 'relative', height: '100%' }}>
+    <div style={{ position: "relative", height: "100%" }}>
       <StickyVirtualList
         ref={stickyListRef}
         items={renderList}
@@ -555,7 +579,7 @@ function NormalProxyGroups(props: { mode: string }) {
       />
 
       {/* 代理组导航栏 */}
-      {mode === 'rule' && (
+      {mode === "rule" && (
         <ProxyGroupNavigator
           proxyGroupNames={proxyGroupNames}
           onGroupLocation={handleGroupLocationByName}
@@ -564,30 +588,30 @@ function NormalProxyGroups(props: { mode: string }) {
         />
       )}
     </div>
-  )
+  );
 }
 
 export const ProxyGroups = (props: Props) => {
-  const { mode, isChainMode = false, chainConfigData } = props
+  const { mode, isChainMode = false, chainConfigData } = props;
 
   // Drive 3s polling on the shared TQ cache; data is read via granular context below
   useQuery({
-    queryKey: ['getProxies'],
+    queryKey: ["getProxies"],
     queryFn: calcuProxies,
     refetchInterval: 3000,
     refetchIntervalInBackground: false,
     staleTime: 1500,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-  })
+  });
 
-  if (mode === 'direct') {
-    return <BaseEmpty textKey="proxies.page.messages.directMode" />
+  if (mode === "direct") {
+    return <BaseEmpty textKey="proxies.page.messages.directMode" />;
   }
 
   if (isChainMode) {
-    return <ChainProxyGroups mode={mode} chainConfigData={chainConfigData} />
+    return <ChainProxyGroups mode={mode} chainConfigData={chainConfigData} />;
   }
 
-  return <NormalProxyGroups mode={mode} />
-}
+  return <NormalProxyGroups mode={mode} />;
+};

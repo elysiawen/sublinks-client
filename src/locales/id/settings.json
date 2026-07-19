@@ -454,7 +454,6 @@
         "update": "Update"
       },
       "messages": {
-        "portableError": "Versi portabel tidak mendukung pembaruan dalam aplikasi. Harap unduh dan ganti secara manual",
         "breakChangeError": "Versi ini adalah pembaruan besar dan tidak mendukung pembaruan dalam aplikasi. Harap hapus instalasi dan unduh serta instal versi baru secara manual"
       }
     },
@@ -632,11 +631,6 @@
         "entryLightweightMode": "Entry Lightweight Mode",
         "direct": "Mode Langsung",
         "reactivateProfiles": "Reaktivasi Profil"
-      }
-    },
-    "password": {
-      "prompts": {
-        "enterRoot": "Harap masukkan kata sandi root Anda"
       }
     },
     "networkInterface": {

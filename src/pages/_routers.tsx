@@ -4,7 +4,6 @@ import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import InfoOutlined from "@mui/icons-material/InfoOutlined";
 import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
-import SpeedOutlined from "@mui/icons-material/SpeedOutlined";
 import SubjectRoundedIcon from "@mui/icons-material/SubjectRounded";
 import WifiRoundedIcon from "@mui/icons-material/WifiRounded";
 import { lazy, Suspense, type ComponentType } from "react";
@@ -23,7 +22,6 @@ import Layout from "./_layout";
 import AboutPage from "./about";
 import HomePage from "./home";
 import MiniPage from "./mini";
-import TestPage from "./test";
 
 const waitForWarmupIdle = (signal: AbortSignal) =>
   new Promise<void>((resolve) => {
@@ -125,12 +123,6 @@ export const navItems = [
     path: "/profile",
     icon: [<DnsRoundedIcon key="mui" />, <ProfilesSvg key="svg" />],
     ...createLazyRoute(() => import("./profiles"), "rules"),
-  },
-  {
-    label: "layout.components.navigation.tabs.test",
-    path: "/test",
-    icon: [<SpeedOutlined key="mui" />, <WifiRoundedIcon key="svg" />],
-    Component: TestPage,
   },
   {
     label: "layout.components.navigation.tabs.connections",
