@@ -79,40 +79,16 @@
 - 修复通过普通导入或深链导入订阅后，自动更新任务未及时生效的问题
 - 修复链式配置文件首次编辑失败及校验回滚后遗留空文件的问题，并优化文件读取错误提示
 
+## v2.5.3
+
+### 🐞 修复问题
+
 <details>
 <summary><strong> ✨ 新增功能 </strong></summary>
-
-- **Mihomo(Meta) 内核升级至 v1.19.29**
-- 增加 TrustTunnel、OpenVPN、Tailscale、GostRelay 节点显示支持
-- 全局扩展脚本增加恢复默认按钮
-- DNS 添加 fake-ip-range6 可配置项
-- Linux 无边框窗口支持拖拽调整大小
-- 代理组新增筛选、排序、延迟测试和快速定位工具
-- 首页当前节点过滤已隐藏的代理组
 
 </details>
 
 <details>
 <summary><strong> 🚀 优化改进 </strong></summary>
-
-- 更健壮的服务生命周期管理
-- 更健壮的 Mihomo API 通信机制
-- 关闭 autofill 弹出窗口
-- 改进切换订阅后激活选中节点的逻辑
-- 实现代理组粘性滚动列表
-- 完善了配置覆写的相关逻辑
-- 支持 Provider 节点延迟检测
-- 优化页面不可见时的 Mihomo WebSocket 订阅，减少后台资源占用
-- 代理组支持分别恢复普通模式和链式代理模式的滚动位置
-- 重构改进订阅配置切换逻辑
-- 优化大量订阅卡片时的拖拽排序性能
-
-</details>
-
-<details>
-<summary><strong> 👙 界面样式 </strong></summary>
-
-- 改进 Sticky Groups 的吸顶阴影、间距和展开/折叠样式
-- 优化代理组工具栏和筛选框布局
 
 </details>
